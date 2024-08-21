@@ -9,6 +9,12 @@ public enum SatelliteType: Int {
   case rectangle
 }
 
+public enum Direction {
+  case random
+  case clockWise
+  case counterClockWise
+}
+
 public class Satellite: SKShapeNode {
 
 //  let type: SatelliteType
@@ -18,14 +24,23 @@ public class Satellite: SKShapeNode {
     return true
   }
 
-  class func random(amount: Int = 10, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting) -> [Satellite] {
+  class func random(amount: Int = 10, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
     var satellites: [Satellite] = []
-    let left = Bool.random()
+    let clockWise: Bool
+    switch direction {
+      case .random:
+        clockWise = Bool.random()
+      case .clockWise:
+        clockWise = true
+      case .counterClockWise:
+        clockWise = false
+    }
     for _ in 0..<amount {
       let maxValue = sceneSize.width/2 - 10
       var randomX = CGFloat.random(in: 50..<maxValue)
-      let randomYVelocity = CGFloat.random(in: 50..<200)
-      if left {
+      let randomYVelocity = CGFloat.random(in: 50..<180)
+//      print("(\(randomX), \(randomYVelocity))")
+      if clockWise {
         randomX *= -1
       }
       let position = CGPoint(x: randomX, y: 0)

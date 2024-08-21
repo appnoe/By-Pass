@@ -27,17 +27,20 @@ class GameViewController: UIViewController {
     settingsView.showHideButton.addTarget(self, action: #selector(toggleSettings), for: .touchUpInside)
     settingsView.zoomSwitch.addTarget(self, action: #selector(toggleZoomButtons), for: .valueChanged)
     settingsView.starsSwitch.addTarget(self, action: #selector(toggleStars), for: .valueChanged)
+//    settingsView.gravityFieldSwitch.addTarget(self, action: #selector(toggleGravityField), for: .valueChanged)
     settingsView.gravityControl.addTarget(self, action: #selector(changeGravity), for: .valueChanged)
     settingsView.loadButton.addTarget(self, action: #selector(loadScene), for: .touchUpInside)
     settingsView.saveButton.addTarget(self, action: #selector(saveScene), for: .touchUpInside)
     settingsView.tipJarButton.addTarget(self, action: #selector(showTipJar), for: .touchUpInside)
     settingsView.shareImageButton.addTarget(self, action: #selector(shareImage), for: .touchUpInside)
+    settingsView.clockWiseButton.addTarget(self, action: #selector(clockWiseRandom), for: .touchUpInside)
     settingsView.randomButton.addTarget(self, action: #selector(random), for: .touchUpInside)
+    settingsView.counterClockWiseButton.addTarget(self, action: #selector(counterClockWiseRandom), for: .touchUpInside)
     settingsView.clearButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
     settingsView.colorControl.addTarget(self, action: #selector(changeColor), for: .valueChanged)
     settingsView.backgroundColorControl.addTarget(self, action: #selector(changeBackgroundColor), for: .valueChanged)
-    settingsView.trailLengthControl.addTarget(self, action: #selector(changeTrailLength), for: .valueChanged)
-    settingsView.trailThicknessControl.addTarget(self, action: #selector(changeTrailThickness), for: .valueChanged)
+//    settingsView.trailLengthControl.addTarget(self, action: #selector(changeTrailLength), for: .valueChanged)
+//    settingsView.trailThicknessControl.addTarget(self, action: #selector(changeTrailThickness), for: .valueChanged)
 
     contentView.zoomStepper.addTarget(self, action: #selector(zoomChanged), for: .valueChanged)
     contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
@@ -176,6 +179,10 @@ extension GameViewController {
     gameScene?.setStars(enabled: sender.isOn)
   }
 
+  @objc func toggleGravityField(_ sender: UISwitch) {
+    gameScene?.model.gravityNode.isEnabled.toggle()
+  }
+
   @objc func toggleZoomButtons(_ sender: UISwitch) {
     contentView.zoomStackView.isHidden = !sender.isOn
   }
@@ -210,11 +217,15 @@ extension GameViewController {
     scene.model.mode = mode
     switch mode {
       case .gravity:
-        contentView.settingsView.trailLengthControl.isEnabled = true
+//        contentView.settingsView.trailLengthControl.isEnabled = true
+        contentView.settingsView.clockWiseButton.isEnabled = true
         contentView.settingsView.randomButton.isEnabled = true
+        contentView.settingsView.counterClockWiseButton.isEnabled = true
       case .spirograph:
-        contentView.settingsView.trailLengthControl.isEnabled = false
+//        contentView.settingsView.trailLengthControl.isEnabled = false
+        contentView.settingsView.clockWiseButton.isEnabled = false
         contentView.settingsView.randomButton.isEnabled = false
+        contentView.settingsView.counterClockWiseButton.isEnabled = false
         if scene.model.satelliteNodes.count > 10 {
           for satellite in scene.model.satelliteNodes.sorted(by: { abs(pow($0.position.y, 2) + pow($0.position.x, 2)) < abs(pow($1.position.y, 2) + pow($1.position.x, 2)) })[10...] {
             scene.model.remove(satellite, explosionIn: scene)
@@ -235,7 +246,34 @@ extension GameViewController {
     guard let gameScene = gameScene else {
       return
     }
-    gameScene.random()
+    gameScene.random(direction: .random)
+  }
+
+  @objc func clockWiseRandom(_ sender: UIButton) {
+    guard let gameScene = gameScene else {
+      return
+    }
+    gameScene.random(direction: .clockWise)
+  }
+
+  @objc func counterClockWiseRandom(_ sender: UIButton) {
+    guard let gameScene = gameScene else {
+      return
+    }
+    gameScene.random(direction: .counterClockWise)
+  }
+
+  func disableRandomButtonsIfNeeded() {
+    if let gameScene, 
+        gameScene.model.satelliteNodes.count > 100 {
+      contentView.settingsView.randomButton.isEnabled = false
+      contentView.settingsView.clockWiseButton.isEnabled = false
+      contentView.settingsView.counterClockWiseButton.isEnabled = false
+    } else {
+      contentView.settingsView.randomButton.isEnabled = true
+      contentView.settingsView.clockWiseButton.isEnabled = true
+      contentView.settingsView.counterClockWiseButton.isEnabled = true
+    }
   }
 
   func updateCountLabel() {
@@ -251,6 +289,7 @@ extension GameViewController {
         text = "\(count)/10"
     }
     contentView.satellitesCountLabel.text = text
+    disableRandomButtonsIfNeeded()
   }
 
   @objc func changeBackgroundColor(_ sender: UISegmentedControl) {

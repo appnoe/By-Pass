@@ -5,6 +5,7 @@
 
 import UIKit
 import RevenueCat
+import OSLog
 
 class TipJarViewController: UITableViewController {
 
@@ -91,15 +92,18 @@ extension TipJarViewController {
       return
     }
     let product = products[indexPath.row]
-    print("\(product.localizedTitle)")
+    let logger = Logger(subsystem: "GravityFun", category: "TipJarViewController")
+    logger.error("\(product.localizedTitle)")
     Task {
       do {
-        _ = try await Purchases.shared.purchase(product: product)
-        if let gameViewController = presentingViewController as? GameViewController {
-          gameViewController.updateForPurchases()
-        }
-        showAlert(title: "Thank you!", message: "You are officially awesome!") {
-          self.dismiss(animated: true)
+        let result = try await Purchases.shared.purchase(product: product)
+        if false == result.userCancelled {
+          if let gameViewController = presentingViewController as? GameViewController {
+            gameViewController.updateForPurchases()
+          }
+          showAlert(title: "Thank you!", message: "You are officially awesome!") {
+            self.dismiss(animated: true)
+          }
         }
       } catch {
         print("\(#file), \(#line): \(error)")

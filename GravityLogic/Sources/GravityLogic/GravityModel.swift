@@ -18,7 +18,7 @@ public class GravityModel {
 //  let emitterForRectangle: SKEmitterNode
   public var backgroundEmitter: SKEmitterNode?
   var explosionEmitter: SKEmitterNode?
-  private(set) var gravityNode: SKFieldNode
+  public private(set) var gravityNode: SKFieldNode
   public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
   var soundEnabled = true
@@ -301,8 +301,8 @@ public class GravityModel {
 
   // MARK: - Misc
 
-  public func random(size: CGSize) -> (nodes: [SKNode], sound: SKAudioNode?) {
-    let satellites = Satellite.random(sceneSize: size, type: currentSatelliteType, colorSetting: colorSetting)
+  public func random(size: CGSize, direction: Direction) -> (nodes: [SKNode], sound: SKAudioNode?) {
+    let satellites = Satellite.random(sceneSize: size, type: currentSatelliteType, colorSetting: colorSetting, direction: direction)
     for satellite in satellites {
       if trailLength != .none {
         satellite.addEmitter(emitterBox: emitterForBox)
@@ -319,11 +319,14 @@ public class GravityModel {
     return (nodes: satellites, sound: sound())
   }
 
-  public func clear() {
-    for node in satelliteNodes {
+  public func clear(nodes: [Satellite]? = nil) {
+    let satellitesToRemove = nodes ?? satelliteNodes
+    for node in satellitesToRemove {
       node.removeFromParent()
+      satelliteNodes.removeAll(where: { node == $0 })
     }
-    satelliteNodes.removeAll()
-    musicAudioNode?.removeFromParent()
+    if satelliteNodes.count < 1 {
+      musicAudioNode?.removeFromParent()
+    }
   }
 }

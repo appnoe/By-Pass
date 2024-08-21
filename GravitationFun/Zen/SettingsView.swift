@@ -12,12 +12,15 @@ class SettingsView: UIView {
   let zoomKeyLabel: UILabel
   let zoomSwitch: UISwitch
 
+//  let gravityFieldKeyLabel: UILabel
+//  let gravityFieldSwitch: UISwitch
+
   let gravityControl: UISegmentedControl
 
-  let trailKeyLabel: UILabel
-  let trailLengthControl: UISegmentedControl
-
-  let trailThicknessControl: UISegmentedControl
+//  let trailKeyLabel: UILabel
+//  let trailLengthControl: UISegmentedControl
+//
+//  let trailThicknessControl: UISegmentedControl
 
   let colorControl: UISegmentedControl
 
@@ -33,7 +36,9 @@ class SettingsView: UIView {
 
   let shareImageButton: UIButton
 
+  let clockWiseButton: UIButton
   let randomButton: UIButton
+  let counterClockWiseButton: UIButton
 
   let clearButton: UIButton
 
@@ -62,28 +67,38 @@ class SettingsView: UIView {
     zoomSwitch.accessibilityLabel = "Show zoom buttons"
     zoomSwitch.onTintColor = darkGray
 
+//    gravityFieldKeyLabel = UILabel()
+//    gravityFieldKeyLabel.text = "Gravity field"
+//    gravityFieldKeyLabel.textColor = .systemGray
+//    gravityFieldKeyLabel.font = .systemFont(ofSize: 13)
+//
+//    gravityFieldSwitch = UISwitch()
+//    gravityFieldSwitch.isOn = true
+//    gravityFieldSwitch.accessibilityLabel = "Activate gravity field"
+//    gravityFieldSwitch.onTintColor = darkGray
+
     gravityControl = UISegmentedControl(items: ["Gravity", "Spirograph"])
     gravityControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
     gravityControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
     gravityControl.selectedSegmentTintColor = darkGray
     gravityControl.selectedSegmentIndex = 0
 
-    trailKeyLabel = UILabel()
-    trailKeyLabel.text = "Trail"
-    trailKeyLabel.textColor = .systemGray
-    trailKeyLabel.font = .systemFont(ofSize: 13)
-
-    trailLengthControl = UISegmentedControl(items: ["none", "short", "long"])
-    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-    trailLengthControl.selectedSegmentTintColor = darkGray
-    trailLengthControl.selectedSegmentIndex = 2
-
-    trailThicknessControl = UISegmentedControl(items: ["thin", "normal", "thick"])
-    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-    trailThicknessControl.selectedSegmentTintColor = darkGray
-    trailThicknessControl.selectedSegmentIndex = 1
+//    trailKeyLabel = UILabel()
+//    trailKeyLabel.text = "Trail"
+//    trailKeyLabel.textColor = .systemGray
+//    trailKeyLabel.font = .systemFont(ofSize: 13)
+//
+//    trailLengthControl = UISegmentedControl(items: ["none", "short", "long"])
+//    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
+//    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
+//    trailLengthControl.selectedSegmentTintColor = darkGray
+//    trailLengthControl.selectedSegmentIndex = 2
+//
+//    trailThicknessControl = UISegmentedControl(items: ["thin", "normal", "thick"])
+//    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
+//    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
+//    trailThicknessControl.selectedSegmentTintColor = darkGray
+//    trailThicknessControl.selectedSegmentIndex = 1
 
     colorControl = UISegmentedControl(items: [UIImage(systemName: "paintpalette")!.withRenderingMode(.alwaysOriginal), UIImage(systemName: "paintpalette")!])
     colorControl.selectedSegmentTintColor = darkGray
@@ -124,9 +139,15 @@ class SettingsView: UIView {
     tipJarButton = UIButton(configuration: .filled())
     tipJarButton.setTitle("Tip Jar", for: .normal)
 
-    randomButton = UIButton(type: .system)
-    randomButton.configuration = UIButton.Configuration.filled()
-    randomButton.setImage(UIImage(systemName: "dice"), for: .normal)
+    var buttonConfig = UIButton.Configuration.filled()
+    buttonConfig.image = UIImage(systemName: "arrow.clockwise")
+    clockWiseButton = UIButton(configuration: buttonConfig)
+
+    buttonConfig.image = UIImage(systemName: "dice")
+    randomButton = UIButton(configuration: buttonConfig)
+
+    buttonConfig.image = UIImage(systemName: "arrow.counterclockwise")
+    counterClockWiseButton = UIButton(configuration: buttonConfig)
 
     clearButton = UIButton(type: .system)
     clearButton.configuration = UIButton.Configuration.filled()
@@ -151,9 +172,12 @@ class SettingsView: UIView {
     let starsStackView = UIStackView(arrangedSubviews: [starsKeyLabel, starsSwitch])
     starsStackView.spacing = 20
 
-    let trailsStackView = UIStackView(arrangedSubviews: [trailKeyLabel, trailLengthControl, trailThicknessControl])
-    trailsStackView.axis = .vertical
-    trailsStackView.spacing = 5
+//    let gravityFieldStackView = UIStackView(arrangedSubviews: [gravityFieldKeyLabel, gravityFieldSwitch])
+//    gravityFieldStackView.spacing = 20
+
+//    let trailsStackView = UIStackView(arrangedSubviews: [trailKeyLabel, trailLengthControl, trailThicknessControl])
+//    trailsStackView.axis = .vertical
+//    trailsStackView.spacing = 5
 
     let backgroundColorStackView = UIStackView(arrangedSubviews: [backgroundColorKeyLabel, backgroundColorControl, backgroundColorDescriptionLabel])
     backgroundColorStackView.axis = .vertical
@@ -163,11 +187,19 @@ class SettingsView: UIView {
     loadSaveStackView.spacing = 5
     loadSaveStackView.distribution = .fillEqually
 
-    let buttonStackView = UIStackView(arrangedSubviews: [clearButton, randomButton, shareImageButton])
+    let randomButtonStackView = UIStackView(arrangedSubviews: [clockWiseButton, randomButton, counterClockWiseButton])
+    randomButtonStackView.spacing = 5
+    randomButtonStackView.distribution = .fillEqually
+
+    let buttonStackView = UIStackView(arrangedSubviews: [clearButton, shareImageButton])
     buttonStackView.spacing = 5
     buttonStackView.distribution = .fillEqually
 
-    let settingsStackView = UIStackView(arrangedSubviews: [zoomStackView, starsStackView, gravityControl, trailsStackView, colorControl, backgroundColorStackView, loadSaveStackView, tipJarButton, buttonStackView])
+    let settingsStackView = UIStackView(arrangedSubviews: [zoomStackView, starsStackView, 
+//                                                           gravityFieldStackView,
+                                                           gravityControl,
+//                                                           trailsStackView,
+                                                           colorControl, backgroundColorStackView, loadSaveStackView, tipJarButton, randomButtonStackView, buttonStackView])
     settingsStackView.axis = .vertical
     settingsStackView.spacing = 20
 

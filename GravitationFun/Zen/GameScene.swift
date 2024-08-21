@@ -5,6 +5,7 @@
 import SpriteKit
 import GameplayKit
 import GravityLogic
+import OSLog
 
 class GameScene: SKScene {
 
@@ -71,6 +72,12 @@ class GameScene: SKScene {
       let strength: CGFloat = 10
       let dt: CGFloat = 1.0/60.0
       for node1 in model.satelliteNodes {
+        let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
+        if distance > 3000 {
+          print("distance: \(distance), removing")
+          model.clear(nodes: [node1])
+          continue
+        }
         for node2 in model.satelliteNodes {
           if nil == node1.physicsBody || nil == node2.physicsBody {
             continue
@@ -93,7 +100,9 @@ class GameScene: SKScene {
   }
 
   func touchDown(_ touch: UITouch) {
-    print("\(touch)")
+    let logger = Logger(subsystem: "GravityFun", category: "GameScene")
+    logger.info("\(touch)")
+    NSLog("%@", touch)
     if model.mode == .spirograph,
        model.satelliteNodes.count > 9 {
       return
@@ -181,8 +190,8 @@ class GameScene: SKScene {
     model.colorSetting = setting
   }
 
-  func random() {
-    let (nodes, _) = model.random(size: size)
+  func random(direction: Direction) {
+    let (nodes, _) = model.random(size: size, direction: direction)
     for node in nodes {
       addChild(node)
     }
