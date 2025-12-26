@@ -17,6 +17,8 @@ class SettingsView: UIView {
 
   let gravityControl: UISegmentedControl
 
+  let blackHolesControl: UISegmentedControl
+
 //  let trailKeyLabel: UILabel
 //  let trailLengthControl: UISegmentedControl
 //
@@ -82,6 +84,17 @@ class SettingsView: UIView {
     gravityControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
     gravityControl.selectedSegmentTintColor = darkGray
     gravityControl.selectedSegmentIndex = 0
+
+    let blackHolesLabel = UILabel()
+    blackHolesLabel.text = "Number Of Black Holes"
+    blackHolesLabel.textColor = .systemGray
+    blackHolesLabel.font = .systemFont(ofSize: 13)
+
+    blackHolesControl = UISegmentedControl(items: ["1", "2", "3"])
+    blackHolesControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
+    blackHolesControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
+    blackHolesControl.selectedSegmentTintColor = darkGray
+    blackHolesControl.selectedSegmentIndex = 0
 
 //    trailKeyLabel = UILabel()
 //    trailKeyLabel.text = "Trail"
@@ -179,6 +192,10 @@ class SettingsView: UIView {
 //    trailsStackView.axis = .vertical
 //    trailsStackView.spacing = 5
 
+    let blackHolesStackView = UIStackView(arrangedSubviews: [blackHolesLabel, blackHolesControl])
+    blackHolesStackView.axis = .vertical
+    blackHolesStackView.spacing = 5
+
     let backgroundColorStackView = UIStackView(arrangedSubviews: [backgroundColorKeyLabel, backgroundColorControl, backgroundColorDescriptionLabel])
     backgroundColorStackView.axis = .vertical
     backgroundColorStackView.spacing = 5
@@ -198,6 +215,7 @@ class SettingsView: UIView {
     let settingsStackView = UIStackView(arrangedSubviews: [zoomStackView, starsStackView, 
 //                                                           gravityFieldStackView,
                                                            gravityControl,
+                                                           blackHolesStackView,
 //                                                           trailsStackView,
                                                            colorControl, backgroundColorStackView, loadSaveStackView, tipJarButton, randomButtonStackView, buttonStackView])
     settingsStackView.axis = .vertical

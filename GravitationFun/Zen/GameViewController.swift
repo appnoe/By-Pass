@@ -29,6 +29,7 @@ class GameViewController: UIViewController {
     settingsView.starsSwitch.addTarget(self, action: #selector(toggleStars), for: .valueChanged)
 //    settingsView.gravityFieldSwitch.addTarget(self, action: #selector(toggleGravityField), for: .valueChanged)
     settingsView.gravityControl.addTarget(self, action: #selector(changeGravity), for: .valueChanged)
+    settingsView.blackHolesControl.addTarget(self, action: #selector(blackHoles), for: .valueChanged)
     settingsView.loadButton.addTarget(self, action: #selector(loadScene), for: .touchUpInside)
     settingsView.saveButton.addTarget(self, action: #selector(saveScene), for: .touchUpInside)
     settingsView.tipJarButton.addTarget(self, action: #selector(showTipJar), for: .touchUpInside)
@@ -233,6 +234,14 @@ extension GameViewController {
         }
     }
     updateCountLabel()
+  }
+
+  @objc func blackHoles(_ sender: UISegmentedControl) {
+    guard let scene = gameScene else {
+      return
+    }
+
+    scene.model.setNumberOfBlackHoles(to: sender.selectedSegmentIndex + 1, in: scene)
   }
 
   @objc func changeColor(_ sender: UISegmentedControl) {

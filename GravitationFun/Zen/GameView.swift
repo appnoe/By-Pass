@@ -30,7 +30,7 @@ class GameView: UIView {
     zoomStepper.maximumValue = 1.25
     zoomStepper.stepValue = 0.25
     zoomStepper.value = 1.0
-    zoomStepper.backgroundColor = .clear
+    zoomStepper.backgroundColor = .darkGray
     zoomStepper.setDecrementImage(UIImage(systemName: "minus.magnifyingglass"), for: .normal)
     zoomStepper.setIncrementImage(UIImage(systemName: "plus.magnifyingglass"), for: .normal)
     zoomStepper.tintColor = .white
