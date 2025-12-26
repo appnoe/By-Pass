@@ -19,6 +19,11 @@ public class GravityModel {
   public var backgroundEmitter: SKEmitterNode?
   var explosionEmitter: SKEmitterNode?
   public private(set) var gravityNode: SKFieldNode
+//  public private(set) var secondGravityNode: SKFieldNode
+//  public private(set) var thirdGravityNode: SKFieldNode
+//  public private(set) var secondCenter: SKShapeNode
+//  public private(set) var thirdCenter: SKShapeNode
+
   public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
   var soundEnabled = true
@@ -88,6 +93,18 @@ public class GravityModel {
 //    emitterForRectangle = RectangleEmitter()
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
+
+//    secondGravityNode = SKFieldNode.radialGravityField()
+//    secondGravityNode.isEnabled = false
+
+//    thirdGravityNode = SKFieldNode.radialGravityField()
+//    thirdGravityNode.isEnabled = false
+
+//    secondCenter = NodeFactory.center()
+//    secondCenter.isHidden = true
+
+//    thirdCenter = NodeFactory.center()
+//    thirdCenter.isHidden = true
 //    canon = SKSpriteNode(color: .white, size: CGSize(width: 5, height: 20))
   }
 
@@ -105,12 +122,22 @@ public class GravityModel {
       scene.addChild(center)
       gravityNode.falloff = 2.0
       scene.addChild(gravityNode)
-//      let secondGravityNode = SKFieldNode.radialGravityField()
-//      secondGravityNode.position = .init(x: 100, y: 0)
-//      let secondCenter = NodeFactory.center()
-//      secondCenter.position = .init(x: 100, y: 0)
-//      scene.addChild(secondCenter)
-//      scene.addChild(secondGravityNode)
+
+      let secondGravityNode = SKFieldNode.radialGravityField()
+      secondGravityNode.position = .init(x: 200, y: 100)
+      secondGravityNode.falloff = 2.0
+      secondGravityNode.name = "secondGravity"
+      secondGravityNode.isEnabled = false
+      let secondCenter = NodeFactory.center()
+      secondCenter.position = .init(x: 200, y: 100)
+      scene.addChild(secondCenter)
+      scene.addChild(secondGravityNode)
+
+//      thirdGravityNode.position = .init(x: 200, y: -100)
+//      thirdCenter.position = .init(x: 200, y: -100)
+//      scene.addChild(thirdCenter)
+//      scene.addChild(thirdGravityNode)
+
     } else if let gravityNode = scene.children.first(where: { $0 is SKFieldNode }) as? SKFieldNode {
       self.gravityNode = gravityNode
     }
@@ -132,6 +159,12 @@ public class GravityModel {
   public func addSound(node: SKAudioNode) {
     musicAudioNode = node
   }
+
+//  public func toggleSecondAndThirdBlackHole(scene: SKScene) {
+//    if let gravityNode = scene.children.first(where: { $0 is SKFieldNode && $0.name == "secondGravity" }) as? SKFieldNode, false == gravityNode.isEnabled {
+//      gravityNode.isEnabled = true
+//    }
+//  }
 
   // MARK: - Satellites
   public func satellite(with position: CGPoint, id: Int) -> SKNode {
