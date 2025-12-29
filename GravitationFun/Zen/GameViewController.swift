@@ -7,7 +7,6 @@ import SpriteKit
 import GameplayKit
 import Combine
 import StoreKit
-import GravityLogic
 import RevenueCat
 
 let closeSettingsNotificationName = Notification.Name(rawValue: "closeSettingsNotification")

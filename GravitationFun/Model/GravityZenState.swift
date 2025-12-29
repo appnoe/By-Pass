@@ -4,7 +4,6 @@
 
 
 import Foundation
-import GravityLogic
 
 struct GravityZenState: Codable {
   let date: Date

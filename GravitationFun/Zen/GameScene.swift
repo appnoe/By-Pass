@@ -4,7 +4,6 @@
 
 import SpriteKit
 import GameplayKit
-import GravityLogic
 import OSLog
 
 class GameScene: SKScene {
