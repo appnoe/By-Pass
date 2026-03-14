@@ -9,33 +9,49 @@ enum NodeFactory {
   static func center() -> SKShapeNode {
     let radius: CGFloat = 14
 
-    // --- Core sun body ---
+    // --- Core sun body (physics anchor) ---
     let node = SKShapeNode(circleOfRadius: radius)
     node.lineWidth = 0
-    node.fillColor = UIColor(red: 1.0, green: 0.97, blue: 0.75, alpha: 1.0)
+    node.fillColor = .clear   // visual comes from effect node below
 
     node.physicsBody = SKPhysicsBody(circleOfRadius: radius)
     node.physicsBody?.isDynamic = false
     node.physicsBody?.categoryBitMask = PhysicsCategory.center
     node.physicsBody?.contactTestBitMask = PhysicsCategory.satellite
 
-    // --- Inner hot corona (tight bright ring) ---
-    let innerCorona = SKShapeNode(circleOfRadius: radius * 1.25)
-    innerCorona.lineWidth = 0
-    innerCorona.fillColor = UIColor(red: 1.0, green: 0.75, blue: 0.1, alpha: 0.45)
-    node.addChild(innerCorona)
+    // --- Bloom effect wrapper ---
+    // SKEffectNode with a Gaussian blur renders the sun body blurred,
+    // giving a real HDR-style glow when blended additively.
+    let glowEffect = SKEffectNode()
+    glowEffect.shouldRasterize = false
+    glowEffect.blendMode = .add
+    if let blur = CIFilter(name: "CIGaussianBlur") {
+      blur.setValue(10.0, forKey: kCIInputRadiusKey)
+      glowEffect.filter = blur
+    }
 
-    // --- Outer soft glow ---
-    let outerGlow = SKShapeNode(circleOfRadius: radius * 2.4)
-    outerGlow.lineWidth = 0
-    outerGlow.fillColor = UIColor(red: 1.0, green: 0.4, blue: 0.0, alpha: 0.12)
-    node.addChild(outerGlow)
+    // Layers inside the effect node: biggest first (darkest), smallest last (brightest)
+    let glowLayers: [(multiplier: CGFloat, r: CGFloat, g: CGFloat, b: CGFloat, a: CGFloat)] = [
+      (3.6, 1.0, 0.30, 0.00, 0.30),
+      (2.6, 1.0, 0.45, 0.00, 0.45),
+      (1.9, 1.0, 0.60, 0.05, 0.60),
+      (1.4, 1.0, 0.78, 0.10, 0.80),
+      (1.0, 1.0, 0.97, 0.70, 1.00),
+    ]
+    for layer in glowLayers {
+      let circle = SKShapeNode(circleOfRadius: radius * layer.multiplier)
+      circle.lineWidth = 0
+      circle.fillColor = UIColor(red: layer.r, green: layer.g, blue: layer.b, alpha: layer.a)
+      glowEffect.addChild(circle)
+    }
 
-    // Pulse outer glow
-    outerGlow.run(SKAction.repeatForever(SKAction.sequence([
-      SKAction.fadeAlpha(to: 0.20, duration: 1.1),
-      SKAction.fadeAlpha(to: 0.06, duration: 1.1)
+    // Subtle pulse on the whole glow
+    glowEffect.run(SKAction.repeatForever(SKAction.sequence([
+      SKAction.fadeAlpha(to: 0.85, duration: 1.3),
+      SKAction.fadeAlpha(to: 1.00, duration: 1.3)
     ])))
+
+    node.addChild(glowEffect)
 
     // --- Surface shimmer: tight radial sparks hugging the sun ---
     let shimmer = NodeFactory.makeSunEmitter(
@@ -69,28 +85,18 @@ enum NodeFactory {
         (UIColor(red: 0.9, green: 0.15, blue: 0.0, alpha: 0.0), 1.0)
       ]
     )
-    // Slight upward drift simulates buoyancy
     flames.xAcceleration = 0
     flames.yAcceleration = 8
     node.addChild(flames)
 
     // --- Protuberances: sporadic tall jets ---
-    // Spawn 4 protuberance emitters at fixed angles around the rim
     let protuberanceAngles: [CGFloat] = [CGFloat.pi/4, CGFloat.pi*3/4, CGFloat.pi*5/4, CGFloat.pi*7/4]
+    let protContainer = SKNode()
     for angle in protuberanceAngles {
       let prot = NodeFactory.makeProtuberance(radius: radius, angle: angle)
-      node.addChild(prot)
+      protContainer.addChild(prot)
     }
-
-    // Slowly rotate protuberance ring to make it feel alive
-    let rotateAction = SKAction.repeatForever(SKAction.rotate(byAngle: .pi * 2, duration: 18))
-    // We wrap all protuberances in a container node so rotation doesn't affect physics
-    let protContainer = SKNode()
-    for child in node.children.filter({ $0.name == "prot" }) {
-      child.removeFromParent()
-      protContainer.addChild(child)
-    }
-    protContainer.run(rotateAction)
+    protContainer.run(SKAction.repeatForever(SKAction.rotate(byAngle: .pi * 2, duration: 18)))
     node.addChild(protContainer)
 
     return node
