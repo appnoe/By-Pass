@@ -403,7 +403,9 @@ extension GameViewController {
     let settingsView = contentView.settingsView
     let activity = UIActivityViewController(activityItems: [image, "#GravityZenApp"], applicationActivities: nil)
     activity.completionWithItemsHandler = { _, _, _, _ in
-      SKStoreReviewController.requestReview()
+      if let scene = self.view.window?.windowScene {
+        SKStoreReviewController.requestReview(in: scene)
+      }
     }
     activity.popoverPresentationController?.sourceView = settingsView.shareImageButton
     self.present(activity, animated: true)
