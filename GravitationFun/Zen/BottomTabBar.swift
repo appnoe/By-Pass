@@ -136,9 +136,7 @@ class BottomTabBar: UIView {
   // MARK: - Factory
 
   private static func makeTabButton(icon: String, title: String) -> UIButton {
-    // clearGlass() is the native iOS 26 Liquid Glass button style for controls
-    // that sit inside a glass container — gives automatic scale+bounce feedback.
-    var config = UIButton.Configuration.clearGlass()
+    var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: icon)?.withConfiguration(
       UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
     )
