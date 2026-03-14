@@ -7,7 +7,6 @@ import SpriteKit
 import GameplayKit
 import Combine
 import StoreKit
-import RevenueCat
 
 let closeSettingsNotificationName = Notification.Name(rawValue: "closeSettingsNotification")
 
@@ -31,7 +30,6 @@ class GameViewController: UIViewController {
     settingsView.blackHolesControl.addTarget(self, action: #selector(blackHoles), for: .valueChanged)
     settingsView.loadButton.addTarget(self, action: #selector(loadScene), for: .touchUpInside)
     settingsView.saveButton.addTarget(self, action: #selector(saveScene), for: .touchUpInside)
-    settingsView.tipJarButton.addTarget(self, action: #selector(showTipJar), for: .touchUpInside)
     settingsView.shareImageButton.addTarget(self, action: #selector(shareImage), for: .touchUpInside)
     settingsView.clockWiseButton.addTarget(self, action: #selector(clockWiseRandom), for: .touchUpInside)
     settingsView.randomButton.addTarget(self, action: #selector(random), for: .touchUpInside)
@@ -85,8 +83,6 @@ class GameViewController: UIViewController {
     super.viewWillAppear(animated)
 
     random(contentView.settingsView.randomButton)
-
-    updateForPurchases()
   }
 
   override var shouldAutorotate: Bool {
@@ -101,22 +97,6 @@ class GameViewController: UIViewController {
     }
   }
 
-  func updateForPurchases() {
-    Task {
-      do {
-        let customerInfo = try await Purchases.shared.customerInfo()
-        print("ids: \(customerInfo.allPurchasedProductIdentifiers)")
-        await MainActor.run {
-          if false == customerInfo.allPurchasedProductIdentifiers.isEmpty {
-            contentView.settingsView.backgroundColorControl.isEnabled = true
-            contentView.settingsView.backgroundColorDescriptionLabel.isHidden = true
-          }
-        }
-      } catch {
-        print("\(#file), \(#line): \(error)")
-      }
-    }
-  }
 }
 
 // MARK: - Actions
@@ -383,12 +363,6 @@ extension GameViewController {
       }
     }
 
-    let navigationController = UINavigationController(rootViewController: next)
-    present(navigationController, animated: true)
-  }
-
-  @objc func showTipJar(_ sender: UIButton) {
-    let next = TipJarViewController()
     let navigationController = UINavigationController(rootViewController: next)
     present(navigationController, animated: true)
   }
