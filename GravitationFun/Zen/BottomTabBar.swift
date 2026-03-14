@@ -26,14 +26,12 @@ class BottomTabBar: UIView {
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
-  // Single glass container wrapping the whole bar
-  private let containerView: UIVisualEffectView
+  // Dark blurred pill background — matches Music app
+  private let pillBackground: UIVisualEffectView
 
-  // A single highlight view that sits inside the container's contentView
-  // and moves behind whichever button is active
-  private let highlightView: UIVisualEffectView
+  // Rounded rect that slides behind the active sun button
+  private let selectionBackground: UIView
 
-  // Stack view holding the buttons — we need a reference to position the highlight
   private let stackView: UIStackView
 
   override init(frame: CGRect) {
@@ -45,24 +43,18 @@ class BottomTabBar: UIView {
     allButtons  = [trashButton, sun1Button, sun2Button, sun3Button, starsButton]
     sunButtons  = [sun1Button, sun2Button, sun3Button]
 
-    // Outer container: one unified Liquid Glass pill
-    let containerEffect = UIGlassContainerEffect()
-    containerView = UIVisualEffectView(effect: containerEffect)
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.layer.cornerRadius = 28
-    containerView.clipsToBounds = true
+    // Dark translucent pill — same dark frosted look as Music app tab bar
+    pillBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
+    pillBackground.translatesAutoresizingMaskIntoConstraints = false
+    pillBackground.layer.cornerRadius = 28
+    pillBackground.clipsToBounds = true
 
-    // Highlight: a single UIGlassEffect view that goes behind the active button
-    // It lives inside containerView.contentView so it merges with the container
-    let highlightEffect = UIGlassEffect()
-    highlightEffect.isInteractive = false
-    highlightView = UIVisualEffectView(effect: highlightEffect)
-    highlightView.translatesAutoresizingMaskIntoConstraints = false
-    highlightView.layer.cornerRadius = 20
-    highlightView.clipsToBounds = true
-    highlightView.alpha = 0
+    // Selection indicator: slightly lighter dark rounded rect
+    selectionBackground = UIView()
+    selectionBackground.backgroundColor = UIColor.white.withAlphaComponent(0.15)
+    selectionBackground.layer.cornerRadius = 20
+    selectionBackground.alpha = 0
 
-    // Stack of buttons inside the container
     stackView = UIStackView(arrangedSubviews: allButtons)
     stackView.axis = .horizontal
     stackView.distribution = .fillEqually
@@ -73,35 +65,22 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    // Full-size glass background so the pill is visibly frosted
-    let backgroundGlass = UIVisualEffectView(effect: UIGlassEffect())
-    backgroundGlass.translatesAutoresizingMaskIntoConstraints = false
-    backgroundGlass.isUserInteractionEnabled = false
-
-    // Layer order inside containerView.contentView: background → highlight → stack
-    containerView.contentView.addSubview(backgroundGlass)
-    containerView.contentView.addSubview(highlightView)
-    containerView.contentView.addSubview(stackView)
-    addSubview(containerView)
+    pillBackground.contentView.addSubview(selectionBackground)
+    pillBackground.contentView.addSubview(stackView)
+    addSubview(pillBackground)
 
     NSLayoutConstraint.activate([
-      containerView.topAnchor.constraint(equalTo: topAnchor),
-      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      pillBackground.topAnchor.constraint(equalTo: topAnchor),
+      pillBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
+      pillBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
+      pillBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-      backgroundGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
-      backgroundGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
-      backgroundGlass.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
-      backgroundGlass.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
-
-      stackView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 6),
-      stackView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor, constant: 8),
-      stackView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -6),
-      stackView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor, constant: -8),
+      stackView.topAnchor.constraint(equalTo: pillBackground.contentView.topAnchor, constant: 6),
+      stackView.leadingAnchor.constraint(equalTo: pillBackground.contentView.leadingAnchor, constant: 8),
+      stackView.bottomAnchor.constraint(equalTo: pillBackground.contentView.bottomAnchor, constant: -6),
+      stackView.trailingAnchor.constraint(equalTo: pillBackground.contentView.trailingAnchor, constant: -8),
     ])
 
-    // Dim all buttons initially; highlights will be set after layout
     for button in allButtons {
       setDim(button, dimmed: true)
     }
@@ -113,7 +92,6 @@ class BottomTabBar: UIView {
 
   override func layoutSubviews() {
     super.layoutSubviews()
-    // Position highlight without animation on first layout
     updateHighlights(animated: false)
   }
 
@@ -142,50 +120,47 @@ class BottomTabBar: UIView {
   // MARK: - Highlight helpers
 
   private func updateHighlights(animated: Bool) {
-    // Determine which buttons should be bright
     var activeIndices: Set<Int> = []
     if let sunIdx = selectedSunIndex {
-      activeIndices.insert(1 + sunIdx) // sun1=index1, sun2=index2, sun3=index3
+      activeIndices.insert(1 + sunIdx) // sun1=1, sun2=2, sun3=3
     }
     if isStarsOn {
-      activeIndices.insert(4) // starsButton is index 4
+      activeIndices.insert(4)
     }
 
     for (i, button) in allButtons.enumerated() {
       setDim(button, dimmed: !activeIndices.contains(i))
     }
 
-    // Move highlight to the active sun button (stars doesn't move the pill highlight,
-    // it just brightens — the pill highlight follows the sun selection)
-    positionHighlight(animated: animated)
+    positionSelection(animated: animated)
   }
 
-  private func positionHighlight(animated: Bool) {
+  private func positionSelection(animated: Bool) {
     guard let sunIdx = selectedSunIndex else {
-      // No sun selected — hide highlight
-      let hide = { self.highlightView.alpha = 0 }
-      animated ? UIView.animate(withDuration: 0.3, animations: hide) : hide()
+      let hide = { self.selectionBackground.alpha = 0 }
+      animated ? UIView.animate(withDuration: 0.25, animations: hide) : hide()
       return
     }
 
     let targetButton = sunButtons[sunIdx]
-    // Convert button frame into the containerView.contentView coordinate space
-    let buttonFrameInStack = targetButton.frame
-    let stackOriginInContent = stackView.frame.origin
+    let buttonFrame = targetButton.frame
+    let stackOrigin = stackView.frame.origin
     let targetFrame = CGRect(
-      x: stackOriginInContent.x + buttonFrameInStack.origin.x + 2,
-      y: stackOriginInContent.y + buttonFrameInStack.origin.y + 2,
-      width: buttonFrameInStack.width - 4,
-      height: buttonFrameInStack.height - 4
+      x: stackOrigin.x + buttonFrame.origin.x + 2,
+      y: stackOrigin.y + buttonFrame.origin.y + 2,
+      width: buttonFrame.width - 4,
+      height: buttonFrame.height - 4
     )
 
     let show = {
-      self.highlightView.frame = targetFrame
-      self.highlightView.alpha = 1
+      self.selectionBackground.frame = targetFrame
+      self.selectionBackground.alpha = 1
     }
 
     if animated {
-      UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.8, initialSpringVelocity: 0, animations: show)
+      UIView.animate(withDuration: 0.3, delay: 0,
+                     usingSpringWithDamping: 0.8, initialSpringVelocity: 0,
+                     animations: show)
     } else {
       show()
     }
