@@ -16,7 +16,7 @@ public class GravityModel {
   var velocityNodes: [Int:SKShapeNode] = [:]
   let emitterForBox: SKEmitterNode
 //  let emitterForRectangle: SKEmitterNode
-  public var backgroundEmitter: SKEmitterNode?
+  public var backgroundEmitter: SKNode?
   var explosionEmitter: SKEmitterNode?
   public private(set) var gravityNode: SKFieldNode
   public private(set) var secondGravityNode: SKFieldNode
@@ -145,7 +145,7 @@ public class GravityModel {
       if let satellite = child as? Satellite {
         satelliteNodes.append(satellite)
       } else if let emitter = child as? SKEmitterNode, emitter.name == "background" {
-        backgroundEmitter = emitter
+        backgroundEmitter = emitter  // legacy: plain emitter without crop mask
       } else if let audio = child as? SKAudioNode {
         musicAudioNode = audio
       }
@@ -356,7 +356,7 @@ public class GravityModel {
 
   // MARK: - Stars
 
-  public func stars() -> SKEmitterNode? {
+  public func stars() -> SKNode? {
     guard backgroundEmitter?.parent == nil else {
       return nil
     }
