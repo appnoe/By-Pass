@@ -56,9 +56,11 @@ class BottomTabBar: UIView {
     containerView.layer.cornerRadius = 28
     containerView.clipsToBounds = true
 
-    // Main pill glass — dark tint so it's visible on the black SpriteKit background
+    // Main pill glass — dark tint so it's visible on the black SpriteKit background.
+    // isInteractive = true gives buttons the native scale+bounce response on tap.
     let pillEffect = UIGlassEffect()
     pillEffect.tintColor = UIColor.black.withAlphaComponent(0.55)
+    pillEffect.isInteractive = true
     pillGlass = UIVisualEffectView(effect: pillEffect)
     pillGlass.translatesAutoresizingMaskIntoConstraints = false
     pillGlass.isUserInteractionEnabled = false
@@ -134,7 +136,9 @@ class BottomTabBar: UIView {
   // MARK: - Factory
 
   private static func makeTabButton(icon: String, title: String) -> UIButton {
-    var config = UIButton.Configuration.plain()
+    // clearGlass() is the native iOS 26 Liquid Glass button style for controls
+    // that sit inside a glass container — gives automatic scale+bounce feedback.
+    var config = UIButton.Configuration.clearGlass()
     config.image = UIImage(systemName: icon)?.withConfiguration(
       UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
     )
