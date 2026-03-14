@@ -6,11 +6,6 @@ import UIKit
 
 class SettingsView: UIView {
 
-  let starsKeyLabel: UILabel
-  let starsSwitch: UISwitch
-
-  let blackHolesControl: UISegmentedControl
-
 //  let trailKeyLabel: UILabel
 //  let trailLengthControl: UISegmentedControl
 //
@@ -26,27 +21,9 @@ class SettingsView: UIView {
   let randomButton: UIButton
   let counterClockWiseButton: UIButton
 
-  let clearButton: UIButton
-
   let showHideButton: UIButton
 
   override init(frame: CGRect) {
-
-    starsKeyLabel = UILabel()
-    starsKeyLabel.text = "Stars"
-    starsKeyLabel.textColor = .label
-    starsKeyLabel.font = .systemFont(ofSize: 13)
-
-    starsSwitch = UISwitch()
-    starsSwitch.isOn = true
-
-    let blackHolesLabel = UILabel()
-    blackHolesLabel.text = "Number Of Black Holes"
-    blackHolesLabel.textColor = .label
-    blackHolesLabel.font = .systemFont(ofSize: 13)
-
-    blackHolesControl = UISegmentedControl(items: ["1", "2", "3"])
-    blackHolesControl.selectedSegmentIndex = 0
 
 //    trailKeyLabel = UILabel()
 //    trailKeyLabel.text = "Trail"
@@ -75,10 +52,6 @@ class SettingsView: UIView {
     buttonConfig.image = UIImage(systemName: "arrow.counterclockwise")
     counterClockWiseButton = UIButton(configuration: buttonConfig)
 
-    clearButton = UIButton(type: .system)
-    clearButton.configuration = UIButton.Configuration.glass()
-    clearButton.setImage(UIImage(systemName: "trash"), for: .normal)
-
     shareImageButton = UIButton(type: .system)
     shareImageButton.configuration = UIButton.Configuration.glass()
     shareImageButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
@@ -97,24 +70,11 @@ class SettingsView: UIView {
     glassView.layer.cornerRadius = 16
     glassView.clipsToBounds = true
 
-    let starsStackView = UIStackView(arrangedSubviews: [starsKeyLabel, starsSwitch])
-    starsStackView.spacing = 20
-
-    let blackHolesStackView = UIStackView(arrangedSubviews: [blackHolesLabel, blackHolesControl])
-    blackHolesStackView.axis = .vertical
-    blackHolesStackView.spacing = 5
-
     let randomButtonStackView = UIStackView(arrangedSubviews: [clockWiseButton, randomButton, counterClockWiseButton])
     randomButtonStackView.spacing = 5
     randomButtonStackView.distribution = .fillEqually
 
-    let buttonStackView = UIStackView(arrangedSubviews: [clearButton, shareImageButton])
-    buttonStackView.spacing = 5
-    buttonStackView.distribution = .fillEqually
-
-    let settingsStackView = UIStackView(arrangedSubviews: [starsStackView,
-                                                           blackHolesStackView,
-                                                           colorControl, randomButtonStackView, buttonStackView])
+    let settingsStackView = UIStackView(arrangedSubviews: [colorControl, randomButtonStackView, shareImageButton])
     settingsStackView.axis = .vertical
     settingsStackView.spacing = 20
 

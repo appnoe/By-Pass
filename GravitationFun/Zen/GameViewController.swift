@@ -23,13 +23,17 @@ class GameViewController: UIViewController {
 
     let settingsView = contentView.settingsView
     settingsView.showHideButton.addTarget(self, action: #selector(toggleSettings), for: .touchUpInside)
-    settingsView.starsSwitch.addTarget(self, action: #selector(toggleStars), for: .valueChanged)
-    settingsView.blackHolesControl.addTarget(self, action: #selector(blackHoles), for: .valueChanged)
     settingsView.shareImageButton.addTarget(self, action: #selector(shareImage), for: .touchUpInside)
+
+    let tabBar = contentView.bottomTabBar
+    tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
+    tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
+    tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
+    tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
+    tabBar.starsButton.addTarget(self, action: #selector(starsTapped), for: .touchUpInside)
     settingsView.clockWiseButton.addTarget(self, action: #selector(clockWiseRandom), for: .touchUpInside)
     settingsView.randomButton.addTarget(self, action: #selector(random), for: .touchUpInside)
     settingsView.counterClockWiseButton.addTarget(self, action: #selector(counterClockWiseRandom), for: .touchUpInside)
-    settingsView.clearButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
     settingsView.colorControl.addTarget(self, action: #selector(changeColor), for: .valueChanged)
 //    settingsView.trailLengthControl.addTarget(self, action: #selector(changeTrailLength), for: .valueChanged)
 //    settingsView.trailThicknessControl.addTarget(self, action: #selector(changeTrailThickness), for: .valueChanged)
@@ -147,6 +151,30 @@ extension GameViewController {
 
   @objc func toggleStars(_ sender: UISwitch) {
     gameScene?.setStars(enabled: sender.isOn)
+  }
+
+  @objc func starsTapped(_ sender: UIButton) {
+    let tabBar = contentView.bottomTabBar
+    tabBar.isStarsOn.toggle()
+    gameScene?.setStars(enabled: tabBar.isStarsOn)
+  }
+
+  @objc func sun1Tapped(_ sender: UIButton) {
+    setSunCount(1)
+  }
+
+  @objc func sun2Tapped(_ sender: UIButton) {
+    setSunCount(2)
+  }
+
+  @objc func sun3Tapped(_ sender: UIButton) {
+    setSunCount(3)
+  }
+
+  private func setSunCount(_ count: Int) {
+    guard let scene = gameScene else { return }
+    contentView.bottomTabBar.selectedSunIndex = count - 1
+    scene.model.setNumberOfBlackHoles(to: count, in: scene)
   }
 
   @objc func toggleGravityField(_ sender: UISwitch) {

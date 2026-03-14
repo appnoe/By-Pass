@@ -15,6 +15,7 @@ class GameView: UIView {
   let zoomStackView: UIStackView
   let fastForwardButton: UIButton
   let satellitesCountLabel: UILabel
+  let bottomTabBar: BottomTabBar
 
   override init(frame: CGRect) {
 
@@ -53,6 +54,9 @@ class GameView: UIView {
     satellitesCountLabel.text = "0"
     satellitesCountLabel.textColor = .secondaryLabel
 
+    bottomTabBar = BottomTabBar()
+    bottomTabBar.translatesAutoresizingMaskIntoConstraints = false
+
     super.init(frame: frame)
 
     skView.ignoresSiblingOrder = true
@@ -68,6 +72,7 @@ class GameView: UIView {
     addSubview(zoomStackView)
     addSubview(fastForwardButton)
     addSubview(satellitesCountLabel)
+    addSubview(bottomTabBar)
 
     let leadingSettingsConstraint = settingsView.showHideButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12)
 
@@ -84,7 +89,12 @@ class GameView: UIView {
       fastForwardButton.heightAnchor.constraint(equalTo: fastForwardButton.widthAnchor),
 
       satellitesCountLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
-      satellitesCountLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20)
+      satellitesCountLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
+
+      // Floating pill tab bar centered at the bottom
+      bottomTabBar.centerXAnchor.constraint(equalTo: centerXAnchor),
+      bottomTabBar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
+      bottomTabBar.heightAnchor.constraint(equalToConstant: 72),
     ])
 
     self.leadingSettingsConstraint = leadingSettingsConstraint
