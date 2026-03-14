@@ -28,7 +28,7 @@ enum NodeFactory {
     let node = SKShapeNode(circleOfRadius: radius)
     node.lineWidth = 0
     node.fillColor = .clear   // visual comes from effect node below
-    node.zPosition = 1        // in front of stars (z=-10), behind planets (z=2)
+    node.zPosition = 10       // in front of stars (z=-100), behind planets (z=20)
 
     node.physicsBody = SKPhysicsBody(circleOfRadius: radius)
     node.physicsBody?.isDynamic = false
@@ -198,38 +198,12 @@ enum NodeFactory {
     emitter.particleLifetime = 60
     emitter.particleLifetimeRange = 30
     emitter.numParticlesToEmit = 0
+    // zPosition on both the node and the particles; with ignoresSiblingOrder=true
+    // SpriteKit sorts purely by zPosition, so -100 puts stars behind everything.
+    emitter.zPosition = -100
+    emitter.particleZPosition = -100
     emitter.advanceSimulationTime(60)
-
-    // Wrap the emitter in a SKCropNode with a ring-shaped mask so that stars
-    // are clipped away over the sun area at the scene centre.
-    // The mask is white everywhere EXCEPT a black circle over the sun,
-    // because SKCropNode renders children only where the mask is non-transparent.
-    let cropNode = SKCropNode()
-    cropNode.zPosition = -10   // always behind sun, planets and trails
-
-    let maskSize = CGSize(width: size.width * 2, height: size.height * 2)
-    let sunClearRadius: CGFloat = 60  // points to keep star-free around origin
-
-    // Draw the mask: full white rectangle with a black (transparent) circle cut out
-    let maskRenderer = UIGraphicsImageRenderer(size: maskSize)
-    let maskImage = maskRenderer.image { ctx in
-      // White fill = visible
-      UIColor.white.setFill()
-      ctx.fill(CGRect(origin: .zero, size: maskSize))
-      // Black (clear) circle in the centre = hidden
-      UIColor.black.setFill()
-      let cx = maskSize.width / 2
-      let cy = maskSize.height / 2
-      ctx.cgContext.fillEllipse(in: CGRect(
-        x: cx - sunClearRadius, y: cy - sunClearRadius,
-        width: sunClearRadius * 2, height: sunClearRadius * 2
-      ))
-    }
-    let maskNode = SKSpriteNode(texture: SKTexture(image: maskImage),
-                                size: maskSize)
-    cropNode.maskNode = maskNode
-    cropNode.addChild(emitter)
-    return cropNode
+    return emitter
   }
 
   static func velocity(from: CGPoint, to: CGPoint) -> SKShapeNode {
