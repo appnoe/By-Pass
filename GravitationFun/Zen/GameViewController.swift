@@ -1,19 +1,14 @@
 //  Created by Dominik Hauser on 22.12.21.
 //  
-//
 
 import UIKit
 import SpriteKit
 import GameplayKit
-import Combine
 import StoreKit
-
-let closeSettingsNotificationName = Notification.Name(rawValue: "closeSettingsNotification")
 
 class GameViewController: UIViewController {
 
   var gameScene: GameScene?
-  var token: AnyCancellable?
   var contentView: GameView {
     return view as! GameView
   }
@@ -21,24 +16,13 @@ class GameViewController: UIViewController {
   override func loadView() {
     let contentView = GameView(frame: UIScreen.main.bounds)
 
-    let settingsView = contentView.settingsView
-    settingsView.showHideButton.addTarget(self, action: #selector(toggleSettings), for: .touchUpInside)
-    settingsView.shareImageButton.addTarget(self, action: #selector(shareImage), for: .touchUpInside)
-
     let tabBar = contentView.bottomTabBar
     tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
     tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
     tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
     tabBar.starsButton.addTarget(self, action: #selector(starsTapped), for: .touchUpInside)
-    settingsView.clockWiseButton.addTarget(self, action: #selector(clockWiseRandom), for: .touchUpInside)
-    settingsView.randomButton.addTarget(self, action: #selector(random), for: .touchUpInside)
-    settingsView.counterClockWiseButton.addTarget(self, action: #selector(counterClockWiseRandom), for: .touchUpInside)
-    settingsView.colorControl.addTarget(self, action: #selector(changeColor), for: .valueChanged)
-//    settingsView.trailLengthControl.addTarget(self, action: #selector(changeTrailLength), for: .valueChanged)
-//    settingsView.trailThicknessControl.addTarget(self, action: #selector(changeTrailThickness), for: .valueChanged)
 
-    contentView.zoomStepper.addTarget(self, action: #selector(zoomChanged), for: .valueChanged)
     contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
     contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpInside)
     contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpOutside)
@@ -58,99 +42,46 @@ class GameViewController: UIViewController {
     }
 
     gameScene = scene
-
     view.presentScene(scene)
-
-    token = NotificationCenter.default
-      .publisher(for: closeSettingsNotificationName, object: nil)
-      .sink { [weak self] _ in
-        self?.contentView.hideSettingsIfNeeded()
-      }
-  }
-
-  deinit {
-    token?.cancel()
-    token = nil
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    random(contentView.settingsView.randomButton)
+    // Start with a random configuration
+    gameScene?.random(direction: .random)
   }
 
-  override var shouldAutorotate: Bool {
-    return true
-  }
+  override var shouldAutorotate: Bool { true }
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    if UIDevice.current.userInterfaceIdiom == .phone {
-      return .allButUpsideDown
-    } else {
-      return .all
-    }
+    return UIDevice.current.userInterfaceIdiom == .phone ? .allButUpsideDown : .all
   }
 
+  override var prefersStatusBarHidden: Bool { true }
 }
 
 // MARK: - Actions
 extension GameViewController {
-  @objc func zoomChanged(_ sender: UIStepper) {
-    if let zoomValue = gameScene?.zoomValue {
-      if abs(sender.value - 0.25) < 0.01 {
-        if zoomValue > 0.25 {
-          sender.stepValue = 0.05
-        } else {
-          sender.stepValue = 0.25
-        }
-      }
-    }
-    contentView.zoomLabel.text = String(format: "%ld", Int(sender.value * 100)) + "%"
-    gameScene?.zoom(to: sender.value)
-  }
 
   @objc func fastForwardTouchDown(_ sender: UIButton) {
-    guard let gameScene = gameScene else {
-      return
-    }
+    guard let gameScene else { return }
     gameScene.physicsWorld.speed = 3
-//    gameScene?.setTrailLength(to: .none)
-    for satellite in gameScene.children.filter({ $0 is Satellite }) {
-      for emitter in satellite.children where emitter is SKEmitterNode {
-        guard let emitter = emitter as? SKEmitterNode else {
-          return
-        }
+    for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
+      for case let emitter as SKEmitterNode in satellite.children {
         emitter.particleBirthRate *= 3
       }
     }
   }
 
   @objc func fastForwardTouchUp(_ sender: UIButton) {
-    guard let gameScene = gameScene else {
-      return
-    }
+    guard let gameScene else { return }
     gameScene.physicsWorld.speed = 1
-//    let selectedTrailLengthIndex = contentView.settingsView.trailLengthControl.selectedSegmentIndex
-//    guard let length = TrailLength(rawValue: selectedTrailLengthIndex) else {
-//      return
-//    }
-//    gameScene?.setTrailLength(to: length)
-    for satellite in gameScene.children.filter({ $0 is Satellite }) {
-      for emitter in satellite.children where emitter is SKEmitterNode {
-        guard let emitter = emitter as? SKEmitterNode else {
-          return
-        }
+    for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
+      for case let emitter as SKEmitterNode in satellite.children {
         emitter.particleBirthRate /= 3
       }
     }
-  }
-
-  @objc func toggleSettings(_ sender: UIButton) {
-    contentView.toggleSettings()
-  }
-
-  @objc func toggleStars(_ sender: UISwitch) {
-    gameScene?.setStars(enabled: sender.isOn)
   }
 
   @objc func starsTapped(_ sender: UIButton) {
@@ -159,17 +90,9 @@ extension GameViewController {
     gameScene?.setStars(enabled: tabBar.isStarsOn)
   }
 
-  @objc func sun1Tapped(_ sender: UIButton) {
-    setSunCount(1)
-  }
-
-  @objc func sun2Tapped(_ sender: UIButton) {
-    setSunCount(2)
-  }
-
-  @objc func sun3Tapped(_ sender: UIButton) {
-    setSunCount(3)
-  }
+  @objc func sun1Tapped(_ sender: UIButton) { setSunCount(1) }
+  @objc func sun2Tapped(_ sender: UIButton) { setSunCount(2) }
+  @objc func sun3Tapped(_ sender: UIButton) { setSunCount(3) }
 
   private func setSunCount(_ count: Int) {
     guard let scene = gameScene else { return }
@@ -177,143 +100,38 @@ extension GameViewController {
     scene.model.setNumberOfBlackHoles(to: count, in: scene)
   }
 
-  @objc func toggleGravityField(_ sender: UISwitch) {
-    gameScene?.model.gravityNode.isEnabled.toggle()
-  }
-
-  @objc func changeTrailLength(_ sender: UISegmentedControl) {
-    guard let length = TrailLength(rawValue: sender.selectedSegmentIndex) else {
-      return
-    }
-    gameScene?.setTrailLength(to: length)
-  }
-
-  @objc func changeTrailThickness(_ sender: UISegmentedControl) {
-    guard let particleScale = ParticleScale(rawValue: sender.selectedSegmentIndex) else {
-      return
-    }
-    gameScene?.model.particleScale = particleScale
-  }
-
-  @objc func toggleSound(_ sender: UISwitch) {
-    gameScene?.setSound(enabled: sender.isOn)
-
-  }
-
-  @objc func blackHoles(_ sender: UISegmentedControl) {
-    guard let scene = gameScene else {
-      return
-    }
-
-    scene.model.setNumberOfBlackHoles(to: sender.selectedSegmentIndex + 1, in: scene)
-  }
-
-  @objc func changeColor(_ sender: UISegmentedControl) {
-    guard let colorSetting = ColorSetting(rawValue: sender.selectedSegmentIndex) else {
-      return
-    }
-    gameScene?.setColorSetting(colorSetting)
-  }
-
-  @objc func random(_ sender: UIButton) {
-    guard let gameScene = gameScene else {
-      return
-    }
-    gameScene.random(direction: .random)
-  }
-
-  @objc func clockWiseRandom(_ sender: UIButton) {
-    guard let gameScene = gameScene else {
-      return
-    }
-    gameScene.random(direction: .clockWise)
-  }
-
-  @objc func counterClockWiseRandom(_ sender: UIButton) {
-    guard let gameScene = gameScene else {
-      return
-    }
-    gameScene.random(direction: .counterClockWise)
-  }
-
-  func disableRandomButtonsIfNeeded() {
-    if let gameScene, 
-        gameScene.model.satelliteNodes.count > 100 {
-      contentView.settingsView.randomButton.isEnabled = false
-      contentView.settingsView.clockWiseButton.isEnabled = false
-      contentView.settingsView.counterClockWiseButton.isEnabled = false
-    } else {
-      contentView.settingsView.randomButton.isEnabled = true
-      contentView.settingsView.clockWiseButton.isEnabled = true
-      contentView.settingsView.counterClockWiseButton.isEnabled = true
-    }
-  }
-
-  func updateCountLabel() {
-    guard let gameScene = gameScene else {
-      return
-    }
-    let text: String
-    let count = gameScene.model.satelliteNodes.count
-    switch gameScene.model.mode {
-      case .gravity:
-        text = "\(count)"
-      case .spirograph:
-        text = "\(count)/10"
-    }
-    contentView.satellitesCountLabel.text = text
-    disableRandomButtonsIfNeeded()
-  }
-
-  @objc func shareImage(_ sender: UIButton) {
-    guard let scene = gameScene else {
-      return
-    }
-    guard let image = getScreenshot(scene: scene) else {
-      return
-    }
-    let settingsView = contentView.settingsView
-    let activity = UIActivityViewController(activityItems: [image, "#GravityZenApp"], applicationActivities: nil)
-    activity.completionWithItemsHandler = { _, _, _, _ in
-      if let scene = self.view.window?.windowScene {
-        SKStoreReviewController.requestReview(in: scene)
-      }
-    }
-    activity.popoverPresentationController?.sourceView = settingsView.shareImageButton
-    self.present(activity, animated: true)
-  }
-
   @objc func clear(_ sender: UIButton) {
-    guard let scene = gameScene else {
-      return
-    }
+    guard let scene = gameScene else { return }
     for (index, satellite) in scene.model.satelliteNodes.enumerated() {
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.03 * Double(index)) {
         scene.model.remove(satellite, explosionIn: scene)
       }
     }
-//    gameScene?.clear()
   }
 
-  override var prefersStatusBarHidden: Bool {
-    return true
+  func updateCountLabel() {
+    guard let gameScene else { return }
+    let count = gameScene.model.satelliteNodes.count
+    let text: String
+    switch gameScene.model.mode {
+      case .gravity:    text = "\(count)"
+      case .spirograph: text = "\(count)/10"
+    }
+    contentView.satellitesCountLabel.text = text
+    disableRandomButtonsIfNeeded()
+  }
+
+  func disableRandomButtonsIfNeeded() {
+    // No random buttons in tab bar yet — placeholder for future use
   }
 
   func getScreenshot(scene: SKScene) -> UIImage? {
-    guard let view = scene.view else {
-      return nil
-    }
-
+    guard let view = scene.view else { return nil }
     let bounds = view.bounds
-
     UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
-
     view.drawHierarchy(in: bounds, afterScreenUpdates: true)
-
-    let screenshotImage = UIGraphicsGetImageFromCurrentImageContext()
-
+    let image = UIGraphicsGetImageFromCurrentImageContext()
     UIGraphicsEndImageContext()
-
-    return screenshotImage
+    return image
   }
 }
