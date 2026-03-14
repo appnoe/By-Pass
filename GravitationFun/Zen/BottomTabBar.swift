@@ -27,35 +27,47 @@ class BottomTabBar: UIView {
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
-  // Dark blurred pill background — matches Music app
-  private let pillBackground: UIVisualEffectView
+  // Outer container using UIGlassContainerEffect so pill + selection can morph together
+  private let containerView: UIVisualEffectView
 
-  // Blurred pill that slides behind the active sun button
-  private let selectionBackground: UIVisualEffectView
+  // The main glass pill background
+  private let pillView: UIVisualEffectView
+
+  // Sliding glass pill that highlights the active sun button
+  private let selectionView: UIVisualEffectView
 
   private let stackView: UIStackView
 
   override init(frame: CGRect) {
-    fastForwardButton = BottomTabBar.makeTabButton(icon: "forward",  title: "Speed")
-    trashButton       = BottomTabBar.makeTabButton(icon: "trash",    title: "Clear")
-    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1 Sun")
-    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
-    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
-    starsButton       = BottomTabBar.makeTabButton(icon: "star",     title: "Stars")
+    fastForwardButton = BottomTabBar.makeTabButton(icon: "forward")
+    trashButton       = BottomTabBar.makeTabButton(icon: "trash")
+    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max")
+    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max")
+    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max")
+    starsButton       = BottomTabBar.makeTabButton(icon: "star")
     allButtons        = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
     sunButtons        = [sun1Button, sun2Button, sun3Button]
 
-    // Dark translucent pill — same dark frosted look as Music app tab bar
-    pillBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
-    pillBackground.translatesAutoresizingMaskIntoConstraints = false
-    pillBackground.layer.cornerRadius = 28
-    pillBackground.clipsToBounds = true
+    // Glass container — lets pill and selection morph into each other
+    let containerEffect = UIGlassContainerEffect()
+    containerView = UIVisualEffectView(effect: containerEffect)
+    containerView.translatesAutoresizingMaskIntoConstraints = false
 
-    // Selection indicator: a brighter blur pill layered on top of the dark background
-    selectionBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterialDark))
-    selectionBackground.layer.cornerRadius = 22
-    selectionBackground.clipsToBounds = true
-    selectionBackground.alpha = 0
+    // Main pill with Liquid Glass
+    let pillGlass = UIGlassEffect()
+    pillGlass.isInteractive = false
+    pillView = UIVisualEffectView(effect: pillGlass)
+    pillView.translatesAutoresizingMaskIntoConstraints = false
+    pillView.layer.cornerRadius = 28
+    pillView.clipsToBounds = true
+
+    // Selection indicator: a separate Liquid Glass pill behind the active sun button
+    let selectionGlass = UIGlassEffect()
+    selectionGlass.isInteractive = false
+    selectionView = UIVisualEffectView(effect: selectionGlass)
+    selectionView.layer.cornerRadius = 22
+    selectionView.clipsToBounds = true
+    selectionView.alpha = 0
 
     stackView = UIStackView(arrangedSubviews: allButtons)
     stackView.axis = .horizontal
@@ -67,20 +79,27 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    pillBackground.contentView.addSubview(selectionBackground)
-    pillBackground.contentView.addSubview(stackView)
-    addSubview(pillBackground)
+    // Build hierarchy: containerView holds pillView; pillView holds selectionView + stackView
+    addSubview(containerView)
+    containerView.contentView.addSubview(pillView)
+    pillView.contentView.addSubview(selectionView)
+    pillView.contentView.addSubview(stackView)
 
     NSLayoutConstraint.activate([
-      pillBackground.topAnchor.constraint(equalTo: topAnchor),
-      pillBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
-      pillBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
-      pillBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
+      containerView.topAnchor.constraint(equalTo: topAnchor),
+      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-      stackView.topAnchor.constraint(equalTo: pillBackground.contentView.topAnchor, constant: 6),
-      stackView.leadingAnchor.constraint(equalTo: pillBackground.contentView.leadingAnchor, constant: 8),
-      stackView.bottomAnchor.constraint(equalTo: pillBackground.contentView.bottomAnchor, constant: -6),
-      stackView.trailingAnchor.constraint(equalTo: pillBackground.contentView.trailingAnchor, constant: -8),
+      pillView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
+      pillView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
+      pillView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
+      pillView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
+
+      stackView.topAnchor.constraint(equalTo: pillView.contentView.topAnchor, constant: 4),
+      stackView.leadingAnchor.constraint(equalTo: pillView.contentView.leadingAnchor, constant: 8),
+      stackView.bottomAnchor.constraint(equalTo: pillView.contentView.bottomAnchor, constant: -4),
+      stackView.trailingAnchor.constraint(equalTo: pillView.contentView.trailingAnchor, constant: -8),
     ])
 
     for button in allButtons {
@@ -99,20 +118,13 @@ class BottomTabBar: UIView {
 
   // MARK: - Factory
 
-  private static func makeTabButton(icon: String, title: String) -> UIButton {
+  private static func makeTabButton(icon: String) -> UIButton {
     var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: icon)?.withConfiguration(
-      UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
+      UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
     )
-    config.title = title
-    config.imagePlacement = .top
-    config.imagePadding = 4
     config.baseForegroundColor = .white
-    config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
-      var outgoing = incoming
-      outgoing.font = UIFont.systemFont(ofSize: 10, weight: .medium)
-      return outgoing
-    }
+    config.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
 
     let button = UIButton(configuration: config)
     button.translatesAutoresizingMaskIntoConstraints = false
@@ -140,7 +152,7 @@ class BottomTabBar: UIView {
 
   private func positionSelection(animated: Bool) {
     guard let sunIdx = selectedSunIndex else {
-      let hide = { self.selectionBackground.alpha = 0 }
+      let hide = { self.selectionView.alpha = 0 }
       animated ? UIView.animate(withDuration: 0.25, animations: hide) : hide()
       return
     }
@@ -156,8 +168,8 @@ class BottomTabBar: UIView {
     )
 
     let show = {
-      self.selectionBackground.frame = targetFrame
-      self.selectionBackground.alpha = 1
+      self.selectionView.frame = targetFrame
+      self.selectionView.alpha = 1
     }
 
     if animated {
@@ -171,7 +183,7 @@ class BottomTabBar: UIView {
 
   private func setDim(_ button: UIButton, dimmed: Bool) {
     var config = button.configuration ?? .plain()
-    config.baseForegroundColor = dimmed ? UIColor.white.withAlphaComponent(0.45) : .white
+    config.baseForegroundColor = dimmed ? UIColor.white.withAlphaComponent(0.40) : .white
     button.configuration = config
   }
 }
