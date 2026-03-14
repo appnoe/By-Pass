@@ -28,6 +28,7 @@ enum NodeFactory {
     let node = SKShapeNode(circleOfRadius: radius)
     node.lineWidth = 0
     node.fillColor = .clear   // visual comes from effect node below
+    node.zPosition = 1        // in front of stars (z=-10), behind planets (z=2)
 
     node.physicsBody = SKPhysicsBody(circleOfRadius: radius)
     node.physicsBody?.isDynamic = false
@@ -192,6 +193,7 @@ enum NodeFactory {
   static func backgroundEmitter(size: CGSize) -> SKEmitterNode? {
     guard let node = SKEmitterNode(fileNamed: "background") else { return nil }
     node.particlePositionRange = CGVector(dx: size.width * 2, dy: size.height * 2)
+    node.zPosition = -10  // always behind sun, planets and trails
     // ~1500 stars at equilibrium: birthRate * lifetime = 25 * 60 = ~1500 visible at any time
     node.particleBirthRate = 25
     node.particleLifetime = 60
