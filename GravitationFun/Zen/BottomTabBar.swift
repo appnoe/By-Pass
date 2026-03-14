@@ -73,7 +73,13 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    // Highlight sits below the stack inside the container's contentView
+    // Full-size glass background so the pill is visibly frosted
+    let backgroundGlass = UIVisualEffectView(effect: UIGlassEffect())
+    backgroundGlass.translatesAutoresizingMaskIntoConstraints = false
+    backgroundGlass.isUserInteractionEnabled = false
+
+    // Layer order inside containerView.contentView: background → highlight → stack
+    containerView.contentView.addSubview(backgroundGlass)
     containerView.contentView.addSubview(highlightView)
     containerView.contentView.addSubview(stackView)
     addSubview(containerView)
@@ -83,6 +89,11 @@ class BottomTabBar: UIView {
       containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
       containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
       containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+      backgroundGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
+      backgroundGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
+      backgroundGlass.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
+      backgroundGlass.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
 
       stackView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 6),
       stackView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor, constant: 8),
