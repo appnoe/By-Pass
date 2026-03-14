@@ -9,6 +9,7 @@ import StoreKit
 class GameViewController: UIViewController {
 
   var gameScene: GameScene?
+  private var pinchBaseScale: CGFloat = 1.0
   var contentView: GameView {
     return view as! GameView
   }
@@ -42,6 +43,9 @@ class GameViewController: UIViewController {
 
     gameScene = scene
     view.presentScene(scene)
+
+    let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
+    view.addGestureRecognizer(pinch)
   }
 
   override func viewWillAppear(_ animated: Bool) {
@@ -62,6 +66,27 @@ class GameViewController: UIViewController {
 
 // MARK: - Actions
 extension GameViewController {
+
+  @objc func handlePinch(_ recognizer: UIPinchGestureRecognizer) {
+    guard let scene = gameScene else { return }
+
+    switch recognizer.state {
+    case .began:
+      scene.isPinching = true
+      pinchBaseScale = scene.camera?.xScale ?? 1.0
+
+    case .changed:
+      // scale down as user spreads fingers (inverse: pinch out → zoom in → smaller camera scale)
+      let newScale = pinchBaseScale / recognizer.scale
+      scene.applyPinchScale(newScale)
+
+    case .ended, .cancelled, .failed:
+      scene.isPinching = false
+
+    default:
+      break
+    }
+  }
 
   @objc func fastForwardTouchDown(_ sender: UIButton) {
     guard let gameScene else { return }

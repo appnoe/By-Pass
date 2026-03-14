@@ -10,6 +10,7 @@ class GameScene: SKScene {
 
   let model = GravityModel()
   var zoomValue: CGFloat = 1.0
+  var isPinching: Bool = false
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
   override class var supportsSecureCoding: Bool {
@@ -99,6 +100,7 @@ class GameScene: SKScene {
   }
 
   func touchDown(_ touch: UITouch) {
+    guard !isPinching else { return }
     let logger = Logger(subsystem: "GravityFun", category: "GameScene")
     logger.info("\(touch)")
     NSLog("%@", touch)
@@ -167,6 +169,12 @@ class GameScene: SKScene {
     self.zoomValue = zoomValue
     let zoomInAction = SKAction.scale(to: 1-(zoomValue-1), duration: 0.3)
     camera?.run(zoomInAction)
+  }
+
+  /// Called continuously during a pinch gesture with the cumulative scale.
+  func applyPinchScale(_ scale: CGFloat) {
+    let clamped = max(0.25, min(scale, 4.0))
+    camera?.setScale(clamped)
   }
 
   func setSound(enabled: Bool) {
