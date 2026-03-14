@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884122F6615C6006183C5 /* BottomTabBar.swift */; };
 		F23AFF862EFE870D0046B0D1 /* ColorSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7C2EFE870D0046B0D1 /* ColorSetting.swift */; };
 		F23AFF872EFE870D0046B0D1 /* RectangleEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */; };
 		F23AFF882EFE870D0046B0D1 /* GravityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7F2EFE870D0046B0D1 /* GravityModel.swift */; };
@@ -24,7 +25,6 @@
 		F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */; };
 		F272AE212A110E59003B5178 /* ZenStatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE202A110E59003B5178 /* ZenStatesViewController.swift */; };
 		F272AE232A117684003B5178 /* Synth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE222A117684003B5178 /* Synth.swift */; };
-		F272AE272A12C149003B5178 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F272AE262A12C149003B5178 /* StoreKit.framework */; };
 		F27F9C5E2A19E837009D32D3 /* GravityZen.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */; };
 		F27F9C602A19E907009D32D3 /* StoreKitTestCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */; };
 		F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E3B277B0F7C00EA5825 /* GameView.swift */; };
@@ -59,6 +59,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CFE884122F6615C6006183C5 /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		F23AFF772EFE870D0046B0D1 /* BoxEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxEmitter.swift; sourceTree = "<group>"; };
 		F23AFF782EFE870D0046B0D1 /* ExplosionEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplosionEmitter.swift; sourceTree = "<group>"; };
 		F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleEmitter.swift; sourceTree = "<group>"; };
@@ -76,7 +77,6 @@
 		F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extension.swift"; sourceTree = "<group>"; };
 		F272AE202A110E59003B5178 /* ZenStatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenStatesViewController.swift; sourceTree = "<group>"; };
 		F272AE222A117684003B5178 /* Synth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synth.swift; sourceTree = "<group>"; };
-		F272AE262A12C149003B5178 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = GravityZen.storekit; sourceTree = "<group>"; };
 		F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTestCertificate.cer; sourceTree = "<group>"; };
 		F2A21E3B277B0F7C00EA5825 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -109,7 +109,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F272AE272A12C149003B5178 /* StoreKit.framework in Frameworks */,
 				F2B5FF0B2A194D11005C53A1 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -159,6 +158,7 @@
 				F2BD5C622773C4DC00136C85 /* GameViewController.swift */,
 				F2A21E3B277B0F7C00EA5825 /* GameView.swift */,
 				F2B6164C27787F3A00BCE6C4 /* SettingsView.swift */,
+				CFE884122F6615C6006183C5 /* BottomTabBar.swift */,
 			);
 			path = Zen;
 			sourceTree = "<group>";
@@ -265,7 +265,6 @@
 		F2D604182781B597003958A2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				F272AE262A12C149003B5178 /* StoreKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -353,7 +352,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "GravitationFun" */;
+			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "Graviton" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -428,6 +427,7 @@
 				F23AFF892EFE870D0046B0D1 /* Satellite.swift in Sources */,
 				F23AFF8A2EFE870D0046B0D1 /* TrailLength.swift in Sources */,
 				F23AFF8B2EFE870D0046B0D1 /* ParticleScale.swift in Sources */,
+				CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */,
 				F23AFF8C2EFE870D0046B0D1 /* ExplosionEmitter.swift in Sources */,
 				F23AFF8D2EFE870D0046B0D1 /* NodeFactory.swift in Sources */,
 				F23AFF8E2EFE870D0046B0D1 /* GravityMode.swift in Sources */,
@@ -655,7 +655,7 @@
 				DEVELOPMENT_TEAM = Q6PD97MRX4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GravitationFun/Info.plist;
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Images can be written to the photos library.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -668,7 +668,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.6;
-				PRODUCT_BUNDLE_IDENTIFIER = de.dasdom.GravitationFun;
+				PRODUCT_BUNDLE_IDENTIFIER = de.appnoe.graviton;
 				PRODUCT_NAME = Gravity;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -688,7 +688,7 @@
 				DEVELOPMENT_TEAM = Q6PD97MRX4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = GravitationFun/Info.plist;
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Images can be written to the photos library.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -701,7 +701,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.6;
-				PRODUCT_BUNDLE_IDENTIFIER = de.dasdom.GravitationFun;
+				PRODUCT_BUNDLE_IDENTIFIER = de.appnoe.graviton;
 				PRODUCT_NAME = Gravity;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -769,7 +769,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "GravitationFun" */ = {
+		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "Graviton" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2BD5C6C2773C4DE00136C85 /* Debug */,

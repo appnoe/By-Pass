@@ -4,8 +4,6 @@
 <dict>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>RevenueCatKey</key>
 	<string>$(REVENUE_CAT_KEY)</string>
 </dict>
