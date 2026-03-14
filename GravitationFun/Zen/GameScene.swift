@@ -130,27 +130,46 @@ class GameScene: SKScene {
   }
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    let totalTouches = event?.allTouches?.count ?? touches.count
+    if totalTouches >= 2 {
+      // Two or more fingers — this is a pinch. Remove any nodes that were
+      // created by the first finger before the gesture recognizer fired.
+      cancelAllPendingSatellites()
+      isPinching = true
+      return
+    }
     for touch in touches {
       touchDown(touch)
     }
   }
 
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard !isPinching else { return }
     for touch in touches {
       touchMoved(touch)
     }
   }
 
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard !isPinching else { return }
     for touch in touches {
       touchUp(touch)
     }
   }
 
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    isPinching = false
     for touch in touches {
       touchUp(touch)
     }
+  }
+
+  private func cancelAllPendingSatellites() {
+    // Remove satellite nodes that have no velocity yet (still being placed)
+    let pending = model.satelliteNodes.filter {
+      $0.physicsBody?.velocity == .zero
+    }
+    model.clear(nodes: pending)
   }
 
   func setTrailLength(to length: TrailLength) {
