@@ -192,10 +192,12 @@ enum NodeFactory {
   static func backgroundEmitter(size: CGSize) -> SKEmitterNode? {
     guard let node = SKEmitterNode(fileNamed: "background") else { return nil }
     node.particlePositionRange = CGVector(dx: size.width * 2, dy: size.height * 2)
-    node.particleLifetime = CGFloat.greatestFiniteMagnitude
-    node.particleBirthRate = 80
+    // ~300 stars at equilibrium: birthRate * lifetime = 80 * 60 = ~300 visible at any time
+    node.particleBirthRate = 5
+    node.particleLifetime = 60
+    node.particleLifetimeRange = 30
     node.numParticlesToEmit = 0 // emit continuously
-    node.advanceSimulationTime(10) // pre-populate so stars appear immediately
+    node.advanceSimulationTime(60) // pre-populate so stars appear immediately
     return node
   }
 
