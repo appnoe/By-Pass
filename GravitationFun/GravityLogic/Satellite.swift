@@ -70,7 +70,7 @@ public class Satellite: SKShapeNode {
     fillColor = .clear
 
     self.position = position
-    zPosition = 2
+    zPosition = 20
 
     // Pick a random planet type and build the textured sprite
     planetType = PlanetType.random()
