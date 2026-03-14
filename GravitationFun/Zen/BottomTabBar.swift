@@ -27,11 +27,18 @@ class BottomTabBar: UIView {
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
-  // Dark blurred pill background — matches Music app
-  private let pillBackground: UIVisualEffectView
+  // UIGlassContainerEffect wraps the whole bar so child glass elements merge
+  private let containerView: UIVisualEffectView
 
-  // Blurred pill that slides behind the active sun button
-  private let selectionBackground: UIVisualEffectView
+  // Full-bar glass background (gives the pill its frosted look)
+  private let pillGlass: UIVisualEffectView
+
+  // Selection indicator: a UIGlassEffect pill that slides behind the active sun button
+  private let selectionView: UIVisualEffectView
+
+  // Leading constraint of selectionView — animated on tab change
+  private var selectionLeadingConstraint: NSLayoutConstraint?
+  private var selectionWidthConstraint: NSLayoutConstraint?
 
   private let stackView: UIStackView
 
@@ -42,20 +49,28 @@ class BottomTabBar: UIView {
     sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
     sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
     starsButton       = BottomTabBar.makeTabButton(icon: "star",     title: "Stars")
-    allButtons        = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
-    sunButtons        = [sun1Button, sun2Button, sun3Button]
+    allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
+    sunButtons  = [sun1Button, sun2Button, sun3Button]
 
-    // Dark translucent pill — same dark frosted look as Music app tab bar
-    pillBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
-    pillBackground.translatesAutoresizingMaskIntoConstraints = false
-    pillBackground.layer.cornerRadius = 28
-    pillBackground.clipsToBounds = true
+    // Container merges all child UIGlassEffect views into one combined render pass
+    containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
+    containerView.translatesAutoresizingMaskIntoConstraints = false
+    containerView.layer.cornerRadius = 28
+    containerView.clipsToBounds = true
 
-    // Selection indicator: a brighter blur pill layered on top of the dark background
-    selectionBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterialDark))
-    selectionBackground.layer.cornerRadius = 22
-    selectionBackground.clipsToBounds = true
-    selectionBackground.alpha = 0
+    // Full-bar frosted glass background — lives as direct child of containerView.contentView
+    pillGlass = UIVisualEffectView(effect: UIGlassEffect())
+    pillGlass.translatesAutoresizingMaskIntoConstraints = false
+    pillGlass.isUserInteractionEnabled = false
+
+    // Selection pill — also a direct child of containerView.contentView so it merges
+    let selectionEffect = UIGlassEffect()
+    selectionEffect.isInteractive = false
+    selectionView = UIVisualEffectView(effect: selectionEffect)
+    selectionView.translatesAutoresizingMaskIntoConstraints = false
+    selectionView.layer.cornerRadius = 20
+    selectionView.clipsToBounds = true
+    selectionView.alpha = 0
 
     stackView = UIStackView(arrangedSubviews: allButtons)
     stackView.axis = .horizontal
@@ -67,20 +82,37 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    pillBackground.contentView.addSubview(selectionBackground)
-    pillBackground.contentView.addSubview(stackView)
-    addSubview(pillBackground)
+    // Layer order: pillGlass (back) → selectionView → stackView (front)
+    containerView.contentView.addSubview(pillGlass)
+    containerView.contentView.addSubview(selectionView)
+    containerView.contentView.addSubview(stackView)
+    addSubview(containerView)
+
+    let selectionLeading = selectionView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor, constant: 8)
+    let selectionWidth = selectionView.widthAnchor.constraint(equalToConstant: 60)
+    selectionLeadingConstraint = selectionLeading
+    selectionWidthConstraint = selectionWidth
 
     NSLayoutConstraint.activate([
-      pillBackground.topAnchor.constraint(equalTo: topAnchor),
-      pillBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
-      pillBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
-      pillBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
+      containerView.topAnchor.constraint(equalTo: topAnchor),
+      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
-      stackView.topAnchor.constraint(equalTo: pillBackground.contentView.topAnchor, constant: 6),
-      stackView.leadingAnchor.constraint(equalTo: pillBackground.contentView.leadingAnchor, constant: 8),
-      stackView.bottomAnchor.constraint(equalTo: pillBackground.contentView.bottomAnchor, constant: -6),
-      stackView.trailingAnchor.constraint(equalTo: pillBackground.contentView.trailingAnchor, constant: -8),
+      pillGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
+      pillGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
+      pillGlass.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
+      pillGlass.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
+
+      selectionView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 4),
+      selectionView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -4),
+      selectionLeading,
+      selectionWidth,
+
+      stackView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 6),
+      stackView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor, constant: 8),
+      stackView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -6),
+      stackView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor, constant: -8),
     ])
 
     for button in allButtons {
@@ -113,7 +145,6 @@ class BottomTabBar: UIView {
       outgoing.font = UIFont.systemFont(ofSize: 10, weight: .medium)
       return outgoing
     }
-
     let button = UIButton(configuration: config)
     button.translatesAutoresizingMaskIntoConstraints = false
     return button
@@ -122,7 +153,7 @@ class BottomTabBar: UIView {
   // MARK: - Highlight helpers
 
   private func updateHighlights(animated: Bool) {
-    // sun indices shifted by 2 (fastForward=0, trash=1, sun1=2, sun2=3, sun3=4, stars=5)
+    // fastForward=0, trash=1, sun1=2, sun2=3, sun3=4, stars=5
     var activeIndices: Set<Int> = []
     if let sunIdx = selectedSunIndex {
       activeIndices.insert(2 + sunIdx)
@@ -139,33 +170,33 @@ class BottomTabBar: UIView {
   }
 
   private func positionSelection(animated: Bool) {
-    guard let sunIdx = selectedSunIndex else {
-      let hide = { self.selectionBackground.alpha = 0 }
+    guard let sunIdx = selectedSunIndex,
+          stackView.frame.width > 0 else {
+      let hide = { self.selectionView.alpha = 0 }
       animated ? UIView.animate(withDuration: 0.25, animations: hide) : hide()
       return
     }
 
     let targetButton = sunButtons[sunIdx]
-    let buttonFrame = targetButton.frame
-    let stackOrigin = stackView.frame.origin
-    let targetFrame = CGRect(
-      x: stackOrigin.x + buttonFrame.origin.x + 2,
-      y: stackOrigin.y + buttonFrame.origin.y + 2,
-      width: buttonFrame.width - 4,
-      height: buttonFrame.height - 4
-    )
+    // Button frame is in stackView coordinates; stackView starts at x=8 in contentView
+    let stackInset: CGFloat = 8
+    let buttonWidth = targetButton.frame.width
+    let newLeading = stackInset + targetButton.frame.origin.x + 2
+    let newWidth = buttonWidth - 4
 
-    let show = {
-      self.selectionBackground.frame = targetFrame
-      self.selectionBackground.alpha = 1
+    let update = {
+      self.selectionLeadingConstraint?.constant = newLeading
+      self.selectionWidthConstraint?.constant = newWidth
+      self.selectionView.alpha = 1
+      self.containerView.contentView.layoutIfNeeded()
     }
 
     if animated {
-      UIView.animate(withDuration: 0.3, delay: 0,
-                     usingSpringWithDamping: 0.8, initialSpringVelocity: 0,
-                     animations: show)
+      UIView.animate(withDuration: 0.35, delay: 0,
+                     usingSpringWithDamping: 0.75, initialSpringVelocity: 0,
+                     animations: update)
     } else {
-      show()
+      update()
     }
   }
 
