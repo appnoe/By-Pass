@@ -121,9 +121,10 @@ public class Satellite: SKShapeNode {
       spriteNode?.color = UIColor(white: colorRatio, alpha: 1)
       spriteNode?.colorBlendFactor = 0.6
     }
+    let trailColor = UIColor(hue: colorRatio, saturation: 0.8, brightness: 1.0, alpha: 1)
     let emitters = children.filter({ $0 is SKEmitterNode }) as! [SKEmitterNode]
     for emitter in emitters {
-      emitter.particleColor = UIColor(hue: colorRatio, saturation: 0.7, brightness: 1.0, alpha: 1)
+      emitter.particleColor = trailColor
     }
   }
 
@@ -141,15 +142,21 @@ public class Satellite: SKShapeNode {
 
   func addEmitter(emitterBox: SKEmitterNode?) {
 
-//    switch type {
-//      case .box:
         guard let emitterCopy = emitterBox?.copy() as? SKEmitterNode else {
           return
         }
 
-    emitterBox?.position = .init(x: radius, y: radius)
+    // Center the emitter on the planet sprite
+    emitterCopy.position = CGPoint(x: radius, y: radius)
 
-        emitterCopy.particleColor = fillColor
+    // Use the current tint color from the sprite, falling back to a visible default
+    let trailColor: UIColor
+    if let sprite = spriteNode, sprite.colorBlendFactor > 0 {
+      trailColor = sprite.color
+    } else {
+      trailColor = UIColor(hue: colorRatio, saturation: 0.8, brightness: 1.0, alpha: 1)
+    }
+    emitterCopy.particleColor = trailColor
         addChild(emitterCopy)
 
 //      case .rectangle:
