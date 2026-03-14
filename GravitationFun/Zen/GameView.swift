@@ -8,7 +8,6 @@ import SpriteKit
 class GameView: UIView {
 
   let skView: SKView
-  let fastForwardButton: UIButton
   let satellitesCountLabel: UILabel
   let bottomTabBar: BottomTabBar
 
@@ -17,10 +16,6 @@ class GameView: UIView {
     skView = SKView(frame: frame)
     skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     skView.isMultipleTouchEnabled = true
-
-    fastForwardButton = UIButton(configuration: .glass())
-    fastForwardButton.translatesAutoresizingMaskIntoConstraints = false
-    fastForwardButton.setImage(UIImage(systemName: "forward"), for: .normal)
 
     satellitesCountLabel = UILabel()
     satellitesCountLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -36,16 +31,10 @@ class GameView: UIView {
     skView.preferredFramesPerSecond = UIScreen.main.maximumFramesPerSecond
 
     addSubview(skView)
-    addSubview(fastForwardButton)
     addSubview(satellitesCountLabel)
     addSubview(bottomTabBar)
 
     NSLayoutConstraint.activate([
-      fastForwardButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 20),
-      fastForwardButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -20),
-      fastForwardButton.widthAnchor.constraint(equalToConstant: 44),
-      fastForwardButton.heightAnchor.constraint(equalTo: fastForwardButton.widthAnchor),
-
       satellitesCountLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
       satellitesCountLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
 
