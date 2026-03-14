@@ -34,8 +34,6 @@ class SettingsView: UIView {
   let loadButton: UIButton
   let saveButton: UIButton
 
-  let tipJarButton: UIButton
-
   let shareImageButton: UIButton
 
   let clockWiseButton: UIButton
@@ -129,10 +127,10 @@ class SettingsView: UIView {
     backgroundColorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
     backgroundColorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
     backgroundColorControl.selectedSegmentIndex = 0
-    backgroundColorControl.isEnabled = false
+    backgroundColorControl.isEnabled = true
 
     backgroundColorDescriptionLabel = UILabel()
-    backgroundColorDescriptionLabel.text = "Enabled after tip"
+    backgroundColorDescriptionLabel.text = ""
     backgroundColorDescriptionLabel.textColor = .systemGray
     backgroundColorDescriptionLabel.font = .systemFont(ofSize: 11)
     backgroundColorDescriptionLabel.textAlignment = .center
@@ -148,9 +146,6 @@ class SettingsView: UIView {
 
     saveButton = UIButton(configuration: .filled())
     saveButton.setTitle("Save", for: .normal)
-
-    tipJarButton = UIButton(configuration: .filled())
-    tipJarButton.setTitle("Tip Jar", for: .normal)
 
     var buttonConfig = UIButton.Configuration.filled()
     buttonConfig.image = UIImage(systemName: "arrow.clockwise")
@@ -217,7 +212,7 @@ class SettingsView: UIView {
                                                            gravityControl,
                                                            blackHolesStackView,
 //                                                           trailsStackView,
-                                                           colorControl, backgroundColorStackView, loadSaveStackView, tipJarButton, randomButtonStackView, buttonStackView])
+                                                           colorControl, backgroundColorStackView, loadSaveStackView, randomButtonStackView, buttonStackView])
     settingsStackView.axis = .vertical
     settingsStackView.spacing = 20
 

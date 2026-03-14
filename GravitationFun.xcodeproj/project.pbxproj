@@ -25,10 +25,8 @@
 		F272AE212A110E59003B5178 /* ZenStatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE202A110E59003B5178 /* ZenStatesViewController.swift */; };
 		F272AE232A117684003B5178 /* Synth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE222A117684003B5178 /* Synth.swift */; };
 		F272AE272A12C149003B5178 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F272AE262A12C149003B5178 /* StoreKit.framework */; };
-		F27F9C5C2A19E590009D32D3 /* TipJarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27F9C5B2A19E590009D32D3 /* TipJarViewController.swift */; };
 		F27F9C5E2A19E837009D32D3 /* GravityZen.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */; };
 		F27F9C602A19E907009D32D3 /* StoreKitTestCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */; };
-		F27F9C632A19EC1B009D32D3 /* TipJarCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27F9C622A19EC1B009D32D3 /* TipJarCell.swift */; };
 		F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E3B277B0F7C00EA5825 /* GameView.swift */; };
 		F2A21E50277F0F8D00EA5825 /* GravityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */; };
 		F2B5FF0B2A194D11005C53A1 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F2B5FF0A2A194D11005C53A1 /* RevenueCat */; };
@@ -79,10 +77,8 @@
 		F272AE202A110E59003B5178 /* ZenStatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenStatesViewController.swift; sourceTree = "<group>"; };
 		F272AE222A117684003B5178 /* Synth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synth.swift; sourceTree = "<group>"; };
 		F272AE262A12C149003B5178 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		F27F9C5B2A19E590009D32D3 /* TipJarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipJarViewController.swift; sourceTree = "<group>"; };
 		F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = GravityZen.storekit; sourceTree = "<group>"; };
 		F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTestCertificate.cer; sourceTree = "<group>"; };
-		F27F9C622A19EC1B009D32D3 /* TipJarCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipJarCell.swift; sourceTree = "<group>"; };
 		F2A21E3B277B0F7C00EA5825 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		F2A21E4D277F0F8D00EA5825 /* GravityUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GravityUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityUITests.swift; sourceTree = "<group>"; };
@@ -170,8 +166,6 @@
 		F27F9C612A19EBE0009D32D3 /* TipJar */ = {
 			isa = PBXGroup;
 			children = (
-				F27F9C5B2A19E590009D32D3 /* TipJarViewController.swift */,
-				F27F9C622A19EC1B009D32D3 /* TipJarCell.swift */,
 				F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */,
 				F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */,
 			);
@@ -444,8 +438,6 @@
 				F2BD5C632773C4DC00136C85 /* GameViewController.swift in Sources */,
 				F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */,
 				F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */,
-				F27F9C632A19EC1B009D32D3 /* TipJarCell.swift in Sources */,
-				F27F9C5C2A19E590009D32D3 /* TipJarViewController.swift in Sources */,
 				F272AE232A117684003B5178 /* Synth.swift in Sources */,
 				F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */,
 				F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */,
