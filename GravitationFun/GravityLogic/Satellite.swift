@@ -27,7 +27,7 @@ public class Satellite: SKShapeNode {
     return true
   }
 
-  class func random(amount: Int = 10, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
+  class func random(amount: Int = 5, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
     var satellites: [Satellite] = []
     let clockWise: Bool
     switch direction {
