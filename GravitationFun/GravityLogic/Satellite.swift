@@ -18,7 +18,7 @@ public enum Direction {
 public class Satellite: SKShapeNode {
 
 //  let type: SatelliteType
-  public private(set) var radius: CGFloat = 8
+  public let radius: CGFloat = 8
   var colorRatio: CGFloat = 0
   private var planetType: PlanetType = .rocky
   private var spriteNode: SKSpriteNode?
@@ -61,8 +61,7 @@ public class Satellite: SKShapeNode {
     return satellites
   }
 
-  init(position: CGPoint, type: PlanetType? = nil, radius: CGFloat = 8) {
-    self.radius = radius
+  init(position: CGPoint) {
     super.init()
 
     // Invisible shape for physics (transparent, no stroke)
@@ -73,8 +72,8 @@ public class Satellite: SKShapeNode {
     self.position = position
     zPosition = 2
 
-    // Use provided planet type or pick a random one
-    planetType = type ?? PlanetType.random()
+    // Pick a random planet type and build the textured sprite
+    planetType = PlanetType.random()
     applyPlanetTexture()
   }
 

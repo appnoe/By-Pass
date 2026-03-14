@@ -51,7 +51,8 @@ class GameViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    gameScene?.solarSystem()
+    // Start with a random configuration
+    gameScene?.random(direction: .random)
   }
 
   override var shouldAutorotate: Bool { true }

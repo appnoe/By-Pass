@@ -73,7 +73,7 @@ class GameScene: SKScene {
       let dt: CGFloat = 1.0/60.0
       for node1 in model.satelliteNodes {
         let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
-        if distance > 6000 {
+        if distance > 3000 {
           print("distance: \(distance), removing")
           model.clear(nodes: [node1])
           continue
@@ -93,8 +93,6 @@ class GameScene: SKScene {
           let normal = CGVector(dx: disp.dx/radius, dy: disp.dy/radius)
           let impulse = CGVector(dx: normal.dx*force*dt, dy: normal.dy*force*dt)
 
-          // Don't move static bodies (e.g. the solar-system sun stand-in)
-          guard node1.physicsBody!.isDynamic else { continue }
           node1.physicsBody!.velocity = CGVector(dx: node1.physicsBody!.velocity.dx + impulse.dx, dy: node1.physicsBody!.velocity.dy + impulse.dy)
         }
       }
@@ -221,98 +219,6 @@ class GameScene: SKScene {
     let (nodes, _) = model.random(size: size, direction: direction)
     for node in nodes {
       addChild(node)
-    }
-  }
-
-  /// Spawns the 8 planets of our solar system on stable circular orbits
-  /// around the central gravity node (the Sun).
-  func solarSystem() {
-    // Physics in this engine (N-Body custom loop, update() method):
-    //   Δv = (m1_eff * m2_eff / r²) * dt,  where m_eff = physicsBody.mass * strength (strength=10)
-    //
-    // For a stable circular orbit around a central mass M_sun:
-    //   v = sqrt(m_planet_eff * M_sun_eff / r)
-    //     = sqrt((10*10) * (M_sun*10) / r)
-    //     = sqrt(1000 * M_sun / r)
-    //
-    // We want Earth's orbital period ≈ 20 s at r_earth = 150 pt:
-    //   v_earth = 2π*150 / (20*60) ≈ 0.785 pt/frame
-    //   0.785² = 1000 * M_sun / 150  →  M_sun ≈ 0.092
-    //
-    // We use M_sun = 0.1 for a clean round number:
-    //   v_earth = sqrt(1000 * 0.1 / 150) ≈ 0.816 pt/frame  (period ≈ 19 s)
-    //
-    // Scale: 1 AU = 150 scene points (Earth at 150 pt from centre).
-
-    let au: CGFloat = 150   // scene points per AU
-    let mSun: CGFloat = 0.1 // physics mass of the static sun node
-
-    // --- Add a hidden static sun satellite so the N-Body loop has a central mass ---
-    // The visual sun (model.center) is already on screen. We add a physics satellite
-    // at the origin with the desired mass. addPhysicsBody() must be called first to
-    // create the SKPhysicsBody, then we override its properties.
-    let sunSatellite = Satellite(position: .zero, type: .rocky)
-    sunSatellite.name = "solarSun"
-    sunSatellite.addPhysicsBody(with: .zero)       // creates SKPhysicsBody with mass=10
-    sunSatellite.physicsBody?.mass = mSun          // override to desired sun mass
-    sunSatellite.physicsBody?.isDynamic = false     // the sun doesn't move
-    sunSatellite.physicsBody?.affectedByGravity = false
-    sunSatellite.physicsBody?.fieldBitMask = 0
-    sunSatellite.physicsBody?.categoryBitMask = 0  // no collision contacts
-    sunSatellite.physicsBody?.contactTestBitMask = 0
-    sunSatellite.isHidden = true                   // the visual sun is already there
-    model.satelliteNodes.append(sunSatellite)
-    addChild(sunSatellite)
-
-    struct PlanetDef {
-      let name: String
-      let au: CGFloat        // semi-major axis in AU
-      let type: PlanetType
-      let colorRatio: CGFloat
-      let radius: CGFloat    // visual & physics radius in scene points
-    }
-
-    let planets: [PlanetDef] = [
-      PlanetDef(name: "Mercury", au:  0.387, type: .rocky,  colorRatio: 0.05, radius:  4),
-      PlanetDef(name: "Venus",   au:  0.723, type: .lava,   colorRatio: 0.12, radius:  6),
-      PlanetDef(name: "Earth",   au:  1.000, type: .ocean,  colorRatio: 0.55, radius:  6),
-      PlanetDef(name: "Mars",    au:  1.524, type: .rocky,  colorRatio: 0.02, radius:  5),
-      PlanetDef(name: "Jupiter", au:  5.203, type: .gas,    colorRatio: 0.10, radius: 14),
-      PlanetDef(name: "Saturn",  au:  9.537, type: .icy,    colorRatio: 0.60, radius: 12),
-      PlanetDef(name: "Uranus",  au: 19.19,  type: .ocean,  colorRatio: 0.48, radius: 10),
-      PlanetDef(name: "Neptune", au: 30.07,  type: .ocean,  colorRatio: 0.62, radius: 10),
-    ]
-
-    // Scale up the visual sun so it looks proportional in the solar system view.
-    model.center.setScale(3.0)
-
-    // Zoom camera out to show inner solar system (Mercury–Jupiter) at launch.
-    // Camera scale 0.35 → visible width = 750/0.35 ≈ 2140 pt, showing up to ~7 AU.
-    camera?.setScale(0.35)
-
-    for planet in planets {
-      let r = planet.au * au
-      // Orbital velocity: v = sqrt(m_planet_eff * m_sun_eff / r)
-      //   m_planet_eff = planet.mass * strength = 10 * 10 = 100
-      //   m_sun_eff    = mSun * strength = mSun * 10
-      let speed = sqrt(100.0 * mSun * 10.0 / r)
-
-      // Place planet at (r, 0) with upward velocity for CCW orbit.
-      let position = CGPoint(x: r, y: 0)
-      let satellite = Satellite(position: position, type: planet.type, radius: planet.radius)
-      satellite.name = planet.name
-      satellite.colorRatio = planet.colorRatio
-      satellite.updateColor(for: model.colorSetting)
-      satellite.addPhysicsBody(with: CGVector(dx: 0, dy: speed))
-      // Disable SKFieldNode and world gravity; only the custom N-Body loop applies.
-      satellite.physicsBody?.affectedByGravity = false
-      satellite.physicsBody?.fieldBitMask = 0
-
-      if model.trailLength != .none {
-        satellite.addEmitter(emitterBox: model.emitterForBox)
-      }
-      model.satelliteNodes.append(satellite)
-      addChild(satellite)
     }
   }
 
