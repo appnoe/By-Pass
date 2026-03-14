@@ -44,6 +44,10 @@ class SettingsView: UIView {
 
   let showHideButton: UIButton
 
+  /// The container holding the settings content and glass background.
+  /// Hide this to make the panel invisible when collapsed.
+  let settingsContentView: UIView
+
   override init(frame: CGRect) {
 
     starsKeyLabel = UILabel()
@@ -142,11 +146,14 @@ class SettingsView: UIView {
     showHideButton = UIButton(type: .system)
     showHideButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
 
+    settingsContentView = UIView()
+    settingsContentView.translatesAutoresizingMaskIntoConstraints = false
+
     super.init(frame: frame)
 
     backgroundColor = .clear
 
-    // Add Liquid Glass background for the settings panel
+    // Liquid Glass background for the settings content panel
     let glassEffect = UIGlassEffect()
     let glassView = UIVisualEffectView(effect: glassEffect)
     glassView.translatesAutoresizingMaskIntoConstraints = false
@@ -186,7 +193,7 @@ class SettingsView: UIView {
     buttonStackView.spacing = 5
     buttonStackView.distribution = .fillEqually
 
-    let settingsStackView = UIStackView(arrangedSubviews: [zoomStackView, starsStackView, 
+    let settingsStackView = UIStackView(arrangedSubviews: [zoomStackView, starsStackView,
 //                                                           gravityFieldStackView,
                                                            gravityControl,
                                                            blackHolesStackView,
@@ -194,32 +201,42 @@ class SettingsView: UIView {
                                                            colorControl, backgroundColorStackView, loadSaveStackView, randomButtonStackView, buttonStackView])
     settingsStackView.axis = .vertical
     settingsStackView.spacing = 20
+    settingsStackView.translatesAutoresizingMaskIntoConstraints = false
+
+    // settingsContentView holds the glass background + settings stack
+    settingsContentView.addSubview(glassView)
+    settingsContentView.addSubview(settingsStackView)
 
     let showHideStackView = UIStackView(arrangedSubviews: [showHideButton])
     showHideStackView.alignment = .top
 
-    let stackView = UIStackView(arrangedSubviews: [settingsStackView, showHideStackView])
-    stackView.translatesAutoresizingMaskIntoConstraints = false
-    stackView.spacing = 22
+    let outerStackView = UIStackView(arrangedSubviews: [settingsContentView, showHideStackView])
+    outerStackView.translatesAutoresizingMaskIntoConstraints = false
+    outerStackView.spacing = 8
+    outerStackView.alignment = .top
 
-    // Insert glass background behind the settings content (not behind showHideButton)
-    addSubview(glassView)
-    addSubview(stackView)
+    addSubview(outerStackView)
 
     NSLayoutConstraint.activate([
-      stackView.topAnchor.constraint(equalTo: topAnchor, constant: 20),
-      stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
-      stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
-      stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      outerStackView.topAnchor.constraint(equalTo: topAnchor),
+      outerStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      outerStackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      outerStackView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
       showHideButton.widthAnchor.constraint(equalToConstant: 44),
       showHideButton.heightAnchor.constraint(equalToConstant: 44),
 
-      // Glass background covers the settings content area (excluding the show/hide button)
-      glassView.topAnchor.constraint(equalTo: topAnchor),
-      glassView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      glassView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      glassView.trailingAnchor.constraint(equalTo: showHideButton.leadingAnchor, constant: -4),
+      // Glass fills the entire settingsContentView
+      glassView.topAnchor.constraint(equalTo: settingsContentView.topAnchor),
+      glassView.leadingAnchor.constraint(equalTo: settingsContentView.leadingAnchor),
+      glassView.bottomAnchor.constraint(equalTo: settingsContentView.bottomAnchor),
+      glassView.trailingAnchor.constraint(equalTo: settingsContentView.trailingAnchor),
+
+      // Settings stack sits on top of the glass with padding
+      settingsStackView.topAnchor.constraint(equalTo: settingsContentView.topAnchor, constant: 20),
+      settingsStackView.leadingAnchor.constraint(equalTo: settingsContentView.leadingAnchor, constant: 12),
+      settingsStackView.trailingAnchor.constraint(equalTo: settingsContentView.trailingAnchor, constant: -12),
+      settingsStackView.bottomAnchor.constraint(equalTo: settingsContentView.bottomAnchor, constant: -16),
     ])
   }
 
