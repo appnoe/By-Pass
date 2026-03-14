@@ -6,7 +6,8 @@ import UIKit
 
 class BottomTabBar: UIView {
 
-  // Publicly accessible buttons in order: trash, sun1, sun2, sun3, stars
+  // Publicly accessible buttons
+  let fastForwardButton: UIButton
   let trashButton: UIButton
   let sun1Button: UIButton
   let sun2Button: UIButton
@@ -35,13 +36,14 @@ class BottomTabBar: UIView {
   private let stackView: UIStackView
 
   override init(frame: CGRect) {
-    trashButton = BottomTabBar.makeTabButton(icon: "trash",   title: "Clear")
-    sun1Button  = BottomTabBar.makeTabButton(icon: "sun.max", title: "1 Sun")
-    sun2Button  = BottomTabBar.makeTabButton(icon: "sun.max", title: "2 Suns")
-    sun3Button  = BottomTabBar.makeTabButton(icon: "sun.max", title: "3 Suns")
-    starsButton = BottomTabBar.makeTabButton(icon: "star",    title: "Stars")
-    allButtons  = [trashButton, sun1Button, sun2Button, sun3Button, starsButton]
-    sunButtons  = [sun1Button, sun2Button, sun3Button]
+    fastForwardButton = BottomTabBar.makeTabButton(icon: "forward",  title: "Speed")
+    trashButton       = BottomTabBar.makeTabButton(icon: "trash",    title: "Clear")
+    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1 Sun")
+    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
+    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
+    starsButton       = BottomTabBar.makeTabButton(icon: "star",     title: "Stars")
+    allButtons        = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
+    sunButtons        = [sun1Button, sun2Button, sun3Button]
 
     // Dark translucent pill — same dark frosted look as Music app tab bar
     pillBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterialDark))
@@ -120,12 +122,13 @@ class BottomTabBar: UIView {
   // MARK: - Highlight helpers
 
   private func updateHighlights(animated: Bool) {
+    // sun indices shifted by 2 (fastForward=0, trash=1, sun1=2, sun2=3, sun3=4, stars=5)
     var activeIndices: Set<Int> = []
     if let sunIdx = selectedSunIndex {
-      activeIndices.insert(1 + sunIdx) // sun1=1, sun2=2, sun3=3
+      activeIndices.insert(2 + sunIdx)
     }
     if isStarsOn {
-      activeIndices.insert(4)
+      activeIndices.insert(5)
     }
 
     for (i, button) in allButtons.enumerated() {

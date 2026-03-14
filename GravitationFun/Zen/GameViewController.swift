@@ -17,15 +17,14 @@ class GameViewController: UIViewController {
     let contentView = GameView(frame: UIScreen.main.bounds)
 
     let tabBar = contentView.bottomTabBar
+    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
+    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpInside)
+    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpOutside)
     tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
     tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
     tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
     tabBar.starsButton.addTarget(self, action: #selector(starsTapped), for: .touchUpInside)
-
-    contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
-    contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpInside)
-    contentView.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpOutside)
 
     view = contentView
   }
