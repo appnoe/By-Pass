@@ -46,108 +46,82 @@ class SettingsView: UIView {
 
   override init(frame: CGRect) {
 
-    let darkGray = UIColor(named: "darkGray")
-
     starsKeyLabel = UILabel()
     starsKeyLabel.text = "Stars"
-    starsKeyLabel.textColor = .systemGray
+    starsKeyLabel.textColor = .label
     starsKeyLabel.font = .systemFont(ofSize: 13)
 
     starsSwitch = UISwitch()
     starsSwitch.isOn = true
-    starsSwitch.onTintColor = darkGray
 
     zoomKeyLabel = UILabel()
     zoomKeyLabel.text = "Zoom buttons"
-    zoomKeyLabel.textColor = .systemGray
+    zoomKeyLabel.textColor = .label
     zoomKeyLabel.font = .systemFont(ofSize: 13)
 
     zoomSwitch = UISwitch()
     zoomSwitch.isOn = false
     zoomSwitch.accessibilityLabel = "Show zoom buttons"
-    zoomSwitch.onTintColor = darkGray
 
 //    gravityFieldKeyLabel = UILabel()
 //    gravityFieldKeyLabel.text = "Gravity field"
-//    gravityFieldKeyLabel.textColor = .systemGray
+//    gravityFieldKeyLabel.textColor = .label
 //    gravityFieldKeyLabel.font = .systemFont(ofSize: 13)
 //
 //    gravityFieldSwitch = UISwitch()
 //    gravityFieldSwitch.isOn = true
 //    gravityFieldSwitch.accessibilityLabel = "Activate gravity field"
-//    gravityFieldSwitch.onTintColor = darkGray
 
     gravityControl = UISegmentedControl(items: ["Gravity", "Spirograph"])
-    gravityControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    gravityControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-    gravityControl.selectedSegmentTintColor = darkGray
     gravityControl.selectedSegmentIndex = 0
 
     let blackHolesLabel = UILabel()
     blackHolesLabel.text = "Number Of Black Holes"
-    blackHolesLabel.textColor = .systemGray
+    blackHolesLabel.textColor = .label
     blackHolesLabel.font = .systemFont(ofSize: 13)
 
     blackHolesControl = UISegmentedControl(items: ["1", "2", "3"])
-    blackHolesControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    blackHolesControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-    blackHolesControl.selectedSegmentTintColor = darkGray
     blackHolesControl.selectedSegmentIndex = 0
 
 //    trailKeyLabel = UILabel()
 //    trailKeyLabel.text = "Trail"
-//    trailKeyLabel.textColor = .systemGray
+//    trailKeyLabel.textColor = .label
 //    trailKeyLabel.font = .systemFont(ofSize: 13)
 //
 //    trailLengthControl = UISegmentedControl(items: ["none", "short", "long"])
-//    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-//    trailLengthControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-//    trailLengthControl.selectedSegmentTintColor = darkGray
 //    trailLengthControl.selectedSegmentIndex = 2
 //
 //    trailThicknessControl = UISegmentedControl(items: ["thin", "normal", "thick"])
-//    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-//    trailThicknessControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-//    trailThicknessControl.selectedSegmentTintColor = darkGray
 //    trailThicknessControl.selectedSegmentIndex = 1
 
     colorControl = UISegmentedControl(items: [UIImage(systemName: "paintpalette")!.withRenderingMode(.alwaysOriginal), UIImage(systemName: "paintpalette")!])
-    colorControl.selectedSegmentTintColor = darkGray
-    colorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    colorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
     colorControl.selectedSegmentIndex = 0
 
     backgroundColorKeyLabel = UILabel()
     backgroundColorKeyLabel.text = "Background"
-    backgroundColorKeyLabel.textColor = .systemGray
+    backgroundColorKeyLabel.textColor = .label
     backgroundColorKeyLabel.font = .systemFont(ofSize: 13)
 
     backgroundColorControl = UISegmentedControl(items: ["black", "gray", "white"])
-    backgroundColorControl.selectedSegmentTintColor = darkGray
-    backgroundColorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-    backgroundColorControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
     backgroundColorControl.selectedSegmentIndex = 0
     backgroundColorControl.isEnabled = true
 
     backgroundColorDescriptionLabel = UILabel()
     backgroundColorDescriptionLabel.text = ""
-    backgroundColorDescriptionLabel.textColor = .systemGray
+    backgroundColorDescriptionLabel.textColor = .secondaryLabel
     backgroundColorDescriptionLabel.font = .systemFont(ofSize: 11)
     backgroundColorDescriptionLabel.textAlignment = .center
 
 //    spawnControl = UISegmentedControl(items: ["manual", "automatic"])
-//    spawnControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.gray], for: .normal)
-//    spawnControl.setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.white], for: .selected)
-//    spawnControl.selectedSegmentTintColor = darkGray
 //    spawnControl.selectedSegmentIndex = 0
 
-    loadButton = UIButton(configuration: .filled())
+    loadButton = UIButton(configuration: .glass())
     loadButton.setTitle("Load", for: .normal)
 
-    saveButton = UIButton(configuration: .filled())
+    saveButton = UIButton(configuration: .glass())
     saveButton.setTitle("Save", for: .normal)
 
-    var buttonConfig = UIButton.Configuration.filled()
+    var buttonConfig = UIButton.Configuration.glass()
     buttonConfig.image = UIImage(systemName: "arrow.clockwise")
     clockWiseButton = UIButton(configuration: buttonConfig)
 
@@ -158,21 +132,26 @@ class SettingsView: UIView {
     counterClockWiseButton = UIButton(configuration: buttonConfig)
 
     clearButton = UIButton(type: .system)
-    clearButton.configuration = UIButton.Configuration.filled()
+    clearButton.configuration = UIButton.Configuration.glass()
     clearButton.setImage(UIImage(systemName: "trash"), for: .normal)
 
     shareImageButton = UIButton(type: .system)
-    shareImageButton.configuration = UIButton.Configuration.filled()
+    shareImageButton.configuration = UIButton.Configuration.glass()
     shareImageButton.setImage(UIImage(systemName: "square.and.arrow.up"), for: .normal)
 
     showHideButton = UIButton(type: .system)
     showHideButton.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-    showHideButton.tintColor = .systemGray
 
     super.init(frame: frame)
 
     backgroundColor = .clear
-    tintColor = darkGray
+
+    // Add Liquid Glass background for the settings panel
+    let glassEffect = UIGlassEffect()
+    let glassView = UIVisualEffectView(effect: glassEffect)
+    glassView.translatesAutoresizingMaskIntoConstraints = false
+    glassView.layer.cornerRadius = 16
+    glassView.clipsToBounds = true
 
     let zoomStackView = UIStackView(arrangedSubviews: [zoomKeyLabel, zoomSwitch])
     zoomStackView.spacing = 20
@@ -223,6 +202,8 @@ class SettingsView: UIView {
     stackView.translatesAutoresizingMaskIntoConstraints = false
     stackView.spacing = 22
 
+    // Insert glass background behind the settings content (not behind showHideButton)
+    addSubview(glassView)
     addSubview(stackView)
 
     NSLayoutConstraint.activate([
@@ -233,6 +214,12 @@ class SettingsView: UIView {
 
       showHideButton.widthAnchor.constraint(equalToConstant: 44),
       showHideButton.heightAnchor.constraint(equalToConstant: 44),
+
+      // Glass background covers the settings content area (excluding the show/hide button)
+      glassView.topAnchor.constraint(equalTo: topAnchor),
+      glassView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      glassView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      glassView.trailingAnchor.constraint(equalTo: showHideButton.leadingAnchor, constant: -4),
     ])
   }
 

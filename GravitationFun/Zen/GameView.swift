@@ -30,14 +30,12 @@ class GameView: UIView {
     zoomStepper.maximumValue = 1.25
     zoomStepper.stepValue = 0.25
     zoomStepper.value = 1.0
-    zoomStepper.backgroundColor = .darkGray
     zoomStepper.setDecrementImage(UIImage(systemName: "minus.magnifyingglass"), for: .normal)
     zoomStepper.setIncrementImage(UIImage(systemName: "plus.magnifyingglass"), for: .normal)
-    zoomStepper.tintColor = .white
 
     zoomLabel = UILabel()
     zoomLabel.font = .systemFont(ofSize: 13)
-    zoomLabel.textColor = .white
+    zoomLabel.textColor = .label
     zoomLabel.textAlignment = .center
 
     zoomStackView = UIStackView(arrangedSubviews: [zoomLabel, zoomStepper])
@@ -46,15 +44,14 @@ class GameView: UIView {
     zoomStackView.axis = .vertical
     zoomStackView.isHidden = true
 
-    fastForwardButton = UIButton(type: .system)
+    fastForwardButton = UIButton(configuration: .glass())
     fastForwardButton.translatesAutoresizingMaskIntoConstraints = false
     fastForwardButton.setImage(UIImage(systemName: "forward"), for: .normal)
-    fastForwardButton.tintColor = .systemGray
 
     satellitesCountLabel = UILabel()
     satellitesCountLabel.translatesAutoresizingMaskIntoConstraints = false
     satellitesCountLabel.text = "0"
-    satellitesCountLabel.textColor = .systemGray
+    satellitesCountLabel.textColor = .secondaryLabel
 
     super.init(frame: frame)
 
