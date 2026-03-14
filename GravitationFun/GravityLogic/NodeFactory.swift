@@ -30,6 +30,15 @@ enum NodeFactory {
     node.fillColor = .clear   // visual comes from effect node below
     node.zPosition = 10       // in front of stars (z=-100), behind planets (z=20)
 
+    // Black disc slightly larger than the glow radius, rendered just above the
+    // star layer (z=-90) so it paints over any stars that spawn near the sun.
+    let starBlockRadius = radius * 4.0  // covers the full glow area
+    let starBlocker = SKShapeNode(circleOfRadius: starBlockRadius)
+    starBlocker.fillColor = .black
+    starBlocker.lineWidth = 0
+    starBlocker.zPosition = -90   // above stars (z=-100), below everything else
+    node.addChild(starBlocker)
+
     node.physicsBody = SKPhysicsBody(circleOfRadius: radius)
     node.physicsBody?.isDynamic = false
     node.physicsBody?.categoryBitMask = PhysicsCategory.center
