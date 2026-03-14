@@ -4,6 +4,21 @@
 
 import Foundation
 import SpriteKit
+import UIKit
+
+// MARK: - Planet Types
+
+enum PlanetType: CaseIterable {
+  case rocky       // grau-braun, Krater
+  case lava        // dunkelrot, Lava-Risse
+  case gas         // orange-beige, horizontale Streifen (Jupiter-artig)
+  case ocean       // blau-grün, Wolkenflecken
+  case icy         // hellblau-weiß, Eisstruktur
+
+  static func random() -> PlanetType {
+    return PlanetType.allCases.randomElement()!
+  }
+}
 
 enum NodeFactory {
   static func center() -> SKShapeNode {
@@ -189,5 +204,241 @@ enum NodeFactory {
     node.strokeColor = .systemGray
     node.lineWidth = 1
     return node
+  }
+
+  // MARK: - Planet Texture
+
+  static func planetTexture(type: PlanetType, radius: CGFloat, baseColor: UIColor) -> SKTexture {
+    let size = CGSize(width: radius * 2, height: radius * 2)
+    let renderer = UIGraphicsImageRenderer(size: size)
+    let image = renderer.image { ctx in
+      let cgCtx = ctx.cgContext
+      let center = CGPoint(x: radius, y: radius)
+
+      // Clip all drawing to circle
+      let circlePath = UIBezierPath(ovalIn: CGRect(origin: .zero, size: size))
+      circlePath.addClip()
+
+      switch type {
+
+      case .rocky:
+        // Base gradient: mid-grey to dark at limb
+        NodeFactory.drawSphereGradient(
+          in: cgCtx, center: center, radius: radius,
+          inner: UIColor(red: 0.60, green: 0.55, blue: 0.48, alpha: 1),
+          outer: UIColor(red: 0.20, green: 0.17, blue: 0.14, alpha: 1)
+        )
+        // Craters
+        var rng = RNG(seed: 0xABCD_1234)
+        for _ in 0..<12 {
+          let r = rng.next() * radius * 0.80
+          let a = rng.next() * .pi * 2
+          let cr = rng.next() * radius * 0.18 + radius * 0.06
+          let x = center.x + cos(a) * r
+          let y = center.y + sin(a) * r
+          // Shadow half
+          cgCtx.setFillColor(UIColor(white: 0.12, alpha: 0.45).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - cr, y: y - cr + cr * 0.15, width: cr * 2, height: cr * 2))
+          // Highlight rim
+          cgCtx.setFillColor(UIColor(white: 0.80, alpha: 0.30).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - cr, y: y - cr - cr * 0.10, width: cr * 2, height: cr * 1.6))
+          // Dark floor
+          cgCtx.setFillColor(UIColor(white: 0.08, alpha: 0.55).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - cr * 0.6, y: y - cr * 0.6, width: cr * 1.2, height: cr * 1.2))
+        }
+
+      case .lava:
+        // Dark red base
+        NodeFactory.drawSphereGradient(
+          in: cgCtx, center: center, radius: radius,
+          inner: UIColor(red: 0.55, green: 0.10, blue: 0.02, alpha: 1),
+          outer: UIColor(red: 0.12, green: 0.02, blue: 0.00, alpha: 1)
+        )
+        // Glowing lava cracks
+        var rng = RNG(seed: 0xDEAD_BEEF)
+        for _ in 0..<18 {
+          let x0 = rng.next() * radius * 1.6 - radius * 0.8 + center.x
+          let y0 = rng.next() * radius * 1.6 - radius * 0.8 + center.y
+          let x1 = x0 + (rng.next() - 0.5) * radius * 0.6
+          let y1 = y0 + (rng.next() - 0.5) * radius * 0.6
+          let alpha = rng.next() * 0.55 + 0.25
+          cgCtx.setStrokeColor(UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: alpha).cgColor)
+          cgCtx.setLineWidth(rng.next() * 1.2 + 0.4)
+          cgCtx.move(to: CGPoint(x: x0, y: y0))
+          cgCtx.addLine(to: CGPoint(x: x1, y: y1))
+          cgCtx.strokePath()
+        }
+        // Hot spots
+        for _ in 0..<6 {
+          let r = rng.next() * radius * 0.75
+          let a = rng.next() * .pi * 2
+          let sr = rng.next() * radius * 0.10 + radius * 0.04
+          let x = center.x + cos(a) * r
+          let y = center.y + sin(a) * r
+          let colors = [UIColor(red: 1.0, green: 0.9, blue: 0.2, alpha: 0.9).cgColor,
+                        UIColor(red: 1.0, green: 0.3, blue: 0.0, alpha: 0.0).cgColor] as CFArray
+          if let grad = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                   colors: colors, locations: [0, 1.0]) {
+            cgCtx.drawRadialGradient(grad,
+              startCenter: CGPoint(x: x, y: y), startRadius: 0,
+              endCenter: CGPoint(x: x, y: y), endRadius: sr * 2,
+              options: [])
+          }
+        }
+
+      case .gas:
+        // Base warm orange
+        NodeFactory.drawSphereGradient(
+          in: cgCtx, center: center, radius: radius,
+          inner: UIColor(red: 0.92, green: 0.72, blue: 0.42, alpha: 1),
+          outer: UIColor(red: 0.40, green: 0.22, blue: 0.08, alpha: 1)
+        )
+        // Horizontal bands
+        var rng = RNG(seed: 0x1234_5678)
+        let bandColors: [UIColor] = [
+          UIColor(red: 0.75, green: 0.45, blue: 0.22, alpha: 0.55),
+          UIColor(red: 0.95, green: 0.82, blue: 0.60, alpha: 0.45),
+          UIColor(red: 0.55, green: 0.30, blue: 0.12, alpha: 0.60),
+          UIColor(red: 0.88, green: 0.65, blue: 0.35, alpha: 0.40),
+          UIColor(red: 0.65, green: 0.38, blue: 0.18, alpha: 0.55),
+        ]
+        var y = radius * 0.15
+        while y < radius * 1.85 {
+          let bh = rng.next() * radius * 0.22 + radius * 0.08
+          let col = bandColors[Int(rng.next() * CGFloat(bandColors.count))]
+          cgCtx.setFillColor(col.cgColor)
+          // Slightly wavy band
+          let wave = rng.next() * radius * 0.06 - radius * 0.03
+          cgCtx.fill(CGRect(x: 0, y: y + wave, width: radius * 2, height: bh))
+          y += bh + rng.next() * radius * 0.05
+        }
+        // Great spot
+        let spotX = center.x + radius * 0.20
+        let spotY = center.y + radius * 0.15
+        cgCtx.setFillColor(UIColor(red: 0.65, green: 0.22, blue: 0.10, alpha: 0.70).cgColor)
+        cgCtx.fillEllipse(in: CGRect(x: spotX - radius * 0.18, y: spotY - radius * 0.10,
+                                     width: radius * 0.36, height: radius * 0.20))
+
+      case .ocean:
+        // Blue-green base
+        NodeFactory.drawSphereGradient(
+          in: cgCtx, center: center, radius: radius,
+          inner: UIColor(red: 0.10, green: 0.45, blue: 0.75, alpha: 1),
+          outer: UIColor(red: 0.02, green: 0.10, blue: 0.30, alpha: 1)
+        )
+        // Land masses
+        var rng = RNG(seed: 0xFEED_FACE)
+        for _ in 0..<5 {
+          let r = rng.next() * radius * 0.65
+          let a = rng.next() * .pi * 2
+          let lw = rng.next() * radius * 0.35 + radius * 0.15
+          let lh = rng.next() * radius * 0.22 + radius * 0.10
+          let x = center.x + cos(a) * r
+          let y = center.y + sin(a) * r
+          cgCtx.setFillColor(UIColor(red: 0.25, green: 0.50, blue: 0.20, alpha: 0.80).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - lw/2, y: y - lh/2, width: lw, height: lh))
+        }
+        // Cloud wisps
+        for _ in 0..<8 {
+          let r = rng.next() * radius * 0.80
+          let a = rng.next() * .pi * 2
+          let cw = rng.next() * radius * 0.40 + radius * 0.15
+          let x = center.x + cos(a) * r
+          let y = center.y + sin(a) * r
+          cgCtx.setFillColor(UIColor(white: 1.0, alpha: rng.next() * 0.35 + 0.15).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - cw/2, y: y - cw * 0.2, width: cw, height: cw * 0.35))
+        }
+
+      case .icy:
+        // White-blue base
+        NodeFactory.drawSphereGradient(
+          in: cgCtx, center: center, radius: radius,
+          inner: UIColor(red: 0.88, green: 0.94, blue: 1.00, alpha: 1),
+          outer: UIColor(red: 0.30, green: 0.50, blue: 0.75, alpha: 1)
+        )
+        // Ice crack network
+        var rng = RNG(seed: 0xC0DE_CAFE)
+        for _ in 0..<22 {
+          let x0 = rng.next() * radius * 2
+          let y0 = rng.next() * radius * 2
+          let x1 = x0 + (rng.next() - 0.5) * radius * 0.7
+          let y1 = y0 + (rng.next() - 0.5) * radius * 0.7
+          let alpha = rng.next() * 0.30 + 0.12
+          cgCtx.setStrokeColor(UIColor(red: 0.55, green: 0.75, blue: 1.0, alpha: alpha).cgColor)
+          cgCtx.setLineWidth(0.5)
+          cgCtx.move(to: CGPoint(x: x0, y: y0))
+          cgCtx.addLine(to: CGPoint(x: x1, y: y1))
+          cgCtx.strokePath()
+        }
+        // Frozen patches
+        for _ in 0..<6 {
+          let r = rng.next() * radius * 0.70
+          let a = rng.next() * .pi * 2
+          let pr = rng.next() * radius * 0.18 + radius * 0.06
+          let x = center.x + cos(a) * r
+          let y = center.y + sin(a) * r
+          cgCtx.setFillColor(UIColor(white: 1.0, alpha: 0.35).cgColor)
+          cgCtx.fillEllipse(in: CGRect(x: x - pr, y: y - pr, width: pr * 2, height: pr * 2))
+        }
+      }
+
+      // --- Shared: specular highlight (top-left bright spot) ---
+      let hlX = center.x - radius * 0.30
+      let hlY = center.y + radius * 0.28
+      let hlColors = [UIColor(white: 1.0, alpha: 0.65).cgColor,
+                      UIColor(white: 1.0, alpha: 0.00).cgColor] as CFArray
+      if let hlGrad = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                 colors: hlColors, locations: [0, 1.0]) {
+        cgCtx.drawRadialGradient(hlGrad,
+          startCenter: CGPoint(x: hlX, y: hlY), startRadius: 0,
+          endCenter: CGPoint(x: hlX, y: hlY), endRadius: radius * 0.55,
+          options: [])
+      }
+
+      // --- Shared: dark limb (atmospheric edge darkening) ---
+      let limbColors = [UIColor(red: 0, green: 0, blue: 0, alpha: 0.00).cgColor,
+                        UIColor(red: 0, green: 0, blue: 0, alpha: 0.55).cgColor] as CFArray
+      if let limbGrad = CGGradient(colorsSpace: CGColorSpaceCreateDeviceRGB(),
+                                   colors: limbColors, locations: [0.65, 1.0]) {
+        cgCtx.drawRadialGradient(limbGrad,
+          startCenter: center, startRadius: radius * 0.55,
+          endCenter: center, endRadius: radius,
+          options: [])
+      }
+    }
+    return SKTexture(image: image)
+  }
+
+  // Sphere shading: off-center radial gradient for 3D look
+  private static func drawSphereGradient(
+    in ctx: CGContext, center: CGPoint, radius: CGFloat,
+    inner: UIColor, outer: UIColor
+  ) {
+    let colors = [inner.cgColor, outer.cgColor] as CFArray
+    let locations: [CGFloat] = [0.0, 1.0]
+    guard let gradient = CGGradient(
+      colorsSpace: CGColorSpaceCreateDeviceRGB(),
+      colors: colors,
+      locations: locations
+    ) else { return }
+    // Offset light source top-left for 3D feel
+    let lightCenter = CGPoint(x: center.x - radius * 0.25, y: center.y + radius * 0.20)
+    ctx.drawRadialGradient(
+      gradient,
+      startCenter: lightCenter, startRadius: 0,
+      endCenter: center, endRadius: radius,
+      options: .drawsAfterEndLocation
+    )
+  }
+}
+
+// MARK: - Simple deterministic RNG (LCG) for texture generation
+
+private struct RNG {
+  var state: UInt64
+  init(seed: UInt64) { state = seed }
+  mutating func next() -> CGFloat {
+    state = state &* 6364136223846793005 &+ 1442695040888963407
+    return CGFloat(state >> 33) / CGFloat(UInt32.max)
   }
 }
