@@ -29,8 +29,8 @@ class BottomTabBar: UIView {
   // Dark blurred pill background — matches Music app
   private let pillBackground: UIVisualEffectView
 
-  // Rounded rect that slides behind the active sun button
-  private let selectionBackground: UIView
+  // Blurred pill that slides behind the active sun button
+  private let selectionBackground: UIVisualEffectView
 
   private let stackView: UIStackView
 
@@ -49,10 +49,10 @@ class BottomTabBar: UIView {
     pillBackground.layer.cornerRadius = 28
     pillBackground.clipsToBounds = true
 
-    // Selection indicator: slightly lighter dark rounded rect
-    selectionBackground = UIView()
-    selectionBackground.backgroundColor = UIColor.white.withAlphaComponent(0.15)
-    selectionBackground.layer.cornerRadius = 20
+    // Selection indicator: a brighter blur pill layered on top of the dark background
+    selectionBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterialDark))
+    selectionBackground.layer.cornerRadius = 22
+    selectionBackground.clipsToBounds = true
     selectionBackground.alpha = 0
 
     stackView = UIStackView(arrangedSubviews: allButtons)
