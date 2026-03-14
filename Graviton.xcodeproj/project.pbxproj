@@ -29,7 +29,6 @@
 		F27F9C602A19E907009D32D3 /* StoreKitTestCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */; };
 		F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E3B277B0F7C00EA5825 /* GameView.swift */; };
 		F2A21E50277F0F8D00EA5825 /* GravityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */; };
-		F2B5FF0B2A194D11005C53A1 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = F2B5FF0A2A194D11005C53A1 /* RevenueCat */; };
 		F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2BD5C5A2773C4DC00136C85 /* AppDelegate.swift */; };
 		F2BD5C612773C4DC00136C85 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2BD5C602773C4DC00136C85 /* GameScene.swift */; };
 		F2BD5C632773C4DC00136C85 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2BD5C622773C4DC00136C85 /* GameViewController.swift */; };
@@ -107,7 +106,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F2B5FF0B2A194D11005C53A1 /* RevenueCat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,7 +299,6 @@
 			);
 			name = GravitationFun;
 			packageProductDependencies = (
-				F2B5FF0A2A194D11005C53A1 /* RevenueCat */,
 			);
 			productName = GravitationFun;
 			productReference = F2BD5C572773C4DC00136C85 /* Gravity.app */;
@@ -359,7 +356,6 @@
 			);
 			mainGroup = F2BD5C4E2773C4DC00136C85;
 			packageReferences = (
-				F2B5FF092A194D11005C53A1 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			productRefGroup = F2BD5C582773C4DC00136C85 /* Products */;
 			projectDirPath = "";
@@ -793,25 +789,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		F2B5FF092A194D11005C53A1 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		F2B5FF0A2A194D11005C53A1 /* RevenueCat */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F2B5FF092A194D11005C53A1 /* XCRemoteSwiftPackageReference "purchases-ios" */;
-			productName = RevenueCat;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F2BD5C4F2773C4DC00136C85 /* Project object */;
 }
