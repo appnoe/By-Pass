@@ -18,8 +18,11 @@ public enum Direction {
 public class Satellite: SKShapeNode {
 
 //  let type: SatelliteType
-  public let radius: CGFloat = 5
+  public let radius: CGFloat = 8
   var colorRatio: CGFloat = 0
+  private var planetType: PlanetType = .rocky
+  private var spriteNode: SKSpriteNode?
+
   public override class var supportsSecureCoding: Bool {
     return true
   }
@@ -59,27 +62,19 @@ public class Satellite: SKShapeNode {
   }
 
   init(position: CGPoint) {
-
-//    let size: CGSize
-//    switch type {
-//      case .box:
-//        size = CGSize(width: 10, height: 10)
-//      case .rectangle:
-//        size = CGSize(width: 5, height: 20)
-//    }
-//
-//    self.type = type
-
-//    super.init(texture: nil, color: .white, size: size)
     super.init()
-    path = CGPath(ellipseIn: .init(x: 0, y: 0, width: radius*2, height: radius*2), transform: nil)
 
+    // Invisible shape for physics (transparent, no stroke)
+    path = CGPath(ellipseIn: .init(x: 0, y: 0, width: radius * 2, height: radius * 2), transform: nil)
     lineWidth = 0
-    fillColor = .white
+    fillColor = .clear
 
     self.position = position
-//    anchorPoint = CGPoint(x: 0.5, y: 0.5)
     zPosition = 2
+
+    // Pick a random planet type and build the textured sprite
+    planetType = PlanetType.random()
+    applyPlanetTexture()
   }
 
   required init?(coder aDecoder: NSCoder) {
@@ -89,6 +84,27 @@ public class Satellite: SKShapeNode {
     super.init(coder: aDecoder)
   }
 
+  private func applyPlanetTexture() {
+    spriteNode?.removeFromParent()
+    let baseColor: UIColor
+    switch planetType {
+    case .rocky: baseColor = UIColor(red: 0.55, green: 0.50, blue: 0.42, alpha: 1)
+    case .lava:  baseColor = UIColor(red: 0.55, green: 0.10, blue: 0.02, alpha: 1)
+    case .gas:   baseColor = UIColor(red: 0.90, green: 0.68, blue: 0.38, alpha: 1)
+    case .ocean: baseColor = UIColor(red: 0.10, green: 0.42, blue: 0.72, alpha: 1)
+    case .icy:   baseColor = UIColor(white: 0.88, alpha: 1)
+    }
+    let texture = NodeFactory.planetTexture(type: planetType, radius: radius, baseColor: baseColor)
+    let sprite = SKSpriteNode(texture: texture, size: CGSize(width: radius * 2, height: radius * 2))
+    sprite.position = CGPoint(x: radius, y: radius)
+    sprite.zPosition = 1
+    addChild(sprite)
+    spriteNode = sprite
+
+    // Slow self-rotation for all planet types
+    sprite.run(SKAction.repeatForever(SKAction.rotate(byAngle: -.pi * 2, duration: Double.random(in: 12...28))))
+  }
+
   func addColor(forInput input: CGPoint, colorSetting: ColorSetting) {
     let length = sqrt(pow(input.x - position.x, 2) + pow(input.y - position.y, 2))
     colorRatio = min(length/150, 0.9)
@@ -96,15 +112,18 @@ public class Satellite: SKShapeNode {
   }
 
   func updateColor(for colorSetting: ColorSetting) {
+    // In multiColor mode: tint the planet sprite; in B&W: desaturate
     switch colorSetting {
-      case .multiColor:
-        fillColor = UIColor(hue: colorRatio, saturation: 0.7, brightness: 1.0, alpha: 1)
-      case .blackAndWhite:
-        fillColor = UIColor(white: colorRatio, alpha: 1)
+    case .multiColor:
+      spriteNode?.color = UIColor(hue: colorRatio, saturation: 0.55, brightness: 1.0, alpha: 1)
+      spriteNode?.colorBlendFactor = 0.25
+    case .blackAndWhite:
+      spriteNode?.color = UIColor(white: colorRatio, alpha: 1)
+      spriteNode?.colorBlendFactor = 0.6
     }
     let emitters = children.filter({ $0 is SKEmitterNode }) as! [SKEmitterNode]
     for emitter in emitters {
-      emitter.particleColor = fillColor
+      emitter.particleColor = UIColor(hue: colorRatio, saturation: 0.7, brightness: 1.0, alpha: 1)
     }
   }
 
