@@ -56,7 +56,7 @@ class GameView: UIView {
     super.init(frame: frame)
 
     skView.ignoresSiblingOrder = true
-    skView.preferredFramesPerSecond = 120
+    skView.preferredFramesPerSecond = UIScreen.main.maximumFramesPerSecond
 
 //    #if DEBUG
 //    skView.showsFPS = true
@@ -68,9 +68,6 @@ class GameView: UIView {
     addSubview(zoomStackView)
     addSubview(fastForwardButton)
     addSubview(satellitesCountLabel)
-
-    // Initially hide the settings content (panel starts collapsed)
-    settingsView.settingsContentView.isHidden = true
 
     let leadingSettingsConstraint = settingsView.showHideButton.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12)
 
@@ -96,38 +93,28 @@ class GameView: UIView {
   required init?(coder: NSCoder) { fatalError() }
 
   func toggleSettings() {
-    guard let leadingSettingsConstraint = leadingSettingsConstraint else { return }
+    let image: UIImage?
+
+    guard let leadingSettingsConstraint = leadingSettingsConstraint else {
+      return
+    }
 
     let button = settingsView.showHideButton
-    let isExpanded = leadingSettingsConstraint.constant > 21
-
-    if isExpanded {
-      // Collapse: hide panel content, move button back to left edge
-      UIView.animate(withDuration: 0.25) {
-        self.settingsView.settingsContentView.alpha = 0
-      } completion: { _ in
-        self.settingsView.settingsContentView.isHidden = true
-        leadingSettingsConstraint.constant = 12
-        button.setImage(UIImage(systemName: "chevron.right"), for: .normal)
-        UIView.animate(withDuration: 0.3) {
-          self.layoutIfNeeded()
-        }
-      }
+    if leadingSettingsConstraint.constant > 21 {
+      leadingSettingsConstraint.constant = 12
+      image = UIImage(systemName: "chevron.right")
     } else {
-      // Expand: show panel content
-      settingsView.settingsContentView.alpha = 0
-      settingsView.settingsContentView.isHidden = false
       if let convertedOrigin = button.superview?.convert(button.frame.origin, to: settingsView) {
         leadingSettingsConstraint.constant = convertedOrigin.x + 10
+        image = UIImage(systemName: "chevron.left")
+      } else {
+        image = nil
       }
-      button.setImage(UIImage(systemName: "chevron.left"), for: .normal)
-      UIView.animate(withDuration: 0.3) {
-        self.layoutIfNeeded()
-      } completion: { _ in
-        UIView.animate(withDuration: 0.25) {
-          self.settingsView.settingsContentView.alpha = 1
-        }
-      }
+    }
+    UIView.animate(withDuration: 0.3) {
+      self.layoutIfNeeded()
+    } completion: { finished in
+      button.setImage(image, for: .normal)
     }
   }
 
