@@ -27,14 +27,17 @@ class BottomTabBar: UIView {
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
-  // Outer container using UIGlassContainerEffect so pill + selection can morph together
+  // Container renders all glass children in one combined pass — enables morphing
   private let containerView: UIVisualEffectView
 
-  // The main glass pill background
+  // Main pill — fills the whole bar
   private let pillView: UIVisualEffectView
 
-  // Sliding glass pill that highlights the active sun button
+  // Selection pill — slides behind the active sun button, sibling of pillView inside container
   private let selectionView: UIVisualEffectView
+
+  // Transparent overlay that holds the buttons, sits above both glass views
+  private let buttonContainer: UIView
 
   private let stackView: UIStackView
 
@@ -48,12 +51,11 @@ class BottomTabBar: UIView {
     allButtons        = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
     sunButtons        = [sun1Button, sun2Button, sun3Button]
 
-    // Glass container — lets pill and selection morph into each other
-    let containerEffect = UIGlassContainerEffect()
-    containerView = UIVisualEffectView(effect: containerEffect)
+    // UIGlassContainerEffect lets nested UIGlassEffect views render + morph together
+    containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
     containerView.translatesAutoresizingMaskIntoConstraints = false
 
-    // Main pill with Liquid Glass
+    // Main pill background
     let pillGlass = UIGlassEffect()
     pillGlass.isInteractive = false
     pillView = UIVisualEffectView(effect: pillGlass)
@@ -61,13 +63,17 @@ class BottomTabBar: UIView {
     pillView.layer.cornerRadius = 28
     pillView.clipsToBounds = true
 
-    // Selection indicator: a separate Liquid Glass pill behind the active sun button
+    // Selection pill — positioned over the active sun button
     let selectionGlass = UIGlassEffect()
     selectionGlass.isInteractive = false
     selectionView = UIVisualEffectView(effect: selectionGlass)
     selectionView.layer.cornerRadius = 22
     selectionView.clipsToBounds = true
     selectionView.alpha = 0
+
+    buttonContainer = UIView()
+    buttonContainer.translatesAutoresizingMaskIntoConstraints = false
+    buttonContainer.backgroundColor = .clear
 
     stackView = UIStackView(arrangedSubviews: allButtons)
     stackView.axis = .horizontal
@@ -79,11 +85,19 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    // Build hierarchy: containerView holds pillView; pillView holds selectionView + stackView
+    // Hierarchy:
+    //   self
+    //   └── containerView (UIGlassContainerEffect)
+    //       └── contentView
+    //           ├── pillView (UIGlassEffect, full bar)
+    //           ├── selectionView (UIGlassEffect, slides under active sun)
+    //           └── buttonContainer (transparent, holds stack)
     addSubview(containerView)
+
     containerView.contentView.addSubview(pillView)
-    pillView.contentView.addSubview(selectionView)
-    pillView.contentView.addSubview(stackView)
+    containerView.contentView.addSubview(selectionView)
+    containerView.contentView.addSubview(buttonContainer)
+    buttonContainer.addSubview(stackView)
 
     NSLayoutConstraint.activate([
       containerView.topAnchor.constraint(equalTo: topAnchor),
@@ -91,15 +105,22 @@ class BottomTabBar: UIView {
       containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
       containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
 
+      // pillView fills the entire container
       pillView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
       pillView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
       pillView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
       pillView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
 
-      stackView.topAnchor.constraint(equalTo: pillView.contentView.topAnchor, constant: 4),
-      stackView.leadingAnchor.constraint(equalTo: pillView.contentView.leadingAnchor, constant: 8),
-      stackView.bottomAnchor.constraint(equalTo: pillView.contentView.bottomAnchor, constant: -4),
-      stackView.trailingAnchor.constraint(equalTo: pillView.contentView.trailingAnchor, constant: -8),
+      // buttonContainer also fills the container (above glass views)
+      buttonContainer.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
+      buttonContainer.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
+      buttonContainer.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
+      buttonContainer.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
+
+      stackView.topAnchor.constraint(equalTo: buttonContainer.topAnchor, constant: 4),
+      stackView.leadingAnchor.constraint(equalTo: buttonContainer.leadingAnchor, constant: 8),
+      stackView.bottomAnchor.constraint(equalTo: buttonContainer.bottomAnchor, constant: -4),
+      stackView.trailingAnchor.constraint(equalTo: buttonContainer.trailingAnchor, constant: -8),
     ])
 
     for button in allButtons {
@@ -134,7 +155,6 @@ class BottomTabBar: UIView {
   // MARK: - Highlight helpers
 
   private func updateHighlights(animated: Bool) {
-    // sun indices shifted by 2 (fastForward=0, trash=1, sun1=2, sun2=3, sun3=4, stars=5)
     var activeIndices: Set<Int> = []
     if let sunIdx = selectedSunIndex {
       activeIndices.insert(2 + sunIdx)
@@ -158,14 +178,9 @@ class BottomTabBar: UIView {
     }
 
     let targetButton = sunButtons[sunIdx]
-    let buttonFrame = targetButton.frame
-    let stackOrigin = stackView.frame.origin
-    let targetFrame = CGRect(
-      x: stackOrigin.x + buttonFrame.origin.x + 2,
-      y: stackOrigin.y + buttonFrame.origin.y + 2,
-      width: buttonFrame.width - 4,
-      height: buttonFrame.height - 4
-    )
+    // Convert button frame into containerView.contentView coordinate space
+    let targetFrame = targetButton.convert(targetButton.bounds, to: containerView.contentView)
+      .insetBy(dx: 2, dy: 2)
 
     let show = {
       self.selectionView.frame = targetFrame
