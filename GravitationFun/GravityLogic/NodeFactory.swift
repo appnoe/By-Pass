@@ -191,16 +191,67 @@ enum NodeFactory {
   }
 
   static func backgroundEmitter(size: CGSize) -> SKEmitterNode? {
-    guard let node = SKEmitterNode(fileNamed: "background") else { return nil }
-    node.particlePositionRange = CGVector(dx: size.width * 2, dy: size.height * 2)
-    node.zPosition = -10  // always behind sun, planets and trails
-    // ~1500 stars at equilibrium: birthRate * lifetime = 25 * 60 = ~1500 visible at any time
-    node.particleBirthRate = 25
-    node.particleLifetime = 60
-    node.particleLifetimeRange = 30
-    node.numParticlesToEmit = 0 // emit continuously
-    node.advanceSimulationTime(60) // pre-populate so stars appear immediately
-    return node
+    // SKEmitterNode has no built-in exclusion zone. To avoid spawning stars over
+    // the sun we split the background into 4 quadrant emitters, each offset so
+    // their combined spawn area leaves a sun-free square of side `gap` at (0,0).
+    //
+    // Layout (scene anchor = centre):
+    //
+    //   q2(-cx, cy) | q1(cx, cy)
+    //   ------------|------------
+    //   q3(-cx,-cy) | q4(cx,-cy)
+    //
+    //   qw = scene half-width  - gap/2   (width  of each quadrant spawn rect)
+    //   qh = scene half-height - gap/2   (height of each quadrant spawn rect)
+    //   cx = gap/2 + qw/2                (x centre of right quadrants)
+    //   cy = gap/2 + qh/2                (y centre of top  quadrants)
+
+    let gap: CGFloat = 140        // side of the sun-free square (pixels)
+    let hw: CGFloat  = size.width   // scene half-width  (anchor=0.5)
+    let hh: CGFloat  = size.height  // scene half-height
+    let qw: CGFloat  = hw - gap / 2
+    let qh: CGFloat  = hh - gap / 2
+    let cx: CGFloat  = gap / 2 + qw / 2
+    let cy: CGFloat  = gap / 2 + qh / 2
+
+    // ~1500 stars total across 4 emitters → ~7 per emitter
+    let birthRate: CGFloat     = 7
+    let lifetime: CGFloat      = 60
+    let lifetimeRange: CGFloat = 30
+
+    func makeQuadrant() -> SKEmitterNode? {
+      guard let e = SKEmitterNode(fileNamed: "background") else { return nil }
+      e.particlePositionRange = CGVector(dx: qw, dy: qh)
+      e.zPosition = -10
+      e.particleBirthRate = birthRate
+      e.particleLifetime = lifetime
+      e.particleLifetimeRange = lifetimeRange
+      e.numParticlesToEmit = 0
+      e.advanceSimulationTime(Double(lifetime))
+      return e
+    }
+
+    // Primary emitter sits at scene origin; we use it purely as a carrier node.
+    // Its own spawn position is (cx, cy); the other 3 quadrants are children
+    // positioned relative to the primary (which is at origin), so their
+    // absolute positions become the correct quadrant centres.
+    guard let primary = makeQuadrant() else { return nil }
+    primary.position = CGPoint(x: cx, y: cy)   // quadrant 1 (top-right)
+
+    if let q2 = makeQuadrant() {
+      q2.position = CGPoint(x: -cx - cx, y: 0) // relative to primary → (-cx, cy)
+      primary.addChild(q2)
+    }
+    if let q3 = makeQuadrant() {
+      q3.position = CGPoint(x: 0, y: -cy - cy) // relative to primary → (cx, -cy)
+      primary.addChild(q3)
+    }
+    if let q4 = makeQuadrant() {
+      q4.position = CGPoint(x: -cx - cx, y: -cy - cy) // → (-cx, -cy)
+      primary.addChild(q4)
+    }
+
+    return primary
   }
 
   static func velocity(from: CGPoint, to: CGPoint) -> SKShapeNode {
