@@ -10,13 +10,54 @@ class InfoSheetViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupSpriteKitView()
+        setupGlowBorder()
         setupTitleLabel()
         setupTaglineLabel()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        // Update glow path after corner radius is applied by the sheet
+        if let glowLayer = view.layer.sublayers?.first(where: { $0.name == "glowBorder" }) as? CAShapeLayer {
+            glowLayer.path = UIBezierPath(
+                roundedRect: view.bounds,
+                cornerRadius: view.layer.cornerRadius
+            ).cgPath
+        }
     }
 
     override var prefersStatusBarHidden: Bool { true }
 
     // MARK: - Setup
+
+    private func setupGlowBorder() {
+        // A CAShapeLayer stroked with the sun's warm orange, with a matching
+        // shadow-blur (shadowRadius) to create an inner-glow effect.
+        // Placed as the bottommost sublayer so it stays behind everything.
+        let glow = CAShapeLayer()
+        glow.name = "glowBorder"
+        glow.fillColor = UIColor.clear.cgColor
+        glow.strokeColor = UIColor(red: 1.0, green: 0.65, blue: 0.10, alpha: 0.55).cgColor
+        glow.lineWidth = 2.0
+        // Shadow = soft halo around the stroke line
+        glow.shadowColor  = UIColor(red: 1.0, green: 0.55, blue: 0.05, alpha: 1.0).cgColor
+        glow.shadowOffset = .zero
+        glow.shadowRadius = 12
+        glow.shadowOpacity = 0.9
+        // path set in viewDidLayoutSubviews once corner radius is known
+        glow.path = UIBezierPath(roundedRect: view.bounds, cornerRadius: 24).cgPath
+        view.layer.insertSublayer(glow, at: 0)
+
+        // Gentle pulse: the glow breathes like the sun
+        let pulse = CABasicAnimation(keyPath: "shadowOpacity")
+        pulse.fromValue = 0.55
+        pulse.toValue   = 0.95
+        pulse.duration  = 1.8
+        pulse.autoreverses = true
+        pulse.repeatCount  = .infinity
+        pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+        glow.add(pulse, forKey: "glowPulse")
+    }
 
     private func setupSpriteKitView() {
         let skView = SKView(frame: view.bounds)
