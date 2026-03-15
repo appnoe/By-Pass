@@ -79,9 +79,9 @@ class SplashViewController: UIViewController {
         badge.addSubview(label)
 
         NSLayoutConstraint.activate([
-            // Badge position: below center
+            // Badge anchored to safe-area bottom
             badge.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            badge.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: 24),
+            badge.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
 
             // Label padding inside badge
             label.topAnchor.constraint(equalTo: badge.topAnchor, constant: 8),
