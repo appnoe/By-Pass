@@ -19,6 +19,11 @@ class BottomTabBar: UIView {
     didSet { updateHighlights(animated: true) }
   }
 
+  // Tracks whether fast-forward is active
+  var isFastForwardOn: Bool = false {
+    didSet { updateHighlights(animated: true) }
+  }
+
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
@@ -153,6 +158,7 @@ class BottomTabBar: UIView {
 
   private func updateHighlights(animated: Bool) {
     var activeIndices: Set<Int> = []
+    if isFastForwardOn { activeIndices.insert(0) }
     if let sunIdx = selectedSunIndex {
       activeIndices.insert(2 + sunIdx)
     }
