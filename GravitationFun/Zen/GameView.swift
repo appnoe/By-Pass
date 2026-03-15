@@ -5,15 +5,22 @@
 import UIKit
 import SpriteKit
 
+/// SKView subclass that opts out of UIKit focus navigation.
+/// Overriding focusItemsInRect: to return [] prevents the
+/// "caching for linear focus movement is limited" runtime log.
+class GravitySKView: SKView {
+  override func focusItems(in rect: CGRect) -> [any UIFocusItem] { [] }
+}
+
 class GameView: UIView {
 
-  let skView: SKView
+  let skView: GravitySKView
   let satellitesCountLabel: UILabel
   let bottomTabBar: BottomTabBar
 
   override init(frame: CGRect) {
 
-    skView = SKView(frame: frame)
+    skView = GravitySKView(frame: frame)
     skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     skView.isMultipleTouchEnabled = true
 

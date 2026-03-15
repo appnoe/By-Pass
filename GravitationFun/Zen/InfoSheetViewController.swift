@@ -84,7 +84,7 @@ class InfoSheetViewController: UIViewController {
     }
 
     private func setupSpriteKitView() {
-        let skView = SKView(frame: view.bounds)
+        let skView = GravitySKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.backgroundColor = .black
         skView.allowsTransparency = false

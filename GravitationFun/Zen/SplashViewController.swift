@@ -6,7 +6,7 @@ import SpriteKit
 
 class SplashViewController: UIViewController {
 
-    private var skView: SKView!
+    private var skView: GravitySKView!
     private var splashScene: SplashScene!
 
     override func viewDidLoad() {
@@ -23,7 +23,7 @@ class SplashViewController: UIViewController {
     // MARK: - Setup
 
     private func setupSpriteKitView() {
-        skView = SKView(frame: view.bounds)
+        skView = GravitySKView(frame: view.bounds)
         skView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         skView.backgroundColor = .black
         skView.allowsTransparency = false
