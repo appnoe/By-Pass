@@ -201,9 +201,17 @@ enum NodeFactory {
 
   static func backgroundEmitter(size: CGSize) -> SKNode? {
     guard let emitter = SKEmitterNode(fileNamed: "background") else { return nil }
-    emitter.particlePositionRange = CGVector(dx: size.width * 2, dy: size.height * 2)
-    // ~1500 stars at equilibrium: birthRate * lifetime = 25 * 60 = ~1500 visible at any time
-    emitter.particleBirthRate = 25
+    // maxZoomOut = 4.0 (camera scale limit in applyPinchScale).
+    // At that scale the visible area is 4× the scene size, so spawn stars
+    // over 4× the scene dimensions to keep the full screen covered.
+    let maxZoomOut: CGFloat = 4.0
+    emitter.particlePositionRange = CGVector(
+      dx: size.width  * maxZoomOut,
+      dy: size.height * maxZoomOut
+    )
+    // Scale birth rate proportionally so density stays visually constant.
+    // Base: 25 stars/s covers 1× area. Area grows with zoom², so multiply accordingly.
+    emitter.particleBirthRate = 25 * maxZoomOut * maxZoomOut
     emitter.particleLifetime = 60
     emitter.particleLifetimeRange = 30
     emitter.numParticlesToEmit = 0
