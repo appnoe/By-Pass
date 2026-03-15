@@ -98,28 +98,45 @@ class SplashViewController: UIViewController {
     // MARK: - Dismissal
 
     private func scheduleDismissal() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
             self?.transitionToGame()
         }
     }
 
     private func transitionToGame() {
-        guard let windowScene = view.window?.windowScene else { return }
-        let gameVC = GameViewController()
-        let window = UIWindow(windowScene: windowScene)
-        window.rootViewController = gameVC
+        guard let currentWindow = view.window,
+              let windowScene = currentWindow.windowScene else { return }
 
-        UIView.transition(
-            with: window,
-            duration: 0.6,
-            options: .transitionCrossDissolve
-        ) {
+        // White flash overlay — fades in over the current splash, then the
+        // game window appears underneath and the overlay fades out.
+        let flash = UIView(frame: currentWindow.bounds)
+        flash.backgroundColor = .white
+        flash.alpha = 0
+        currentWindow.addSubview(flash)
+
+        UIView.animate(withDuration: 0.35, animations: {
+            flash.alpha = 1.0
+        }) { _ in
+            // Swap root window while everything is white
+            let gameVC = GameViewController()
+            let window = UIWindow(windowScene: windowScene)
+            window.rootViewController = gameVC
             window.makeKeyAndVisible()
-        }
 
-        // Hand over window ownership to SceneDelegate
-        if let delegate = windowScene.delegate as? SceneDelegate {
-            delegate.window = window
+            if let delegate = windowScene.delegate as? SceneDelegate {
+                delegate.window = window
+            }
+
+            // Add flash to new window and fade it out
+            flash.removeFromSuperview()
+            flash.frame = window.bounds
+            window.addSubview(flash)
+
+            UIView.animate(withDuration: 0.45, delay: 0.05, options: .curveEaseOut) {
+                flash.alpha = 0
+            } completion: { _ in
+                flash.removeFromSuperview()
+            }
         }
     }
 }
@@ -132,11 +149,11 @@ class SplashScene: SKScene {
     private let sunRadius: CGFloat = 22
     // Orbit definition: (orbitRadius, planetRadius, color, period)
     private let orbits: [(r: CGFloat, pr: CGFloat, color: UIColor, period: TimeInterval)] = [
-        (70,  5,  UIColor(red: 0.75, green: 0.60, blue: 0.45, alpha: 1), 2.8),
-        (105, 7,  UIColor(red: 0.20, green: 0.50, blue: 0.85, alpha: 1), 4.8),
-        (145, 6,  UIColor(red: 0.30, green: 0.65, blue: 0.30, alpha: 1), 7.8),
-        (185, 9,  UIColor(red: 0.85, green: 0.55, blue: 0.25, alpha: 1), 13.0),
-        (230, 5,  UIColor(red: 0.70, green: 0.55, blue: 0.40, alpha: 1), 21.0),
+        (70,  5,  UIColor(red: 0.75, green: 0.60, blue: 0.45, alpha: 1),  6.0),
+        (105, 7,  UIColor(red: 0.20, green: 0.50, blue: 0.85, alpha: 1), 10.0),
+        (145, 6,  UIColor(red: 0.30, green: 0.65, blue: 0.30, alpha: 1), 16.0),
+        (185, 9,  UIColor(red: 0.85, green: 0.55, blue: 0.25, alpha: 1), 26.0),
+        (230, 5,  UIColor(red: 0.70, green: 0.55, blue: 0.40, alpha: 1), 42.0),
     ]
 
     override func didMove(to view: SKView) {
