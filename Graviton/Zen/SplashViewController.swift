@@ -114,7 +114,7 @@ class SplashViewController: UIViewController {
         flash.alpha = 0
         currentWindow.addSubview(flash)
 
-        UIView.animate(withDuration: 0.175, animations: {
+        UIView.animate(withDuration: 0.08, animations: {
             flash.alpha = 1.0
         }) { _ in
             // Swap root window while everything is white
@@ -132,7 +132,7 @@ class SplashViewController: UIViewController {
             flash.frame = window.bounds
             window.addSubview(flash)
 
-            UIView.animate(withDuration: 0.225, delay: 0.05, options: .curveEaseOut) {
+            UIView.animate(withDuration: 0.12, delay: 0, options: .curveEaseOut) {
                 flash.alpha = 0
             } completion: { _ in
                 flash.removeFromSuperview()
