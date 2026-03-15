@@ -416,7 +416,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/scripts/increment_build_number.sh\"\n";
+			shellScript = "# Only run during actual builds, not indexing\nif [ \"${ACTION}\" == \"indexbuild\" ]; then\n    exit 0\nfi\n\nSOURCE_PLIST=\"${SRCROOT}/Graviton/Info.plist\"\n\nCURRENT_BUILD=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"${SOURCE_PLIST}\" 2>/dev/null)\n\nif [ -z \"${CURRENT_BUILD}\" ]; then\n    CURRENT_BUILD=0\nfi\n\nNEW_BUILD=$((CURRENT_BUILD + 1))\n\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${SOURCE_PLIST}\"\n\necho \"Build number incremented: ${CURRENT_BUILD} → ${NEW_BUILD}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
