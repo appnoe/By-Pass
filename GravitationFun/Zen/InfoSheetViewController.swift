@@ -13,9 +13,9 @@ class InfoSheetViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupSpriteKitView()
+        setupGlowBorder()   // directly above SKView, behind title and badge
         setupTitleLabel()
         setupTaglineLabel()
-        setupGlowBorder()   // added last so it's the topmost subview
     }
 
     override func viewDidLayoutSubviews() {
@@ -40,14 +40,14 @@ class InfoSheetViewController: UIViewController {
         glowOverlay.clipsToBounds = false
 
         // Visible border line
-        glowOverlay.layer.borderColor = UIColor(red: 1.0, green: 0.60, blue: 0.05, alpha: 0.70).cgColor
-        glowOverlay.layer.borderWidth = 1.5
+        glowOverlay.layer.borderColor = UIColor(red: 1.0, green: 0.60, blue: 0.05, alpha: 0.55).cgColor
+        glowOverlay.layer.borderWidth = 1.0
 
-        // Outer glow via layer shadow
+        // Inward glow via layer shadow (offset zero = even halo)
         glowOverlay.layer.shadowColor  = UIColor(red: 1.0, green: 0.50, blue: 0.02, alpha: 1.0).cgColor
         glowOverlay.layer.shadowOffset = .zero
-        glowOverlay.layer.shadowRadius = 14
-        glowOverlay.layer.shadowOpacity = 0.85
+        glowOverlay.layer.shadowRadius = 8
+        glowOverlay.layer.shadowOpacity = 0.65
 
         view.addSubview(glowOverlay)
 
