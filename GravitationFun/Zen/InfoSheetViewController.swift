@@ -26,30 +26,25 @@ class InfoSheetViewController: UIViewController {
 
     private func updateGlowPath() {
         let r = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : 24
-        let inset: CGFloat = 12  // how far inside the ring extends
-
-        // Outer path = full bounds with sheet corner radius
-        let outer = UIBezierPath(roundedRect: view.bounds, cornerRadius: r)
-        // Inner path = inset rect — punch a hole so centre is fully transparent
-        let innerRect = view.bounds.insetBy(dx: inset, dy: inset)
-        let inner = UIBezierPath(roundedRect: innerRect, cornerRadius: max(0, r - inset))
-        outer.append(inner.reversing())   // even-odd fill = only the ring
-
-        // Apply as mask so only the ring strip renders
-        if let maskLayer = glowOverlay.layer.mask as? CAShapeLayer {
-            maskLayer.path = outer.cgPath
-        } else {
-            let maskLayer = CAShapeLayer()
-            maskLayer.fillRule = .evenOdd
-            maskLayer.path = outer.cgPath
-            glowOverlay.layer.mask = maskLayer
-        }
-
-        // Keep the shadow path tight to the border line
         glowOverlay.layer.cornerRadius = r
         glowOverlay.layer.shadowPath = UIBezierPath(
             roundedRect: view.bounds, cornerRadius: r
         ).cgPath
+
+        // Gradient mask: opaque at top and bottom edges, transparent in the
+        // centre — so the border "frays" and fades out towards the middle.
+        let grad = glowOverlay.layer.mask as? CAGradientLayer ?? CAGradientLayer()
+        grad.frame = view.bounds
+        grad.colors = [
+            UIColor.white.cgColor,          // top   – fully visible
+            UIColor.clear.cgColor,          // centre – invisible
+            UIColor.clear.cgColor,          // centre – invisible
+            UIColor.white.cgColor,          // bottom – fully visible
+        ]
+        grad.locations = [0, 0.35, 0.65, 1.0]
+        grad.startPoint = CGPoint(x: 0.5, y: 0)
+        grad.endPoint   = CGPoint(x: 0.5, y: 1)
+        glowOverlay.layer.mask = grad
     }
 
     override var prefersStatusBarHidden: Bool { true }
