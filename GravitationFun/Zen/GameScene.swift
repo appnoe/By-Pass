@@ -176,14 +176,6 @@ class GameScene: SKScene {
     model.trailLength = length
   }
 
-  func setStars(enabled: Bool) {
-    if enabled, let stars = model.stars() {
-      insertChild(stars, at: 0)
-    } else {
-      model.disableStars()
-    }
-  }
-
   func zoom(to zoomValue: CGFloat) {
     self.zoomValue = zoomValue
     let zoomInAction = SKAction.scale(to: 1-(zoomValue-1), duration: 0.3)
