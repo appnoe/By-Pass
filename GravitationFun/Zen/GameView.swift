@@ -28,7 +28,7 @@ class GameView: UIView {
     super.init(frame: frame)
 
     skView.ignoresSiblingOrder = true
-    skView.preferredFramesPerSecond = UIScreen.main.maximumFramesPerSecond
+    skView.preferredFramesPerSecond = 120  // set to max; SKView caps to actual display rate
 
     addSubview(skView)
     addSubview(satellitesCountLabel)

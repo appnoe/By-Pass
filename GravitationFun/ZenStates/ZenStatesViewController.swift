@@ -24,7 +24,7 @@ class ZenStatesViewController: UITableViewController {
     let textAttributes = [NSAttributedString.Key.foregroundColor: UIColor.systemBackground]
     navigationController?.navigationBar.titleTextAttributes = textAttributes
 
-    let doneButton = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(done))
+    let doneButton = UIBarButtonItem(title: "Done", style: .prominent, target: self, action: #selector(done))
     navigationItem.rightBarButtonItem = doneButton
 
     do {

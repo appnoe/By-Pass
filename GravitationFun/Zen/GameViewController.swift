@@ -15,7 +15,7 @@ class GameViewController: UIViewController {
   }
 
   override func loadView() {
-    let contentView = GameView(frame: UIScreen.main.bounds)
+    let contentView = GameView(frame: .zero)
 
     let tabBar = contentView.bottomTabBar
     tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
