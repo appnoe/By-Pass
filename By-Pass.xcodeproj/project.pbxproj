@@ -289,7 +289,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F2BD5C6E2773C4DE00136C85 /* Build configuration list for PBXNativeTarget "By-Pass" */;
 			buildPhases = (
-				CF8163DB2F66D1620000646F /* Increase Build Number */,
 				F2BD5C532773C4DC00136C85 /* Sources */,
 				F2BD5C542773C4DC00136C85 /* Frameworks */,
 				F2BD5C552773C4DC00136C85 /* Resources */,
@@ -400,28 +399,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		CF8163DB2F66D1620000646F /* Increase Build Number */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Increase Build Number";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if [ \"${ACTION}\" == \"indexbuild\" ]; then\n    exit 0\nfi\n\nBUILD_NUMBER_FILE=\"${SRCROOT}/buildnumber.xcconfig\"\n\nNEW_BUILD=$(date +%s)\n\necho \"BUILD_NUMBER = ${NEW_BUILD}\" > \"${BUILD_NUMBER_FILE}\"\n\nBUILT_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\nif [ -f \"${BUILT_PLIST}\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${BUILT_PLIST}\"\nfi\n\necho \"Build number set to: ${NEW_BUILD}\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		F2A21E49277F0F8D00EA5825 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -498,7 +475,6 @@
 /* Begin XCBuildConfiguration section */
 		F2A21E55277F0F8D00EA5825 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -521,7 +497,6 @@
 		};
 		F2A21E56277F0F8D00EA5825 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -544,7 +519,6 @@
 		};
 		F2BD5C6C2773C4DE00136C85 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF8163DC2F66D2980000646F /* buildnumber.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -609,7 +583,6 @@
 		};
 		F2BD5C6D2773C4DE00136C85 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -668,13 +641,12 @@
 		};
 		F2BD5C6F2773C4DE00136C85 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF8163DC2F66D2980000646F /* buildnumber.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(​BUILD​_​NUMBER)";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -705,13 +677,12 @@
 		};
 		F2BD5C702773C4DE00136C85 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CF8163DC2F66D2980000646F /* buildnumber.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(​BUILD​_​NUMBER)";
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -742,7 +713,6 @@
 		};
 		F2D604132781AAC9003958A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
@@ -767,7 +737,6 @@
 		};
 		F2D604142781AAC9003958A2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";

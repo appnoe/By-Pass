@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>CFBundleVersion</key>
+	<string>1773576994</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
