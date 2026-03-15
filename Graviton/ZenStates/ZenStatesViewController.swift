@@ -77,11 +77,15 @@ class ZenStatesViewController: UITableViewController {
       gravityZenStates.remove(at: indexPath.row)
       tableView.deleteRows(at: [indexPath], with: .automatic)
 
-      do {
-        let data = try JSONEncoder().encode(gravityZenStates)
-        try data.write(to: FileManager.default.sceneStatesURL)
-      } catch {
-        print("\(#file), \(#line): \(error)")
+      let statesToSave = gravityZenStates
+      let url = FileManager.default.sceneStatesURL
+      DispatchQueue.global(qos: .utility).async {
+        do {
+          let data = try JSONEncoder().encode(statesToSave)
+          try data.write(to: url)
+        } catch {
+          print("\(#file), \(#line): \(error)")
+        }
       }
     }
   }
