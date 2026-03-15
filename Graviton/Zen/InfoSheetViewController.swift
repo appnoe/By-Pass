@@ -150,16 +150,7 @@ class InfoSheetViewController: UIViewController {
     }
 
     private func buildNumber() -> String {
-        guard let url = Bundle.main.url(forResource: "buildnumber", withExtension: "xcconfig"),
-              let content = try? String(contentsOf: url, encoding: .utf8) else { return "" }
-        for line in content.components(separatedBy: .newlines) {
-            guard let range = line.range(of: "=") else { continue }
-            let key = line[line.startIndex..<range.lowerBound].trimmingCharacters(in: .whitespaces)
-            if key == "BUILD_NUMBER" {
-                return String(line[range.upperBound...]).trimmingCharacters(in: .whitespaces)
-            }
-        }
-        return ""
+        return Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
     }
 
     private func imprintText() -> NSAttributedString {
