@@ -167,6 +167,11 @@ class InfoSheetViewController: UIViewController {
         result.append(spacer)
         result.append(heading("Steuerinformationen:"))
         result.append(body("Finanzamt Düsseldorf-Süd\nSteuer-Nr. 122/5703/5885\nUSt-IdNr: DE308226646"))
+        result.append(spacer)
+        result.append(NSAttributedString(string: "Datenschutzerklärung:\nDiese App erfasst keine Daten.", attributes: [
+            .font: UIFont.systemFont(ofSize: 13, weight: .bold),
+            .foregroundColor: UIColor(white: 0.95, alpha: 1.0)
+        ]))
 
         // Centre-align the whole paragraph
         let style = NSMutableParagraphStyle()
