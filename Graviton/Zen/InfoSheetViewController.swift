@@ -15,6 +15,7 @@ class InfoSheetViewController: UIViewController {
         setupSpriteKitView()
         setupGlowBorder()   // directly above SKView, behind title and badge
         setupTitleLabel()
+        setupVersionLabel()
         setupImprintLabel()
         setupTaglineLabel()
     }
@@ -111,6 +112,24 @@ class InfoSheetViewController: UIViewController {
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48)
+        ])
+    }
+
+    private func setupVersionLabel() {
+        let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
+        let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
+
+        let label = UILabel()
+        label.text = "\(version) (\(build))"
+        label.textAlignment = .center
+        label.textColor = UIColor(white: 1.0, alpha: 0.45)
+        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 124)
         ])
     }
 
