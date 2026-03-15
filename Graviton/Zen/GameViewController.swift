@@ -4,7 +4,6 @@
 import UIKit
 import SpriteKit
 import GameplayKit
-import StoreKit
 
 class GameViewController: UIViewController {
 
