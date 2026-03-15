@@ -150,11 +150,9 @@ extension GameViewController {
 
   func getScreenshot(scene: SKScene) -> UIImage? {
     guard let view = scene.view else { return nil }
-    let bounds = view.bounds
-    UIGraphicsBeginImageContextWithOptions(bounds.size, false, 0)
-    view.drawHierarchy(in: bounds, afterScreenUpdates: true)
-    let image = UIGraphicsGetImageFromCurrentImageContext()
-    UIGraphicsEndImageContext()
-    return image
+    let renderer = UIGraphicsImageRenderer(bounds: view.bounds)
+    return renderer.image { _ in
+      view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
+    }
   }
 }

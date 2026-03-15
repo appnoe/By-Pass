@@ -27,7 +27,6 @@
 		F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE1B2A10F014003B5178 /* GravityZenState.swift */; };
 		F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */; };
 		F272AE212A110E59003B5178 /* ZenStatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE202A110E59003B5178 /* ZenStatesViewController.swift */; };
-		F272AE232A117684003B5178 /* Synth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE222A117684003B5178 /* Synth.swift */; };
 		F27F9C5E2A19E837009D32D3 /* GravityZen.storekit in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */; };
 		F27F9C602A19E907009D32D3 /* StoreKitTestCertificate.cer in Resources */ = {isa = PBXBuildFile; fileRef = F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */; };
 		F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E3B277B0F7C00EA5825 /* GameView.swift */; };
@@ -80,7 +79,6 @@
 		F272AE1B2A10F014003B5178 /* GravityZenState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityZenState.swift; sourceTree = "<group>"; };
 		F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extension.swift"; sourceTree = "<group>"; };
 		F272AE202A110E59003B5178 /* ZenStatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenStatesViewController.swift; sourceTree = "<group>"; };
-		F272AE222A117684003B5178 /* Synth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synth.swift; sourceTree = "<group>"; };
 		F27F9C5D2A19E837009D32D3 /* GravityZen.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = GravityZen.storekit; sourceTree = "<group>"; };
 		F27F9C5F2A19E907009D32D3 /* StoreKitTestCertificate.cer */ = {isa = PBXFileReference; lastKnownFileType = file; path = StoreKitTestCertificate.cer; sourceTree = "<group>"; };
 		F2A21E3B277B0F7C00EA5825 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
@@ -210,7 +208,6 @@
 		F2B5FF102A19E2C1005C53A1 /* Experiments */ = {
 			isa = PBXGroup;
 			children = (
-				F272AE222A117684003B5178 /* Synth.swift */,
 			);
 			path = Experiments;
 			sourceTree = "<group>";
@@ -442,7 +439,6 @@
 				F2BD5C632773C4DC00136C85 /* GameViewController.swift in Sources */,
 				F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */,
 				F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */,
-				F272AE232A117684003B5178 /* Synth.swift in Sources */,
 				F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */,
 				F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */,
 			);

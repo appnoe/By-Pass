@@ -3,7 +3,7 @@
 //
 
 import XCTest
-@testable import Gravity
+@testable import GravitationFun
 import SpriteKit
 
 class GameSceneTests: XCTestCase {
