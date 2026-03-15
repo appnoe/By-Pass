@@ -117,7 +117,7 @@ class InfoSheetViewController: UIViewController {
 
     private func setupVersionLabel() {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
-        let build   = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
+        let build   = buildNumber()
 
         let label = UILabel()
         label.text = "\(version) (\(build))"
@@ -129,7 +129,7 @@ class InfoSheetViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 124)
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 142)
         ])
     }
 
@@ -145,8 +145,20 @@ class InfoSheetViewController: UIViewController {
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 32),
             label.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -32),
-            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 160)
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 178)
         ])
+    }
+
+    private func buildNumber() -> String {
+        guard let url = Bundle.main.url(forResource: "buildnumber", withExtension: "xcconfig"),
+              let content = try? String(contentsOf: url, encoding: .utf8) else { return "" }
+        for line in content.components(separatedBy: .newlines) {
+            let parts = line.components(separatedBy: "=")
+            if parts.count == 2, parts[0].trimmingCharacters(in: .whitespaces) == "BUILD_NUMBER" {
+                return parts[1].trimmingCharacters(in: .whitespaces)
+            }
+        }
+        return ""
     }
 
     private func imprintText() -> NSAttributedString {
