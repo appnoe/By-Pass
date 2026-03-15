@@ -355,7 +355,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "Graviton" */;
+			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "OrbitApp" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -665,8 +665,9 @@
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Graviton/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Graviton - DBG";
+				INFOPLIST_KEY_CFBundleDisplayName = OrbitApp;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.educational-games";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -699,8 +700,9 @@
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Graviton/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Graviton - DBG";
+				INFOPLIST_KEY_CFBundleDisplayName = OrbitApp;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.educational-games";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -783,7 +785,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "Graviton" */ = {
+		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "OrbitApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2BD5C6C2773C4DE00136C85 /* Debug */,
