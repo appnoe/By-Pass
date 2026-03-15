@@ -36,7 +36,7 @@ class SplashViewController: UIViewController {
 
     private func setupTitleLabel() {
         let label = UILabel()
-        label.text = "OrbitApp"
+        label.text = "By-Pass"
         label.textAlignment = .center
         label.textColor = .white
         // Use a large, rounded system font for a cosmic feel

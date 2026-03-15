@@ -97,7 +97,7 @@ class InfoSheetViewController: UIViewController {
 
     private func setupTitleLabel() {
         let label = UILabel()
-        label.text = "OrbitApp"
+        label.text = "By-Pass"
         label.textAlignment = .center
         label.textColor = .white
         if let rounded = UIFont(name: "SF Pro Rounded", size: 72) {
