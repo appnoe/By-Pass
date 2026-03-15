@@ -344,7 +344,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "OrbitApp" */;
+			buildConfigurationList = F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "By-Pass" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -773,7 +773,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "OrbitApp" */ = {
+		F2BD5C522773C4DC00136C85 /* Build configuration list for PBXProject "By-Pass" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F2BD5C6C2773C4DE00136C85 /* Debug */,

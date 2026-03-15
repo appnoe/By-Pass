@@ -17,7 +17,7 @@
                BlueprintIdentifier = "F2BD5C562773C4DC00136C85"
                BuildableName = "Gravity.app"
                BlueprintName = "By-Pass"
-               ReferencedContainer = "container:OrbitApp.xcodeproj">
+               ReferencedContainer = "container:By-Pass.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,7 +35,7 @@
                BlueprintIdentifier = "F2A21E4C277F0F8D00EA5825"
                BuildableName = "GravityUITests.xctest"
                BlueprintName = "GravityUITests"
-               ReferencedContainer = "container:OrbitApp.xcodeproj">
+               ReferencedContainer = "container:By-Pass.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -45,7 +45,7 @@
                BlueprintIdentifier = "F2D6040B2781AAC9003958A2"
                BuildableName = "GravityTests.xctest"
                BlueprintName = "GravityTests"
-               ReferencedContainer = "container:OrbitApp.xcodeproj">
+               ReferencedContainer = "container:By-Pass.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -67,7 +67,7 @@
             BlueprintIdentifier = "F2BD5C562773C4DC00136C85"
             BuildableName = "Gravity.app"
             BlueprintName = "By-Pass"
-            ReferencedContainer = "container:OrbitApp.xcodeproj">
+            ReferencedContainer = "container:By-Pass.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -84,7 +84,7 @@
             BlueprintIdentifier = "F2BD5C562773C4DC00136C85"
             BuildableName = "Gravity.app"
             BlueprintName = "By-Pass"
-            ReferencedContainer = "container:OrbitApp.xcodeproj">
+            ReferencedContainer = "container:By-Pass.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
