@@ -147,13 +147,15 @@ class SplashViewController: UIViewController {
 class SplashScene: SKScene {
 
     private let sunRadius: CGFloat = 22
-    // Orbit definition: (orbitRadius, planetRadius, color, period)
-    private let orbits: [(r: CGFloat, pr: CGFloat, color: UIColor, period: TimeInterval)] = [
-        (70,  5,  UIColor(red: 0.75, green: 0.60, blue: 0.45, alpha: 1),  6.0),
-        (105, 7,  UIColor(red: 0.20, green: 0.50, blue: 0.85, alpha: 1), 10.0),
-        (145, 6,  UIColor(red: 0.30, green: 0.65, blue: 0.30, alpha: 1), 16.0),
-        (185, 9,  UIColor(red: 0.85, green: 0.55, blue: 0.25, alpha: 1), 26.0),
-        (230, 5,  UIColor(red: 0.70, green: 0.55, blue: 0.40, alpha: 1), 42.0),
+
+    // Orbit definition: (orbitRadius, planetRadius, planetType, baseColor, period, hasRing)
+    // Planets in order: Mercury, Earth, Mars, Jupiter, Saturn
+    private let orbits: [(r: CGFloat, pr: CGFloat, type: PlanetType, base: UIColor, period: TimeInterval, ring: Bool)] = [
+        ( 70,  5, .rocky,  UIColor(red: 0.65, green: 0.57, blue: 0.50, alpha: 1),  6.0, false),  // Mercury
+        (105,  8, .ocean,  UIColor(red: 0.10, green: 0.45, blue: 0.75, alpha: 1), 10.0, false),  // Earth
+        (145,  6, .lava,   UIColor(red: 0.72, green: 0.28, blue: 0.12, alpha: 1), 16.0, false),  // Mars
+        (190, 14, .gas,    UIColor(red: 0.88, green: 0.70, blue: 0.42, alpha: 1), 26.0, false),  // Jupiter
+        (245, 11, .rocky,  UIColor(red: 0.85, green: 0.76, blue: 0.55, alpha: 1), 42.0, true ),  // Saturn
     ]
 
     override func didMove(to view: SKView) {
@@ -282,7 +284,7 @@ class SplashScene: SKScene {
             addChild(pivot)
 
             // Planet on the pivot arm
-            let planet = makePlanet(radius: orbit.pr, color: orbit.color)
+            let planet = makePlanet(radius: orbit.pr, type: orbit.type, base: orbit.base, ring: orbit.ring)
             planet.position = CGPoint(x: orbit.r, y: 0)
             pivot.addChild(planet)
 
@@ -297,30 +299,51 @@ class SplashScene: SKScene {
         }
     }
 
-    private func makePlanet(radius: CGFloat, color: UIColor) -> SKNode {
-        let node = SKShapeNode(circleOfRadius: radius)
-        node.fillColor = color
-        node.lineWidth = 0
+    private func makePlanet(radius: CGFloat, type: PlanetType, base: UIColor, ring: Bool) -> SKNode {
+        let container = SKNode()
 
-        // Tiny glow via additive emitter
-        let glow = SKEmitterNode()
-        glow.particleBirthRate = 10
-        glow.particleLifetime = 0.4
-        glow.particleLifetimeRange = 0.2
-        glow.particleSpeed = 0
-        glow.particleSpeedRange = 1
-        glow.emissionAngleRange = .pi * 2
-        glow.particleScale = 0.08
-        glow.particleScaleRange = 0.03
-        glow.particleScaleSpeed = -0.1
-        glow.particleAlpha = 0.5
-        glow.particleAlphaSpeed = -1.2
-        glow.particleBlendMode = .add
-        glow.particleColorBlendFactor = 1.0
-        glow.particleColor = color
-        glow.particlePositionRange = CGVector(dx: radius, dy: radius)
-        node.addChild(glow)
+        // Realistic planet texture via NodeFactory
+        let texture = NodeFactory.planetTexture(type: type, radius: radius, baseColor: base)
+        let sprite = SKSpriteNode(texture: texture, size: CGSize(width: radius * 2, height: radius * 2))
+        sprite.zPosition = 0
+        container.addChild(sprite)
 
-        return node
+        // Saturn-style ring: a flat ellipse drawn behind and in front of the planet
+        if ring {
+            let ringWidth  = radius * 2.6
+            let ringHeight = radius * 0.55
+            // Back half (behind planet)
+            let backRing = makeRingArc(width: ringWidth, height: ringHeight, front: false)
+            backRing.zPosition = -1
+            container.addChild(backRing)
+            // Front half (in front of planet)
+            let frontRing = makeRingArc(width: ringWidth, height: ringHeight, front: true)
+            frontRing.zPosition = 1
+            container.addChild(frontRing)
+        }
+
+        return container
+    }
+
+    /// Draws either the front (top) or back (bottom) half of an elliptical ring using a bezier arc.
+    private func makeRingArc(width: CGFloat, height: CGFloat, front: Bool) -> SKNode {
+        let path = CGMutablePath()
+        // Full ellipse via transform
+        let transform = CGAffineTransform(scaleX: width / 2, y: height / 2)
+        path.addEllipse(in: CGRect(x: -1, y: -1, width: 2, height: 2), transform: transform)
+
+        let node = SKShapeNode(path: path)
+        node.fillColor = .clear
+        node.strokeColor = UIColor(red: 0.85, green: 0.78, blue: 0.58, alpha: front ? 0.75 : 0.45)
+        node.lineWidth = front ? 3.5 : 2.5
+        // Clip to show only the correct half by masking with a rectangle
+        let clip = SKCropNode()
+        let mask = SKSpriteNode(color: .white,
+                                size: CGSize(width: width * 2, height: height))
+        // Front half = upper semi-ellipse (positive y in SpriteKit = up)
+        mask.position = CGPoint(x: 0, y: front ? height / 2 : -height / 2)
+        clip.maskNode = mask
+        clip.addChild(node)
+        return clip
     }
 }
