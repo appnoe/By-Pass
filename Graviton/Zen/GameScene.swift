@@ -125,26 +125,12 @@ class GameScene: SKScene {
 
     let endPosition = touch.location(in: self)
 
-    if let satellite = model.temporaryNodes[touch.hash] {
-      let dx = satellite.position.x - endPosition.x
-      let dy = satellite.position.y - endPosition.y
-      let speed = sqrt(dx * dx + dy * dy)
-      // Map speed to volume: 0 at rest, 1.0 at ~400 units/s (clamped)
-      let volume = Float(min(speed / 400.0, 1.0))
-
-      let hiss = SKAudioNode(fileNamed: "swoosh.m4a")
-      hiss.autoplayLooped = false
-      hiss.isPositional = false
-      addChild(hiss)
-      hiss.run(SKAction.sequence([
-        SKAction.changeVolume(to: volume, duration: 0),
-        SKAction.play(),
-        SKAction.wait(forDuration: 0.5),
-        SKAction.removeFromParent()
-      ]))
-    }
-
+    let hasSatellite = model.temporaryNodes[touch.hash] != nil
     model.addVelocityToSatellite(id: touch.hash, input: endPosition)
+
+    if hasSatellite {
+      run(SKAction.playSoundFileNamed("swoosh.m4a", waitForCompletion: false))
+    }
   }
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
