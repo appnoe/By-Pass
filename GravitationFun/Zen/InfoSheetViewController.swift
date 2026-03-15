@@ -15,6 +15,7 @@ class InfoSheetViewController: UIViewController {
         setupSpriteKitView()
         setupGlowBorder()   // directly above SKView, behind title and badge
         setupTitleLabel()
+        setupImprintLabel()
         setupTaglineLabel()
     }
 
@@ -109,8 +110,65 @@ class InfoSheetViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30)
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 48)
         ])
+    }
+
+    private func setupImprintLabel() {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.attributedText = imprintText()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 32),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -32),
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 160)
+        ])
+    }
+
+    private func imprintText() -> NSAttributedString {
+        let heading = { (text: String) -> NSAttributedString in
+            NSAttributedString(string: text + "\n", attributes: [
+                .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+                .foregroundColor: UIColor(white: 1.0, alpha: 0.95)
+            ])
+        }
+        let body = { (text: String) -> NSAttributedString in
+            NSAttributedString(string: text + "\n", attributes: [
+                .font: UIFont.systemFont(ofSize: 13, weight: .regular),
+                .foregroundColor: UIColor(white: 0.75, alpha: 1.0)
+            ])
+        }
+        let spacer = NSAttributedString(string: "\n", attributes: [
+            .font: UIFont.systemFont(ofSize: 6)
+        ])
+
+        let result = NSMutableAttributedString()
+        result.append(body("Appnö GmbH\nErkrather Str. 401\n40231 Düsseldorf"))
+        result.append(spacer)
+        result.append(heading("Geschäftsführer:"))
+        result.append(body("Klaus Rodewig"))
+        result.append(spacer)
+        result.append(heading("Kontakt:"))
+        result.append(body("info@appnoe.de"))
+        result.append(spacer)
+        result.append(heading("Handelsregister:"))
+        result.append(body("Amtsgericht Düsseldorf\nHRB 74943"))
+        result.append(spacer)
+        result.append(heading("Steuerinformationen:"))
+        result.append(body("Finanzamt Düsseldorf-Süd\nSteuer-Nr. 122/5703/5885\nUSt-IdNr: DE308226646"))
+
+        // Centre-align the whole paragraph
+        let style = NSMutableParagraphStyle()
+        style.alignment = .center
+        style.lineSpacing = 2
+        result.addAttribute(.paragraphStyle, value: style,
+                            range: NSRange(location: 0, length: result.length))
+        return result
     }
 
     private func setupTaglineLabel() {
