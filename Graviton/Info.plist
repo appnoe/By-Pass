@@ -5,7 +5,7 @@
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
 	<key>CFBundleVersion</key>
-	<string>1773577152</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
