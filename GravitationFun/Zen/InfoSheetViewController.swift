@@ -148,7 +148,13 @@ class InfoSheetViewController: UIViewController {
         ])
 
         let result = NSMutableAttributedString()
-        result.append(body("Appnö GmbH\nErkrather Str. 401\n40231 Düsseldorf"))
+        result.append(body("by"))
+        result.append(spacer)
+        result.append(NSAttributedString(string: "Appnö GmbH\n", attributes: [
+            .font: UIFont.systemFont(ofSize: 13, weight: .bold),
+            .foregroundColor: UIColor(white: 0.75, alpha: 1.0)
+        ]))
+        result.append(body("Erkrather Str. 401\n40231 Düsseldorf"))
         result.append(spacer)
         result.append(heading("Geschäftsführer:"))
         result.append(body("Klaus Rodewig"))
