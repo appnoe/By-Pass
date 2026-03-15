@@ -86,7 +86,7 @@
 		F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityUITests.swift; sourceTree = "<group>"; };
 		F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		F2B6164B2777998200BCE6C4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		F2BD5C572773C4DC00136C85 /* Gravity.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gravity.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2BD5C572773C4DC00136C85 /* By-Pass.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "By-Pass.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2BD5C5A2773C4DC00136C85 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F2BD5C602773C4DC00136C85 /* GameScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		F2BD5C622773C4DC00136C85 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
@@ -219,7 +219,7 @@
 		F2BD5C582773C4DC00136C85 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F2BD5C572773C4DC00136C85 /* Gravity.app */,
+				F2BD5C572773C4DC00136C85 /* By-Pass.app */,
 				F2A21E4D277F0F8D00EA5825 /* GravityUITests.xctest */,
 				F2D6040C2781AAC9003958A2 /* GravityTests.xctest */,
 			);
@@ -299,7 +299,7 @@
 			packageProductDependencies = (
 			);
 			productName = GravitationFun;
-			productReference = F2BD5C572773C4DC00136C85 /* Gravity.app */;
+			productReference = F2BD5C572773C4DC00136C85 /* By-Pass.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F2D6040B2781AAC9003958A2 /* GravityTests */ = {
@@ -667,9 +667,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.appnoe.by-pass";
-				PRODUCT_NAME = Gravity;
+				PRODUCT_NAME = "By-Pass";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -702,9 +702,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.6;
+				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "de.appnoe.by-pass";
-				PRODUCT_NAME = Gravity;
+				PRODUCT_NAME = "By-Pass";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
