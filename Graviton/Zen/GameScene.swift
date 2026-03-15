@@ -125,7 +125,12 @@ class GameScene: SKScene {
 
     let endPosition = touch.location(in: self)
 
+    let hasSatellite = model.temporaryNodes[touch.hash] != nil
     model.addVelocityToSatellite(id: touch.hash, input: endPosition)
+
+    if hasSatellite {
+      run(SKAction.playSoundFileNamed("swoosh.m4a", waitForCompletion: false))
+    }
   }
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
