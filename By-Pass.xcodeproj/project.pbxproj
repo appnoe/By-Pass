@@ -287,6 +287,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F2BD5C6E2773C4DE00136C85 /* Build configuration list for PBXNativeTarget "By-Pass" */;
 			buildPhases = (
+				CF8163DB2F66D1620000646F /* Increase Build Number */,
 				F2BD5C532773C4DC00136C85 /* Sources */,
 				F2BD5C542773C4DC00136C85 /* Frameworks */,
 				F2BD5C552773C4DC00136C85 /* Resources */,
@@ -396,6 +397,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		CF8163DB2F66D1620000646F /* Increase Build Number */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Increase Build Number";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/scripts/increment_build_number.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		F2A21E49277F0F8D00EA5825 /* Sources */ = {
