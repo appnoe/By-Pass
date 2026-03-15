@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		CFD95B2F2F66CCDD008FDFF5 /* swoosh.m4a in Resources */ = {isa = PBXBuildFile; fileRef = CFD95B2E2F66CCDD008FDFF5 /* swoosh.m4a */; };
 		CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884122F6615C6006183C5 /* BottomTabBar.swift */; };
 		CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884142F661B66006183C5 /* SceneDelegate.swift */; };
 		CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884162F66B314006183C5 /* SplashViewController.swift */; };
@@ -60,7 +59,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CFD95B2E2F66CCDD008FDFF5 /* swoosh.m4a */ = {isa = PBXFileReference; lastKnownFileType = text; path = swoosh.m4a; sourceTree = "<group>"; };
 		CFE884122F6615C6006183C5 /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CFE884162F66B314006183C5 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
@@ -245,7 +243,6 @@
 				F2D6041D2781D927003958A2 /* background.sks */,
 				F2D6041B2781D75F003958A2 /* gravity.m4a */,
 				CFE884142F661B66006183C5 /* SceneDelegate.swift */,
-				CFD95B2E2F66CCDD008FDFF5 /* swoosh.m4a */,
 			);
 			path = Graviton;
 			sourceTree = "<group>";
@@ -386,7 +383,6 @@
 				F2BD5C682773C4DE00136C85 /* Assets.xcassets in Resources */,
 				F2D604242781D92E003958A2 /* background.sks in Resources */,
 				F23AFF922EFE870D0046B0D1 /* Assets.xcassets in Resources */,
-				CFD95B2F2F66CCDD008FDFF5 /* swoosh.m4a in Resources */,
 				F2BD5C6B2773C4DE00136C85 /* LaunchScreen.storyboard in Resources */,
 				F27F9C602A19E907009D32D3 /* StoreKitTestCertificate.cer in Resources */,
 			);
