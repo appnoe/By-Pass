@@ -10,6 +10,7 @@ class GameViewController: UIViewController {
 
   var gameScene: GameScene?
   private var pinchBaseScale: CGFloat = 1.0
+  private var isFastForward = false
   var contentView: GameView {
     return view as! GameView
   }
@@ -18,9 +19,7 @@ class GameViewController: UIViewController {
     let contentView = GameView(frame: .zero)
 
     let tabBar = contentView.bottomTabBar
-    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchDown), for: .touchDown)
-    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpInside)
-    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardTouchUp), for: .touchUpOutside)
+    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
     tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
     tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
     tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
@@ -88,24 +87,19 @@ extension GameViewController {
     }
   }
 
-  @objc func fastForwardTouchDown(_ sender: UIButton) {
+  @objc func fastForwardToggled(_ sender: UIButton) {
     guard let gameScene else { return }
-    gameScene.physicsWorld.speed = 3
+    isFastForward.toggle()
+    let speed: CGFloat = isFastForward ? 3 : 1
+    gameScene.physicsWorld.speed = speed
     for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
       for case let emitter as SKEmitterNode in satellite.children {
-        emitter.particleBirthRate *= 3
+        emitter.particleBirthRate = isFastForward
+          ? emitter.particleBirthRate * 3
+          : emitter.particleBirthRate / 3
       }
     }
-  }
-
-  @objc func fastForwardTouchUp(_ sender: UIButton) {
-    guard let gameScene else { return }
-    gameScene.physicsWorld.speed = 1
-    for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
-      for case let emitter as SKEmitterNode in satellite.children {
-        emitter.particleBirthRate /= 3
-      }
-    }
+    contentView.bottomTabBar.isFastForwardOn = isFastForward
   }
 
   @objc func infoTapped(_ sender: UIButton) {
