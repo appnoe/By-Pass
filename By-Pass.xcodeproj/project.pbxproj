@@ -418,7 +418,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ \"${ACTION}\" == \"indexbuild\" ]; then\n    exit 0\nfi\n\nBUILD_NUMBER_FILE=\"${SRCROOT}/buildnumber.xcconfig\"\n\nif [ ! -f \"${BUILD_NUMBER_FILE}\" ]; then\n    echo \"BUILD_NUMBER = 1\" > \"${BUILD_NUMBER_FILE}\"\nfi\n\nCURRENT_BUILD=$(grep \"BUILD_NUMBER\" \"${BUILD_NUMBER_FILE}\" | sed 's/BUILD_NUMBER = //')\nNEW_BUILD=$((CURRENT_BUILD + 1))\n\necho \"BUILD_NUMBER = ${NEW_BUILD}\" > \"${BUILD_NUMBER_FILE}\"\n\n# Write the new build number directly into the built Info.plist\nBUILT_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\nif [ -f \"${BUILT_PLIST}\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${BUILT_PLIST}\"\nfi\n\necho \"Build number incremented: ${CURRENT_BUILD} → ${NEW_BUILD}\"\n";
+			shellScript = "if [ \"${ACTION}\" == \"indexbuild\" ]; then\n    exit 0\nfi\n\nBUILD_NUMBER_FILE=\"${SRCROOT}/buildnumber.xcconfig\"\n\nL1=$(printf \"\\\\$(printf '%03o' $((RANDOM % 26 + 65)))\")\nL2=$(printf \"\\\\$(printf '%03o' $((RANDOM % 26 + 65)))\")\nTIMESTAMP=$(date +%s)\nNEW_BUILD=\"${L1}${L2}${TIMESTAMP}\"\n\necho \"BUILD_NUMBER = ${NEW_BUILD}\" > \"${BUILD_NUMBER_FILE}\"\n\nBUILT_PLIST=\"${BUILT_PRODUCTS_DIR}/${INFOPLIST_PATH}\"\nif [ -f \"${BUILT_PLIST}\" ]; then\n    /usr/libexec/PlistBuddy -c \"Set :CFBundleVersion ${NEW_BUILD}\" \"${BUILT_PLIST}\"\nfi\n\necho \"Build number set to: ${NEW_BUILD}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
