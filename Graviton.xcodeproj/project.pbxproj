@@ -218,7 +218,7 @@
 		F2BD5C4E2773C4DC00136C85 = {
 			isa = PBXGroup;
 			children = (
-				F2BD5C592773C4DC00136C85 /* GravitationFun */,
+				F2BD5C592773C4DC00136C85 /* Graviton */,
 				F2D6040D2781AAC9003958A2 /* GravityTests */,
 				F2A21E4E277F0F8D00EA5825 /* GravityUITests */,
 				F2BD5C582773C4DC00136C85 /* Products */,
@@ -236,7 +236,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F2BD5C592773C4DC00136C85 /* GravitationFun */ = {
+		F2BD5C592773C4DC00136C85 /* Graviton */ = {
 			isa = PBXGroup;
 			children = (
 				F2B6164B2777998200BCE6C4 /* Info.plist */,
@@ -255,7 +255,7 @@
 				F2D6041B2781D75F003958A2 /* gravity.m4a */,
 				CFE884142F661B66006183C5 /* SceneDelegate.swift */,
 			);
-			path = GravitationFun;
+			path = Graviton;
 			sourceTree = "<group>";
 		};
 		F2D6040D2781AAC9003958A2 /* GravityTests */ = {
@@ -664,7 +664,7 @@
 				CURRENT_PROJECT_VERSION = 100;
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = GravitationFun/Info.plist;
+				INFOPLIST_FILE = Graviton/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Graviton - DBG";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -698,7 +698,7 @@
 				CURRENT_PROJECT_VERSION = 100;
 				DEVELOPMENT_TEAM = MX2FBKL65A;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = GravitationFun/Info.plist;
+				INFOPLIST_FILE = Graviton/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Graviton;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
