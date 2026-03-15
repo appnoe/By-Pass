@@ -21,7 +21,31 @@ class InfoSheetViewController: UIViewController {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         glowOverlay.frame = view.bounds
+        updateGlowPath()
+    }
+
+    private func updateGlowPath() {
         let r = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : 24
+        let inset: CGFloat = 12  // how far inside the ring extends
+
+        // Outer path = full bounds with sheet corner radius
+        let outer = UIBezierPath(roundedRect: view.bounds, cornerRadius: r)
+        // Inner path = inset rect — punch a hole so centre is fully transparent
+        let innerRect = view.bounds.insetBy(dx: inset, dy: inset)
+        let inner = UIBezierPath(roundedRect: innerRect, cornerRadius: max(0, r - inset))
+        outer.append(inner.reversing())   // even-odd fill = only the ring
+
+        // Apply as mask so only the ring strip renders
+        if let maskLayer = glowOverlay.layer.mask as? CAShapeLayer {
+            maskLayer.path = outer.cgPath
+        } else {
+            let maskLayer = CAShapeLayer()
+            maskLayer.fillRule = .evenOdd
+            maskLayer.path = outer.cgPath
+            glowOverlay.layer.mask = maskLayer
+        }
+
+        // Keep the shadow path tight to the border line
         glowOverlay.layer.cornerRadius = r
         glowOverlay.layer.shadowPath = UIBezierPath(
             roundedRect: view.bounds, cornerRadius: r
@@ -35,7 +59,8 @@ class InfoSheetViewController: UIViewController {
     private func setupGlowBorder() {
         // Transparent overlay on top of the SKView so the glow is never occluded.
         // clipsToBounds = false lets the shadow spread outside the bounds.
-        glowOverlay.backgroundColor = .clear
+        // Subtle warm tint in the ring strip; transparent centre = planets show through
+        glowOverlay.backgroundColor = UIColor(red: 1.0, green: 0.45, blue: 0.02, alpha: 0.08)
         glowOverlay.isUserInteractionEnabled = false
         glowOverlay.clipsToBounds = false
 
