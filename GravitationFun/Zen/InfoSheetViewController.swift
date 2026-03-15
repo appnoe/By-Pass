@@ -6,24 +6,26 @@ import SpriteKit
 
 class InfoSheetViewController: UIViewController {
 
+    // The glow overlay sits on top of everything else and is pointer-transparent.
+    private let glowOverlay = UIView()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
         setupSpriteKitView()
-        setupGlowBorder()
         setupTitleLabel()
         setupTaglineLabel()
+        setupGlowBorder()   // added last so it's the topmost subview
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        // Update glow path after corner radius is applied by the sheet
-        if let glowLayer = view.layer.sublayers?.first(where: { $0.name == "glowBorder" }) as? CAShapeLayer {
-            glowLayer.path = UIBezierPath(
-                roundedRect: view.bounds,
-                cornerRadius: view.layer.cornerRadius
-            ).cgPath
-        }
+        glowOverlay.frame = view.bounds
+        let r = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : 24
+        glowOverlay.layer.cornerRadius = r
+        glowOverlay.layer.shadowPath = UIBezierPath(
+            roundedRect: view.bounds, cornerRadius: r
+        ).cgPath
     }
 
     override var prefersStatusBarHidden: Bool { true }
@@ -31,32 +33,33 @@ class InfoSheetViewController: UIViewController {
     // MARK: - Setup
 
     private func setupGlowBorder() {
-        // A CAShapeLayer stroked with the sun's warm orange, with a matching
-        // shadow-blur (shadowRadius) to create an inner-glow effect.
-        // Placed as the bottommost sublayer so it stays behind everything.
-        let glow = CAShapeLayer()
-        glow.name = "glowBorder"
-        glow.fillColor = UIColor.clear.cgColor
-        glow.strokeColor = UIColor(red: 1.0, green: 0.65, blue: 0.10, alpha: 0.55).cgColor
-        glow.lineWidth = 2.0
-        // Shadow = soft halo around the stroke line
-        glow.shadowColor  = UIColor(red: 1.0, green: 0.55, blue: 0.05, alpha: 1.0).cgColor
-        glow.shadowOffset = .zero
-        glow.shadowRadius = 12
-        glow.shadowOpacity = 0.9
-        // path set in viewDidLayoutSubviews once corner radius is known
-        glow.path = UIBezierPath(roundedRect: view.bounds, cornerRadius: 24).cgPath
-        view.layer.insertSublayer(glow, at: 0)
+        // Transparent overlay on top of the SKView so the glow is never occluded.
+        // clipsToBounds = false lets the shadow spread outside the bounds.
+        glowOverlay.backgroundColor = .clear
+        glowOverlay.isUserInteractionEnabled = false
+        glowOverlay.clipsToBounds = false
 
-        // Gentle pulse: the glow breathes like the sun
+        // Visible border line
+        glowOverlay.layer.borderColor = UIColor(red: 1.0, green: 0.60, blue: 0.05, alpha: 0.70).cgColor
+        glowOverlay.layer.borderWidth = 1.5
+
+        // Outer glow via layer shadow
+        glowOverlay.layer.shadowColor  = UIColor(red: 1.0, green: 0.50, blue: 0.02, alpha: 1.0).cgColor
+        glowOverlay.layer.shadowOffset = .zero
+        glowOverlay.layer.shadowRadius = 14
+        glowOverlay.layer.shadowOpacity = 0.85
+
+        view.addSubview(glowOverlay)
+
+        // Gentle pulse on the shadow opacity
         let pulse = CABasicAnimation(keyPath: "shadowOpacity")
-        pulse.fromValue = 0.55
-        pulse.toValue   = 0.95
-        pulse.duration  = 1.8
-        pulse.autoreverses = true
-        pulse.repeatCount  = .infinity
+        pulse.fromValue  = 0.45
+        pulse.toValue    = 0.95
+        pulse.duration   = 1.8
+        pulse.autoreverses   = true
+        pulse.repeatCount    = .infinity
         pulse.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
-        glow.add(pulse, forKey: "glowPulse")
+        glowOverlay.layer.add(pulse, forKey: "glowPulse")
     }
 
     private func setupSpriteKitView() {
