@@ -354,19 +354,6 @@ public class GravityModel {
     }
   }
 
-  // MARK: - Stars
-
-  public func stars() -> SKNode? {
-    guard backgroundEmitter?.parent == nil else {
-      return nil
-    }
-    return backgroundEmitter
-  }
-
-  public func disableStars() {
-    backgroundEmitter?.removeFromParent()
-  }
-
   // MARK: - Projectile
 
   public func projectile(size: CGSize) -> SKNode {

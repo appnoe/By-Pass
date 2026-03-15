@@ -12,12 +12,7 @@ class BottomTabBar: UIView {
   let sun1Button: UIButton
   let sun2Button: UIButton
   let sun3Button: UIButton
-  let starsButton: UIButton
-
-  // Tracks whether stars is toggled on
-  var isStarsOn: Bool = true {
-    didSet { updateHighlights(animated: true) }
-  }
+  let infoButton: UIButton
 
   // Tracks selected sun index (0 = 1 sun, 1 = 2 suns, 2 = 3 suns), nil = none selected
   var selectedSunIndex: Int? = 0 {
@@ -47,8 +42,8 @@ class BottomTabBar: UIView {
     sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1 Sun")
     sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
     sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
-    starsButton       = BottomTabBar.makeTabButton(icon: "star",     title: "Stars")
-    allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, starsButton]
+    infoButton        = BottomTabBar.makeTabButton(icon: "info.circle", title: "Info")
+    allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
     sunButtons  = [sun1Button, sun2Button, sun3Button]
 
     containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
@@ -160,9 +155,6 @@ class BottomTabBar: UIView {
     var activeIndices: Set<Int> = []
     if let sunIdx = selectedSunIndex {
       activeIndices.insert(2 + sunIdx)
-    }
-    if isStarsOn {
-      activeIndices.insert(5)
     }
 
     for (i, button) in allButtons.enumerated() {

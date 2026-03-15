@@ -10,6 +10,7 @@
 		CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884122F6615C6006183C5 /* BottomTabBar.swift */; };
 		CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884142F661B66006183C5 /* SceneDelegate.swift */; };
 		CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884162F66B314006183C5 /* SplashViewController.swift */; };
+		CFE884192F66B6BB006183C5 /* InfoSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */; };
 		F23AFF862EFE870D0046B0D1 /* ColorSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7C2EFE870D0046B0D1 /* ColorSetting.swift */; };
 		F23AFF872EFE870D0046B0D1 /* RectangleEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */; };
 		F23AFF882EFE870D0046B0D1 /* GravityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7F2EFE870D0046B0D1 /* GravityModel.swift */; };
@@ -62,6 +63,7 @@
 		CFE884122F6615C6006183C5 /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CFE884162F66B314006183C5 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
+		CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoSheetViewController.swift; sourceTree = "<group>"; };
 		F23AFF772EFE870D0046B0D1 /* BoxEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxEmitter.swift; sourceTree = "<group>"; };
 		F23AFF782EFE870D0046B0D1 /* ExplosionEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplosionEmitter.swift; sourceTree = "<group>"; };
 		F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleEmitter.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				F2A21E3B277B0F7C00EA5825 /* GameView.swift */,
 				CFE884122F6615C6006183C5 /* BottomTabBar.swift */,
 				CFE884162F66B314006183C5 /* SplashViewController.swift */,
+				CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */,
 			);
 			path = Zen;
 			sourceTree = "<group>";
@@ -422,6 +425,7 @@
 				F23AFF862EFE870D0046B0D1 /* ColorSetting.swift in Sources */,
 				F23AFF872EFE870D0046B0D1 /* RectangleEmitter.swift in Sources */,
 				F23AFF882EFE870D0046B0D1 /* GravityModel.swift in Sources */,
+				CFE884192F66B6BB006183C5 /* InfoSheetViewController.swift in Sources */,
 				F23AFF892EFE870D0046B0D1 /* Satellite.swift in Sources */,
 				CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */,
 				F23AFF8A2EFE870D0046B0D1 /* TrailLength.swift in Sources */,

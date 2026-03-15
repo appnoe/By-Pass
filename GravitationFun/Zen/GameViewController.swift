@@ -25,7 +25,7 @@ class GameViewController: UIViewController {
     tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
     tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
-    tabBar.starsButton.addTarget(self, action: #selector(starsTapped), for: .touchUpInside)
+    tabBar.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
 
     view = contentView
   }
@@ -108,10 +108,15 @@ extension GameViewController {
     }
   }
 
-  @objc func starsTapped(_ sender: UIButton) {
-    let tabBar = contentView.bottomTabBar
-    tabBar.isStarsOn.toggle()
-    gameScene?.setStars(enabled: tabBar.isStarsOn)
+  @objc func infoTapped(_ sender: UIButton) {
+    let infoVC = InfoSheetViewController()
+    infoVC.modalPresentationStyle = .pageSheet
+    if let sheet = infoVC.sheetPresentationController {
+      sheet.detents = [.large()]
+      sheet.prefersGrabberVisible = true
+      sheet.preferredCornerRadius = 24
+    }
+    present(infoVC, animated: true)
   }
 
   @objc func sun1Tapped(_ sender: UIButton) { setSunCount(1) }
