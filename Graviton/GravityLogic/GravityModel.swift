@@ -4,18 +4,11 @@
 
 import SpriteKit
 
-public enum SpawnMode: Int {
-  case maual
-  case automatic
-}
-
 public class GravityModel {
   public var satelliteNodes: [Satellite] = []
-//  var canon: SKSpriteNode
   var temporaryNodes: [Int:Satellite] = [:]
   var velocityNodes: [Int:SKShapeNode] = [:]
   let emitterForBox: SKEmitterNode
-//  let emitterForRectangle: SKEmitterNode
   public var backgroundEmitter: SKNode?
   var explosionEmitter: SKEmitterNode?
   public private(set) var gravityNode: SKFieldNode
@@ -37,36 +30,11 @@ public class GravityModel {
       trailLength = mode.trailLength
     }
   }
-//  public var spawnMode: SpawnMode = .maual {
-//    didSet {
-//      let linearDamping: CGFloat
-//      switch spawnMode {
-//        case .maual:
-//          linearDamping = 0
-//          gravityNode.falloff = 1.9
-//        case .automatic:
-//          linearDamping = 0.03
-//          gravityNode.falloff = 1
-//      }
-//      for node in satelliteNodes {
-//        node.physicsBody?.linearDamping = linearDamping
-//      }
-//    }
-//  }
-//  public var friction: Friction = .none {
-//    didSet {
-//      let linearDamping = friction.linearDamping
-//      for node in satelliteNodes {
-//        node.physicsBody?.linearDamping = linearDamping
-//      }
-//    }
-//  }
   public var trailLength: TrailLength = .long {
     didSet {
       setEmitter(enabled: false)
 
       emitterForBox.particleLifetime = trailLength.lifetime()
-//      emitterForRectangle.particleLifetime = trailLength.lifetime()
 
       switch trailLength {
         case .none:
@@ -94,7 +62,6 @@ public class GravityModel {
   // MARK: - Setup
   public init() {
     emitterForBox = BoxEmitter()
-//    emitterForRectangle = RectangleEmitter()
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
 
@@ -111,12 +78,10 @@ public class GravityModel {
 
     thirdCenter = NodeFactory.center()
     thirdCenter.isHidden = true
-//    canon = SKSpriteNode(color: .white, size: CGSize(width: 5, height: 20))
   }
 
   public func setup(scene: SKScene) {
     emitterForBox.targetNode = scene
-//    emitterForRectangle.targetNode = scene
 
     if scene.children.filter({ $0 is Satellite }).count < 1 {
       backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
@@ -150,9 +115,6 @@ public class GravityModel {
         musicAudioNode = audio
       }
     }
-//    let size = scene.size
-//    canon.position = CGPoint(x: 0, y: -floor(size.height/2)+30)
-//    scene.addChild(canon)
   }
 
   public func addSound(node: SKAudioNode) {
@@ -237,15 +199,8 @@ public class GravityModel {
       musicAudioNode?.removeFromParent()
     }
 
-//    moveEmittersIn(node: satellite, to: target)
     explosion(at: satellite.position, inNode: target)
     satellite.removeFromParent()
-
-//    if spawnMode == .automatic, satelliteNodes.count < 5 {
-//      for node in random(size: target.size).nodes {
-//        target.addChild(node)
-//      }
-//    }
   }
 
   // MARK: - Sound
@@ -306,7 +261,6 @@ public class GravityModel {
     let position = satellite.position
     let velocity = CGVector(dx: position.x - input.x, dy: position.y - input.y)
     satellite.addPhysicsBody(with: velocity)
-//    satellite.physicsBody?.linearDamping = friction.linearDamping
 
     if trailLength != .none {
       satellite.addEmitter(emitterBox: emitterForBox)
@@ -328,20 +282,6 @@ public class GravityModel {
       }
     }
   }
-
-//  func moveEmittersIn(node: SKNode, to: SKNode) {
-//    let emitters = node.children.filter({ $0 is SKEmitterNode }) as! [SKEmitterNode]
-//    for emitter in emitters {
-//      emitter.removeFromParent()
-//      emitter.position = node.position
-//      emitter.numParticlesToEmit = 0
-//      emitter.particleBirthRate = 0
-//      to.addChild(emitter)
-//      DispatchQueue.main.asyncAfter(deadline: .now() + trailLength.lifetime()) {
-//        emitter.removeFromParent()
-//      }
-//    }
-//  }
 
   func explosion(at position: CGPoint, inNode node: SKNode) {
     let emitter = explosionEmitter?.copy() as? SKEmitterNode
@@ -375,13 +315,7 @@ public class GravityModel {
       if trailLength != .none {
         satellite.addEmitter(emitterBox: emitterForBox)
       }
-//      switch spawnMode {
-//        case .maual:
-          satellite.physicsBody?.linearDamping = 0.0
-//        case .automatic:
-//          satellite.physicsBody?.linearDamping = 0.01
-//      }
-//      satellite.physicsBody?.linearDamping = friction.linearDamping
+      satellite.physicsBody?.linearDamping = 0.0
     }
     self.satelliteNodes.append(contentsOf: satellites)
     return (nodes: satellites, sound: sound())
