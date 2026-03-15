@@ -79,21 +79,21 @@ class GameScene: SKScene {
           continue
         }
         for node2 in model.satelliteNodes {
-          if nil == node1.physicsBody || nil == node2.physicsBody {
+          guard let body1 = node1.physicsBody, let body2 = node2.physicsBody else {
             continue
           }
-          let m1 = node1.physicsBody!.mass*strength
-          let m2 = node2.physicsBody!.mass*strength
+          let m1 = body1.mass * strength
+          let m2 = body2.mass * strength
           let disp = CGVector(dx: node2.position.x-node1.position.x, dy: node2.position.y-node1.position.y)
           let radius = sqrt(disp.dx*disp.dx+disp.dy*disp.dy)
           if radius < node1.radius*1.3 { //Radius lower-bound.
             continue
           }
-          let force = (m1*m2)/(radius*radius);
+          let force = (m1*m2)/(radius*radius)
           let normal = CGVector(dx: disp.dx/radius, dy: disp.dy/radius)
           let impulse = CGVector(dx: normal.dx*force*dt, dy: normal.dy*force*dt)
 
-          node1.physicsBody!.velocity = CGVector(dx: node1.physicsBody!.velocity.dx + impulse.dx, dy: node1.physicsBody!.velocity.dy + impulse.dy)
+          body1.velocity = CGVector(dx: body1.velocity.dx + impulse.dx, dy: body1.velocity.dy + impulse.dy)
         }
       }
     }
@@ -103,7 +103,6 @@ class GameScene: SKScene {
     guard !isPinching else { return }
     let logger = Logger(subsystem: "GravityFun", category: "GameScene")
     logger.info("\(touch)")
-    NSLog("%@", touch)
     if model.mode == .spirograph,
        model.satelliteNodes.count > 9 {
       return
