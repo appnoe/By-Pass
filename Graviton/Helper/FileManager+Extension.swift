@@ -17,6 +17,6 @@ extension FileManager {
   }
 
   var sceneStatesURL: URL {
-    return documentsURL.appendingPathComponent("scene_states.json ")
+    return documentsURL.appendingPathComponent("scene_states.json")
   }
 }
