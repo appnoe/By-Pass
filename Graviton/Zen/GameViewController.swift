@@ -13,6 +13,7 @@ class GameViewController: UIViewController {
   var contentView: GameView {
     return view as! GameView
   }
+  private var onboardingOverlay: OnboardingOverlayView?
 
   override func loadView() {
     let contentView = GameView(frame: .zero)
@@ -49,8 +50,29 @@ class GameViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
 
-    // Start with a random configuration
-    gameScene?.random(direction: .random)
+    if shouldShowOnboarding() {
+      showOnboarding()
+    } else {
+      // Start with a random configuration
+      gameScene?.random(direction: .random)
+    }
+  }
+
+  private func shouldShowOnboarding() -> Bool {
+    return !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+  }
+
+  private func showOnboarding() {
+    let overlay = OnboardingOverlayView(frame: view.bounds)
+    overlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    overlay.onDismiss = { [weak self] in
+      self?.onboardingOverlay = nil
+      UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+      self?.gameScene?.random(direction: .random)
+    }
+    view.addSubview(overlay)
+    onboardingOverlay = overlay
+    overlay.startAnimation()
   }
 
   override var shouldAutorotate: Bool { true }
