@@ -259,7 +259,7 @@ public class GravityModel {
     }
 
     let position = satellite.position
-    let velocityScale: CGFloat = 0.5
+    let velocityScale: CGFloat = 0.6
     let velocity = CGVector(dx: (position.x - input.x) * velocityScale, dy: (position.y - input.y) * velocityScale)
     satellite.addPhysicsBody(with: velocity)
 
