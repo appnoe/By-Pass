@@ -27,6 +27,9 @@ class BottomTabBar: UIView {
   private let allButtons: [UIButton]
   private let sunButtons: [UIButton]
 
+  // Clips the glass rendering to the pill shape
+  private let clipView: UIView
+
   // UIGlassContainerEffect: renders all child UIGlassEffect views in one combined pass
   private let containerView: UIVisualEffectView
 
@@ -51,10 +54,15 @@ class BottomTabBar: UIView {
     allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
     sunButtons  = [sun1Button, sun2Button, sun3Button]
 
+    clipView = UIView()
+    clipView.translatesAutoresizingMaskIntoConstraints = false
+    clipView.layer.cornerRadius = 28
+    clipView.layer.cornerCurve = .continuous
+    clipView.clipsToBounds = true
+    clipView.backgroundColor = .clear
+
     containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
     containerView.translatesAutoresizingMaskIntoConstraints = false
-    containerView.layer.cornerRadius = 28
-    containerView.clipsToBounds = true
 
     // Main pill glass — dark tint so it's visible on the black SpriteKit background.
     // isInteractive = true gives buttons the native scale+bounce response on tap.
@@ -71,6 +79,7 @@ class BottomTabBar: UIView {
     selectionView = UIVisualEffectView(effect: selectionEffect)
     selectionView.translatesAutoresizingMaskIntoConstraints = false
     selectionView.layer.cornerRadius = 20
+    selectionView.layer.cornerCurve = .continuous
     selectionView.clipsToBounds = true
     selectionView.alpha = 0
 
@@ -84,12 +93,12 @@ class BottomTabBar: UIView {
 
     backgroundColor = .clear
 
-    // Hierarchy: pillGlass (back) → selectionView → stackView (front),
-    // all direct children of containerView.contentView so UIGlassContainerEffect merges them
+    // Hierarchy: clipView clips the pill shape, containerView renders glass inside it
     containerView.contentView.addSubview(pillGlass)
     containerView.contentView.addSubview(selectionView)
     containerView.contentView.addSubview(stackView)
-    addSubview(containerView)
+    clipView.addSubview(containerView)
+    addSubview(clipView)
 
     let selectionLeading = selectionView.leadingAnchor.constraint(
       equalTo: containerView.contentView.leadingAnchor, constant: 8)
@@ -98,10 +107,15 @@ class BottomTabBar: UIView {
     selectionWidthConstraint   = selectionWidth
 
     NSLayoutConstraint.activate([
-      containerView.topAnchor.constraint(equalTo: topAnchor),
-      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      clipView.topAnchor.constraint(equalTo: topAnchor),
+      clipView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      clipView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      clipView.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+      containerView.topAnchor.constraint(equalTo: clipView.topAnchor),
+      containerView.leadingAnchor.constraint(equalTo: clipView.leadingAnchor),
+      containerView.bottomAnchor.constraint(equalTo: clipView.bottomAnchor),
+      containerView.trailingAnchor.constraint(equalTo: clipView.trailingAnchor),
 
       pillGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
       pillGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
