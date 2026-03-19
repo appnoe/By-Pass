@@ -48,6 +48,9 @@ class GameView: UIView {
       bottomTabBar.centerXAnchor.constraint(equalTo: centerXAnchor),
       bottomTabBar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
       bottomTabBar.heightAnchor.constraint(equalToConstant: 60),
+      bottomTabBar.widthAnchor.constraint(lessThanOrEqualToConstant: 360),
+      bottomTabBar.leadingAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
+      bottomTabBar.trailingAnchor.constraint(lessThanOrEqualTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
     ])
   }
 
