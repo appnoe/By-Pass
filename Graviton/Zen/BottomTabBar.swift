@@ -54,6 +54,7 @@ class BottomTabBar: UIView {
     containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
     containerView.translatesAutoresizingMaskIntoConstraints = false
     containerView.layer.cornerRadius = 28
+    containerView.layer.cornerCurve = .continuous
     containerView.clipsToBounds = true
 
     // Main pill glass — dark tint so it's visible on the black SpriteKit background.
@@ -71,6 +72,7 @@ class BottomTabBar: UIView {
     selectionView = UIVisualEffectView(effect: selectionEffect)
     selectionView.translatesAutoresizingMaskIntoConstraints = false
     selectionView.layer.cornerRadius = 20
+    selectionView.layer.cornerCurve = .continuous
     selectionView.clipsToBounds = true
     selectionView.alpha = 0
 
