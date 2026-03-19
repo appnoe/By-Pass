@@ -47,7 +47,6 @@ class GameView: UIView {
 
       bottomTabBar.centerXAnchor.constraint(equalTo: centerXAnchor),
       bottomTabBar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
-      bottomTabBar.heightAnchor.constraint(equalToConstant: 60),
     ])
   }
 
