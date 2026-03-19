@@ -18,13 +18,23 @@ class GameViewController: UIViewController {
   override func loadView() {
     let contentView = GameView(frame: .zero)
 
-    let tabBar = contentView.bottomTabBar
-    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
-    tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
-    tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
-    tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
-    tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
-    tabBar.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+    let menu = contentView.radialMenu
+
+    menu.onFastForwardToggled = { [weak self] in
+      self?.fastForwardToggled()
+    }
+
+    menu.onClearTapped = { [weak self] in
+      self?.clear()
+    }
+
+    menu.onSunCountChanged = { [weak self] count in
+      self?.setSunCount(count)
+    }
+
+    menu.onInfoTapped = { [weak self] in
+      self?.infoTapped()
+    }
 
     view = contentView
   }
@@ -108,7 +118,7 @@ extension GameViewController {
     }
   }
 
-  @objc func fastForwardToggled(_ sender: UIButton) {
+  func fastForwardToggled() {
     guard let gameScene else { return }
     isFastForward.toggle()
     let speed: CGFloat = isFastForward ? 3 : 1
@@ -120,10 +130,10 @@ extension GameViewController {
           : emitter.particleBirthRate / 3
       }
     }
-    contentView.bottomTabBar.isFastForwardOn = isFastForward
+    contentView.radialMenu.isFastForwardOn = isFastForward
   }
 
-  @objc func infoTapped(_ sender: UIButton) {
+  func infoTapped() {
     let infoVC = InfoSheetViewController()
     infoVC.modalPresentationStyle = .pageSheet
     if let sheet = infoVC.sheetPresentationController {
@@ -134,17 +144,13 @@ extension GameViewController {
     present(infoVC, animated: true)
   }
 
-  @objc func sun1Tapped(_ sender: UIButton) { setSunCount(1) }
-  @objc func sun2Tapped(_ sender: UIButton) { setSunCount(2) }
-  @objc func sun3Tapped(_ sender: UIButton) { setSunCount(3) }
-
   private func setSunCount(_ count: Int) {
     guard let scene = gameScene else { return }
-    contentView.bottomTabBar.selectedSunIndex = count - 1
+    contentView.radialMenu.selectedSunCount = count
     scene.model.setNumberOfBlackHoles(to: count, in: scene)
   }
 
-  @objc func clear(_ sender: UIButton) {
+  func clear() {
     guard let scene = gameScene else { return }
     for (index, satellite) in scene.model.satelliteNodes.enumerated() {
       DispatchQueue.main.asyncAfter(deadline: .now() + 0.03 * Double(index)) {
@@ -162,11 +168,6 @@ extension GameViewController {
       case .spirograph: text = "\(count)/10"
     }
     contentView.satellitesCountLabel.text = text
-    disableRandomButtonsIfNeeded()
-  }
-
-  func disableRandomButtonsIfNeeded() {
-    // No random buttons in tab bar yet — placeholder for future use
   }
 
   func getScreenshot(scene: SKScene) -> UIImage? {

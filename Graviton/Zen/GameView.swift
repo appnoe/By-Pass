@@ -16,7 +16,7 @@ class GameView: UIView {
 
   let skView: GravitySKView
   let satellitesCountLabel: UILabel
-  let bottomTabBar: BottomTabBar
+  let radialMenu: RadialMenuView
 
   override init(frame: CGRect) {
 
@@ -29,8 +29,8 @@ class GameView: UIView {
     satellitesCountLabel.text = "0"
     satellitesCountLabel.textColor = .secondaryLabel
 
-    bottomTabBar = BottomTabBar()
-    bottomTabBar.translatesAutoresizingMaskIntoConstraints = false
+    radialMenu = RadialMenuView()
+    radialMenu.translatesAutoresizingMaskIntoConstraints = false
 
     super.init(frame: frame)
 
@@ -39,18 +39,17 @@ class GameView: UIView {
 
     addSubview(skView)
     addSubview(satellitesCountLabel)
-    addSubview(bottomTabBar)
+    addSubview(radialMenu)
 
     NSLayoutConstraint.activate([
       satellitesCountLabel.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 20),
       satellitesCountLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -20),
 
-      bottomTabBar.centerXAnchor.constraint(equalTo: centerXAnchor),
-      bottomTabBar.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
-      bottomTabBar.heightAnchor.constraint(equalToConstant: 60),
-      bottomTabBar.widthAnchor.constraint(lessThanOrEqualToConstant: 360),
-      bottomTabBar.leadingAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
-      bottomTabBar.trailingAnchor.constraint(lessThanOrEqualTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
+      // RadialMenu: füllt den gesamten Bereich (für Dimming + Menü-Item-Positionen)
+      radialMenu.topAnchor.constraint(equalTo: topAnchor),
+      radialMenu.leadingAnchor.constraint(equalTo: leadingAnchor),
+      radialMenu.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
+      radialMenu.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
     ])
   }
 
