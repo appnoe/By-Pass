@@ -161,10 +161,14 @@ public class GravityModel {
         center.physicsBody?.mass = sunMass
         center.physicsBody?.linearDamping = 0
         center.physicsBody?.angularDamping = 0
+        center.physicsBody?.affectedByGravity = false
+        center.physicsBody?.collisionBitMask = 0  // no physical bounce-back from satellites
         secondCenter.physicsBody?.isDynamic = true
         secondCenter.physicsBody?.mass = sunMass
         secondCenter.physicsBody?.linearDamping = 0
         secondCenter.physicsBody?.angularDamping = 0
+        secondCenter.physicsBody?.affectedByGravity = false
+        secondCenter.physicsBody?.collisionBitMask = 0
 
         // Circular orbit velocity: v = sqrt(F * r) where F = (m*str)^2 / d^2
         // With m=50, str=10, d=224, r=112 → v ≈ 23.6 pts/s
@@ -182,10 +186,13 @@ public class GravityModel {
         // Restore suns to static for 3-body mode
         center.physicsBody?.isDynamic = false
         center.physicsBody?.velocity = .zero
+        center.physicsBody?.collisionBitMask = PhysicsCategory.satellite
         secondCenter.physicsBody?.isDynamic = false
         secondCenter.physicsBody?.velocity = .zero
+        secondCenter.physicsBody?.collisionBitMask = PhysicsCategory.satellite
         thirdCenter.physicsBody?.isDynamic = false
         thirdCenter.physicsBody?.velocity = .zero
+        thirdCenter.physicsBody?.collisionBitMask = PhysicsCategory.satellite
 
         let xPos = sqrt((distance * distance) - (distance * distance/4))/2
         secondGravityNode.isEnabled = true
@@ -214,12 +221,14 @@ public class GravityModel {
         center.physicsBody?.isDynamic = false
         center.physicsBody?.velocity = .zero
         center.physicsBody?.mass = 1.0
+        center.physicsBody?.collisionBitMask = PhysicsCategory.satellite
 
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
         secondCenter.physicsBody?.isDynamic = false
         secondCenter.physicsBody?.velocity = .zero
+        secondCenter.physicsBody?.collisionBitMask = PhysicsCategory.satellite
 
         thirdGravityNode.isEnabled = false
         thirdCenter.isHidden = true
