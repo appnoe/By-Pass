@@ -95,7 +95,7 @@ class OnboardingOverlayView: UIView {
             hintLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             hintLabel.topAnchor.constraint(equalTo: topAnchor, constant: bounds.height * 0.15 + 44),
             skipLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            skipLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50)
+            skipLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -84)
         ])
     }
 
