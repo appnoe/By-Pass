@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		CF56F8952F69E3060072A4E2 /* OnboardingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */; };
-		CF56F8972F6C87DF0072A4E2 /* RadialMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF56F8962F6C87DF0072A4E2 /* RadialMenuView.swift */; };
+		CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884122F6615C6006183C5 /* BottomTabBar.swift */; };
 		CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884142F661B66006183C5 /* SceneDelegate.swift */; };
 		CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884162F66B314006183C5 /* SplashViewController.swift */; };
 		CFE884192F66B6BB006183C5 /* InfoSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */; };
@@ -58,8 +58,8 @@
 
 /* Begin PBXFileReference section */
 		CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
-		CF56F8962F6C87DF0072A4E2 /* RadialMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadialMenuView.swift; sourceTree = "<group>"; };
 		CF8163DC2F66D2980000646F /* buildnumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = buildnumber.xcconfig; sourceTree = "<group>"; };
+		CFE884122F6615C6006183C5 /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CFE884162F66B314006183C5 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoSheetViewController.swift; sourceTree = "<group>"; };
@@ -155,10 +155,10 @@
 				F2BD5C602773C4DC00136C85 /* GameScene.swift */,
 				F2BD5C622773C4DC00136C85 /* GameViewController.swift */,
 				F2A21E3B277B0F7C00EA5825 /* GameView.swift */,
+				CFE884122F6615C6006183C5 /* BottomTabBar.swift */,
 				CFE884162F66B314006183C5 /* SplashViewController.swift */,
 				CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */,
 				CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */,
-				CF56F8962F6C87DF0072A4E2 /* RadialMenuView.swift */,
 			);
 			path = Zen;
 			sourceTree = "<group>";
@@ -407,6 +407,7 @@
 				F23AFF8A2EFE870D0046B0D1 /* TrailLength.swift in Sources */,
 				F23AFF8B2EFE870D0046B0D1 /* ParticleScale.swift in Sources */,
 				CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */,
+				CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */,
 				F23AFF8C2EFE870D0046B0D1 /* ExplosionEmitter.swift in Sources */,
 				F23AFF8D2EFE870D0046B0D1 /* NodeFactory.swift in Sources */,
 				F23AFF8E2EFE870D0046B0D1 /* GravityMode.swift in Sources */,
@@ -419,7 +420,6 @@
 				F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */,
 				F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */,
 				F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */,
-				CF56F8972F6C87DF0072A4E2 /* RadialMenuView.swift in Sources */,
 				F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
