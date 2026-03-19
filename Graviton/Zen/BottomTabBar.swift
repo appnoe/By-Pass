@@ -47,9 +47,9 @@ class BottomTabBar: UIView {
   override init(frame: CGRect) {
     fastForwardButton = BottomTabBar.makeTabButton(icon: "forward",  title: "Speed")
     trashButton       = BottomTabBar.makeTabButton(icon: "trash",    title: "Clear")
-    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1 Sun")
-    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
-    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
+    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1")
+    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2")
+    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3")
     infoButton        = BottomTabBar.makeTabButton(icon: "info.circle", title: "Info")
     allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
     sunButtons  = [sun1Button, sun2Button, sun3Button]
