@@ -19,6 +19,20 @@ public class GravityModel {
   public private(set) var secondCenter: SKShapeNode
   public private(set) var thirdCenter: SKShapeNode
 
+  /// True while the 2-sun binary orbit mode is active.
+  public private(set) var binaryOrbitActive: Bool = false
+
+  /// The currently active sun nodes (1, 2, or 3 depending on mode).
+  public var activeSunNodes: [SKShapeNode] {
+    if thirdCenter.parent != nil && !thirdCenter.isHidden {
+      return [center, secondCenter, thirdCenter]
+    } else if secondCenter.parent != nil && !secondCenter.isHidden {
+      return [center, secondCenter]
+    } else {
+      return [center]
+    }
+  }
+
   public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
   var soundEnabled = true
@@ -139,7 +153,39 @@ public class GravityModel {
         thirdGravityNode.isEnabled = false
         thirdCenter.isHidden = true
         thirdCenter.removeFromParent()
+
+        // Enable binary orbit: make suns dynamic and set tangential velocities
+        binaryOrbitActive = true
+        let sunMass: CGFloat = 50.0
+        center.physicsBody?.isDynamic = true
+        center.physicsBody?.mass = sunMass
+        center.physicsBody?.linearDamping = 0
+        center.physicsBody?.angularDamping = 0
+        secondCenter.physicsBody?.isDynamic = true
+        secondCenter.physicsBody?.mass = sunMass
+        secondCenter.physicsBody?.linearDamping = 0
+        secondCenter.physicsBody?.angularDamping = 0
+
+        // Circular orbit velocity: v = sqrt(F * r) where F = (m*str)^2 / d^2
+        // With m=50, str=10, d=224, r=112 → v ≈ 23.6 pts/s
+        let str: CGFloat = 10.0
+        let m = sunMass * str
+        let force = (m * m) / (distance * distance)
+        let orbitalV = sqrt(force * (distance / 2))
+
+        // Left sun (negative x) moves downward; right sun moves upward → CCW orbit
+        center.physicsBody?.velocity = CGVector(dx: 0, dy: -orbitalV)
+        secondCenter.physicsBody?.velocity = CGVector(dx: 0, dy: orbitalV)
+
       case 3:
+        binaryOrbitActive = false
+        // Restore suns to static for 3-body mode
+        center.physicsBody?.isDynamic = false
+        center.physicsBody?.velocity = .zero
+        secondCenter.physicsBody?.isDynamic = false
+        secondCenter.physicsBody?.velocity = .zero
+        thirdCenter.physicsBody?.isDynamic = false
+        thirdCenter.physicsBody?.velocity = .zero
 
         let xPos = sqrt((distance * distance) - (distance * distance/4))/2
         secondGravityNode.isEnabled = true
@@ -163,9 +209,17 @@ public class GravityModel {
         thirdCenter.isHidden = false
         thirdCenter.position = .init(x: xPos, y: -distance/2)
       default:
+        binaryOrbitActive = false
+        // Restore sun to static for single-sun mode
+        center.physicsBody?.isDynamic = false
+        center.physicsBody?.velocity = .zero
+        center.physicsBody?.mass = 1.0
+
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
+        secondCenter.physicsBody?.isDynamic = false
+        secondCenter.physicsBody?.velocity = .zero
 
         thirdGravityNode.isEnabled = false
         thirdCenter.isHidden = true
