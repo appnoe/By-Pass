@@ -37,7 +37,7 @@ class BottomTabBar: UIView {
   private let pillGlass: UIVisualEffectView
 
   // Selection indicator: slides behind the active sun button
-  private let selectionView: UIVisualEffectView
+  private let selectionView: UIButton
 
   private var selectionLeadingConstraint: NSLayoutConstraint?
   private var selectionWidthConstraint: NSLayoutConstraint?
@@ -73,14 +73,10 @@ class BottomTabBar: UIView {
     pillGlass.translatesAutoresizingMaskIntoConstraints = false
     pillGlass.isUserInteractionEnabled = false
 
-    // Selection pill — slightly lighter tint to stand out from the main pill
-    let selectionEffect = UIGlassEffect()
-    selectionEffect.tintColor = UIColor.white.withAlphaComponent(0.15)
-    selectionView = UIVisualEffectView(effect: selectionEffect)
+    // Selection indicator — clearGlass button as visual highlight, non-interactive
+    selectionView = UIButton(configuration: .clearGlass())
     selectionView.translatesAutoresizingMaskIntoConstraints = false
-    selectionView.layer.cornerRadius = 20
-    selectionView.layer.cornerCurve = .continuous
-    selectionView.clipsToBounds = true
+    selectionView.isUserInteractionEnabled = false
     selectionView.alpha = 0
 
     stackView = UIStackView(arrangedSubviews: allButtons)
