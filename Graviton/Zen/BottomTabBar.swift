@@ -25,33 +25,98 @@ class BottomTabBar: UIView {
   }
 
   private let allButtons: [UIButton]
+  private let sunButtons: [UIButton]
+
+  // UIGlassContainerEffect: renders all child UIGlassEffect views in one combined pass
+  private let containerView: UIVisualEffectView
+
+  // Full-bar glass background
+  private let pillGlass: UIVisualEffectView
+
+  // Selection indicator: slides behind the active sun button
+  private let selectionView: UIVisualEffectView
+
+  private var selectionLeadingConstraint: NSLayoutConstraint?
+  private var selectionWidthConstraint: NSLayoutConstraint?
+
   private let stackView: UIStackView
 
   override init(frame: CGRect) {
-    fastForwardButton = BottomTabBar.makeTabButton(icon: "forward",     title: "Speed")
-    trashButton       = BottomTabBar.makeTabButton(icon: "trash",       title: "Clear")
-    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",     title: "1 Sun")
-    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",     title: "2 Suns")
-    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",     title: "3 Suns")
+    fastForwardButton = BottomTabBar.makeTabButton(icon: "forward",  title: "Speed")
+    trashButton       = BottomTabBar.makeTabButton(icon: "trash",    title: "Clear")
+    sun1Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "1 Sun")
+    sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2 Suns")
+    sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3 Suns")
     infoButton        = BottomTabBar.makeTabButton(icon: "info.circle", title: "Info")
-    allButtons = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
+    allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
+    sunButtons  = [sun1Button, sun2Button, sun3Button]
+
+    containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
+    containerView.translatesAutoresizingMaskIntoConstraints = false
+    containerView.layer.cornerRadius = 28
+    containerView.clipsToBounds = true
+
+    // Main pill glass — dark tint so it's visible on the black SpriteKit background.
+    // isInteractive = true gives buttons the native scale+bounce response on tap.
+    let pillEffect = UIGlassEffect()
+    pillEffect.tintColor = UIColor.black.withAlphaComponent(0.55)
+    pillEffect.isInteractive = true
+    pillGlass = UIVisualEffectView(effect: pillEffect)
+    pillGlass.translatesAutoresizingMaskIntoConstraints = false
+    pillGlass.isUserInteractionEnabled = false
+
+    // Selection pill — slightly lighter tint to stand out from the main pill
+    let selectionEffect = UIGlassEffect()
+    selectionEffect.tintColor = UIColor.white.withAlphaComponent(0.15)
+    selectionView = UIVisualEffectView(effect: selectionEffect)
+    selectionView.translatesAutoresizingMaskIntoConstraints = false
+    selectionView.layer.cornerRadius = 20
+    selectionView.clipsToBounds = true
+    selectionView.alpha = 0
 
     stackView = UIStackView(arrangedSubviews: allButtons)
     stackView.axis = .horizontal
     stackView.distribution = .fillEqually
-    stackView.spacing = 8
+    stackView.spacing = 0
     stackView.translatesAutoresizingMaskIntoConstraints = false
 
     super.init(frame: frame)
 
     backgroundColor = .clear
-    addSubview(stackView)
+
+    // Hierarchy: pillGlass (back) → selectionView → stackView (front),
+    // all direct children of containerView.contentView so UIGlassContainerEffect merges them
+    containerView.contentView.addSubview(pillGlass)
+    containerView.contentView.addSubview(selectionView)
+    containerView.contentView.addSubview(stackView)
+    addSubview(containerView)
+
+    let selectionLeading = selectionView.leadingAnchor.constraint(
+      equalTo: containerView.contentView.leadingAnchor, constant: 8)
+    let selectionWidth = selectionView.widthAnchor.constraint(equalToConstant: 60)
+    selectionLeadingConstraint = selectionLeading
+    selectionWidthConstraint   = selectionWidth
 
     NSLayoutConstraint.activate([
-      stackView.topAnchor.constraint(equalTo: topAnchor),
-      stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      containerView.topAnchor.constraint(equalTo: topAnchor),
+      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+      pillGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
+      pillGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
+      pillGlass.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
+      pillGlass.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
+
+      selectionView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 4),
+      selectionView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -4),
+      selectionLeading,
+      selectionWidth,
+
+      stackView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 6),
+      stackView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor, constant: 8),
+      stackView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -6),
+      stackView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor, constant: -8),
     ])
 
     for button in allButtons {
@@ -71,7 +136,7 @@ class BottomTabBar: UIView {
   // MARK: - Factory
 
   private static func makeTabButton(icon: String, title: String) -> UIButton {
-    var config = UIButton.Configuration.clearGlass()
+    var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: icon)?.withConfiguration(
       UIImage.SymbolConfiguration(pointSize: 20, weight: .regular)
     )
@@ -98,20 +163,45 @@ class BottomTabBar: UIView {
       activeIndices.insert(2 + sunIdx)
     }
 
+    for (i, button) in allButtons.enumerated() {
+      setDim(button, dimmed: !activeIndices.contains(i))
+    }
+
+    positionSelection(animated: animated)
+  }
+
+  private func positionSelection(animated: Bool) {
+    guard let sunIdx = selectedSunIndex,
+          stackView.frame.width > 0 else {
+      let hide = { self.selectionView.alpha = 0 }
+      animated ? UIView.animate(withDuration: 0.25, animations: hide) : hide()
+      return
+    }
+
+    let targetButton = sunButtons[sunIdx]
+    let stackInset: CGFloat = 8
+    let newLeading = stackInset + targetButton.frame.origin.x + 2
+    let newWidth   = targetButton.frame.width - 4
+
     let update = {
-      for (i, button) in self.allButtons.enumerated() {
-        self.setDim(button, dimmed: !activeIndices.contains(i))
-      }
+      self.selectionLeadingConstraint?.constant = newLeading
+      self.selectionWidthConstraint?.constant   = newWidth
+      self.selectionView.alpha = 1
+      self.containerView.contentView.layoutIfNeeded()
     }
 
     if animated {
-      UIView.animate(withDuration: 0.25, animations: update)
+      UIView.animate(withDuration: 0.35, delay: 0,
+                     usingSpringWithDamping: 0.75, initialSpringVelocity: 0,
+                     animations: update)
     } else {
       update()
     }
   }
 
   private func setDim(_ button: UIButton, dimmed: Bool) {
-    button.alpha = dimmed ? 0.45 : 1.0
+    var config = button.configuration ?? .plain()
+    config.baseForegroundColor = dimmed ? UIColor.white.withAlphaComponent(0.45) : .white
+    button.configuration = config
   }
 }
