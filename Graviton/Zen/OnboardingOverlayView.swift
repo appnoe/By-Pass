@@ -74,7 +74,7 @@ class OnboardingOverlayView: UIView {
         addSubview(handImageView)
 
         // Hinweistext
-        hintLabel.text = "Antippen, ziehen & loslassen"
+        hintLabel.text = "Tap, drag & release"
         hintLabel.textColor = UIColor.white.withAlphaComponent(0.90)
         hintLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         hintLabel.textAlignment = .center
@@ -83,7 +83,7 @@ class OnboardingOverlayView: UIView {
         addSubview(hintLabel)
 
         // "Tippen zum Überspringen"
-        skipLabel.text = "Tippen zum Überspringen"
+        skipLabel.text = "Tap to skip"
         skipLabel.textColor = UIColor.white.withAlphaComponent(0.45)
         skipLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         skipLabel.textAlignment = .center
@@ -95,7 +95,7 @@ class OnboardingOverlayView: UIView {
             hintLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             hintLabel.topAnchor.constraint(equalTo: topAnchor, constant: bounds.height * 0.15 + 44),
             skipLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            skipLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -50)
+            skipLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -84)
         ])
     }
 
