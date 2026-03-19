@@ -71,32 +71,6 @@ class GameScene: SKScene {
     if model.mode == .gravity {
       let strength: CGFloat = 10
       let dt: CGFloat = 1.0/60.0
-
-      // Binary star orbit: apply mutual gravity between the two suns
-      if model.binaryOrbitActive,
-         let body1 = model.center.physicsBody,
-         let body2 = model.secondCenter.physicsBody {
-        let disp = CGVector(
-          dx: model.secondCenter.position.x - model.center.position.x,
-          dy: model.secondCenter.position.y - model.center.position.y
-        )
-        let dist = sqrt(disp.dx*disp.dx + disp.dy*disp.dy)
-        if dist > 1 {
-          let m1 = body1.mass * strength
-          let m2 = body2.mass * strength
-          let force = (m1 * m2) / (dist * dist)
-          let normal = CGVector(dx: disp.dx/dist, dy: disp.dy/dist)
-          let impulse = CGVector(dx: normal.dx*force*dt, dy: normal.dy*force*dt)
-          body1.velocity = CGVector(dx: body1.velocity.dx + impulse.dx, dy: body1.velocity.dy + impulse.dy)
-          body2.velocity = CGVector(dx: body2.velocity.dx - impulse.dx, dy: body2.velocity.dy - impulse.dy)
-        }
-
-        // Keep gravity field nodes synced to moving suns so satellites are attracted correctly
-        model.gravityNode.position = model.center.position
-        model.secondGravityNode.position = model.secondCenter.position
-      }
-
-      // Satellite–satellite gravity
       for node1 in model.satelliteNodes {
         let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
         if distance > 3000 {
