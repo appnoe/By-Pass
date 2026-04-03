@@ -21,6 +21,12 @@ public class GravityModel {
 
   public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
+
+  // Sun orbit (Lagrange equilateral-triangle solution for 3-sun mode)
+  private var sunsAreOrbiting = false
+  private let sunOrbitStrength: CGFloat = 73_000
+  private var sunPositions: [CGPoint] = []
+  private var sunVelocities: [CGVector] = []
   var soundEnabled = true
   public var mode: GravityMode = .gravity {
     didSet {
@@ -125,6 +131,9 @@ public class GravityModel {
     let distance: CGFloat = 224
     switch number {
       case 2:
+        sunsAreOrbiting = false
+        sunPositions = []
+        sunVelocities = []
         secondGravityNode.isEnabled = true
         secondGravityNode.position = .init(x: distance/2, y: 4)
         if nil == secondCenter.parent {
@@ -140,29 +149,43 @@ public class GravityModel {
         thirdCenter.isHidden = true
         thirdCenter.removeFromParent()
       case 3:
+        // Lagrange equilateral-triangle solution: three suns orbit their common
+        // centre of mass. Side length = distance, circumradius R = distance/√3.
+        let R = distance / sqrt(3.0)
+        let v = sqrt(sunOrbitStrength / distance)   // orbital speed (px/s)
 
-        let xPos = sqrt((distance * distance) - (distance * distance/4))/2
+        // Equilateral triangle centred at (0,0), CW rotation
+        sunPositions = [
+          CGPoint(x: 0,          y:  R),
+          CGPoint(x: -distance/2, y: -R/2),
+          CGPoint(x:  distance/2, y: -R/2)
+        ]
+        // CW tangential velocities (net centre-of-mass velocity = zero)
+        sunVelocities = [
+          CGVector(dx:  v,         dy:  0),
+          CGVector(dx: -v/2,       dy:  v * sqrt(3.0)/2),
+          CGVector(dx: -v/2,       dy: -v * sqrt(3.0)/2)
+        ]
+        sunsAreOrbiting = true
+
+        center.position         = sunPositions[0]
+        gravityNode.position    = sunPositions[0]
+
         secondGravityNode.isEnabled = true
-        secondGravityNode.position = .init(x: xPos, y: distance/2)
-
-        if nil == secondCenter.parent {
-          scene.addChild(secondCenter)
-        }
-        secondCenter.isHidden = false
-        secondCenter.position = .init(x: xPos, y: distance/2)
-
-        gravityNode.position = .init(x: -xPos, y: 4)
-        center.position = .init(x: -xPos, y: 4)
+        secondGravityNode.position  = sunPositions[1]
+        if nil == secondCenter.parent { scene.addChild(secondCenter) }
+        secondCenter.isHidden  = false
+        secondCenter.position  = sunPositions[1]
 
         thirdGravityNode.isEnabled = true
-        thirdGravityNode.position = .init(x: xPos, y: -distance/2)
-
-        if nil == thirdCenter.parent {
-          scene.addChild(thirdCenter)
-        }
-        thirdCenter.isHidden = false
-        thirdCenter.position = .init(x: xPos, y: -distance/2)
+        thirdGravityNode.position  = sunPositions[2]
+        if nil == thirdCenter.parent { scene.addChild(thirdCenter) }
+        thirdCenter.isHidden  = false
+        thirdCenter.position  = sunPositions[2]
       default:
+        sunsAreOrbiting = false
+        sunPositions = []
+        sunVelocities = []
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
@@ -306,6 +329,45 @@ public class GravityModel {
     projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
     projectile.physicsBody?.contactTestBitMask = PhysicsCategory.center | PhysicsCategory.satellite
     return projectile
+  }
+
+  // MARK: - Sun orbit
+
+  /// Symplectic-Euler integration of the three orbiting suns (Lagrange solution).
+  /// Call once per frame; updates both visual nodes and gravity-field positions.
+  public func updateSunOrbit(dt: CGFloat) {
+    guard sunsAreOrbiting, sunPositions.count == 3 else { return }
+
+    // Accumulate velocity impulses from pairwise sun–sun attraction
+    var dv = [CGVector](repeating: .zero, count: 3)
+    for i in 0..<3 {
+      for j in 0..<3 where j != i {
+        let dx = sunPositions[j].x - sunPositions[i].x
+        let dy = sunPositions[j].y - sunPositions[i].y
+        let r2 = dx*dx + dy*dy
+        guard r2 > 1 else { continue }
+        let r  = sqrt(r2)
+        let f  = sunOrbitStrength / r2
+        dv[i].dx += (dx / r) * f * dt
+        dv[i].dy += (dy / r) * f * dt
+      }
+    }
+
+    // Update velocities then positions (symplectic Euler)
+    for i in 0..<3 {
+      sunVelocities[i].dx += dv[i].dx
+      sunVelocities[i].dy += dv[i].dy
+      sunPositions[i].x   += sunVelocities[i].dx * dt
+      sunPositions[i].y   += sunVelocities[i].dy * dt
+    }
+
+    // Sync visual and field nodes to the new positions
+    center.position          = sunPositions[0]
+    gravityNode.position     = sunPositions[0]
+    secondCenter.position    = sunPositions[1]
+    secondGravityNode.position = sunPositions[1]
+    thirdCenter.position     = sunPositions[2]
+    thirdGravityNode.position = sunPositions[2]
   }
 
   // MARK: - Misc
