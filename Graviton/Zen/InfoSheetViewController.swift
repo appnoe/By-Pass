@@ -17,7 +17,6 @@ class InfoSheetViewController: UIViewController {
         setupTitleLabel()
         setupVersionLabel()
         setupImprintLabel()
-        setupTaglineLabel()
     }
 
     override func viewDidLayoutSubviews() {
@@ -206,31 +205,4 @@ class InfoSheetViewController: UIViewController {
         return result
     }
 
-    private func setupTaglineLabel() {
-        let badge = UIView()
-        badge.backgroundColor = UIColor(white: 1.0, alpha: 0.12)
-        badge.layer.cornerRadius = 12
-        badge.layer.borderWidth = 0.8
-        badge.layer.borderColor = UIColor(white: 1.0, alpha: 0.30).cgColor
-        badge.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(badge)
-
-        let label = UILabel()
-        label.text = "Based on \"Gravity Zen\" by Dasdom"
-        label.textAlignment = .center
-        label.textColor = UIColor(white: 0.85, alpha: 1.0)
-        label.font = UIFont.systemFont(ofSize: 13, weight: .regular)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        badge.addSubview(label)
-
-        NSLayoutConstraint.activate([
-            badge.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            badge.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
-
-            label.topAnchor.constraint(equalTo: badge.topAnchor, constant: 8),
-            label.bottomAnchor.constraint(equalTo: badge.bottomAnchor, constant: -8),
-            label.leadingAnchor.constraint(equalTo: badge.leadingAnchor, constant: 16),
-            label.trailingAnchor.constraint(equalTo: badge.trailingAnchor, constant: -16)
-        ])
-    }
 }
