@@ -131,19 +131,27 @@ public class GravityModel {
     let distance: CGFloat = 224
     switch number {
       case 2:
-        sunsAreOrbiting = false
-        sunPositions = []
-        sunVelocities = []
-        secondGravityNode.isEnabled = true
-        secondGravityNode.position = .init(x: distance/2, y: 4)
-        if nil == secondCenter.parent {
-          scene.addChild(secondCenter)
-        }
-        secondCenter.isHidden = false
-        secondCenter.position = .init(x: distance/2, y: 4)
+        // Two-body circular orbit (CW): both suns on the x-axis, equal speed
+        let v2 = sqrt(sunOrbitStrength / (2 * distance))
+        sunPositions = [
+          CGPoint(x: -distance/2, y: 0),
+          CGPoint(x:  distance/2, y: 0)
+        ]
+        // CW tangential: point at (−r,0) → velocity (0,+v); point at (+r,0) → (0,−v)
+        sunVelocities = [
+          CGVector(dx: 0, dy:  v2),
+          CGVector(dx: 0, dy: -v2)
+        ]
+        sunsAreOrbiting = true
 
-        gravityNode.position = .init(x: -distance/2, y: 4)
-        center.position = .init(x: -distance/2, y: 4)
+        center.position      = sunPositions[0]
+        gravityNode.position = sunPositions[0]
+
+        secondGravityNode.isEnabled = true
+        secondGravityNode.position  = sunPositions[1]
+        if nil == secondCenter.parent { scene.addChild(secondCenter) }
+        secondCenter.isHidden = false
+        secondCenter.position = sunPositions[1]
 
         thirdGravityNode.isEnabled = false
         thirdCenter.isHidden = true
@@ -336,12 +344,13 @@ public class GravityModel {
   /// Symplectic-Euler integration of the three orbiting suns (Lagrange solution).
   /// Call once per frame; updates both visual nodes and gravity-field positions.
   public func updateSunOrbit(dt: CGFloat) {
-    guard sunsAreOrbiting, sunPositions.count == 3 else { return }
+    let n = sunPositions.count
+    guard sunsAreOrbiting, n >= 2 else { return }
 
     // Accumulate velocity impulses from pairwise sun–sun attraction
-    var dv = [CGVector](repeating: .zero, count: 3)
-    for i in 0..<3 {
-      for j in 0..<3 where j != i {
+    var dv = [CGVector](repeating: .zero, count: n)
+    for i in 0..<n {
+      for j in 0..<n where j != i {
         let dx = sunPositions[j].x - sunPositions[i].x
         let dy = sunPositions[j].y - sunPositions[i].y
         let r2 = dx*dx + dy*dy
@@ -354,7 +363,7 @@ public class GravityModel {
     }
 
     // Update velocities then positions (symplectic Euler)
-    for i in 0..<3 {
+    for i in 0..<n {
       sunVelocities[i].dx += dv[i].dx
       sunVelocities[i].dy += dv[i].dy
       sunPositions[i].x   += sunVelocities[i].dx * dt
@@ -362,12 +371,16 @@ public class GravityModel {
     }
 
     // Sync visual and field nodes to the new positions
-    center.position          = sunPositions[0]
-    gravityNode.position     = sunPositions[0]
-    secondCenter.position    = sunPositions[1]
-    secondGravityNode.position = sunPositions[1]
-    thirdCenter.position     = sunPositions[2]
-    thirdGravityNode.position = sunPositions[2]
+    center.position      = sunPositions[0]
+    gravityNode.position = sunPositions[0]
+    if n >= 2 {
+      secondCenter.position      = sunPositions[1]
+      secondGravityNode.position = sunPositions[1]
+    }
+    if n >= 3 {
+      thirdCenter.position      = sunPositions[2]
+      thirdGravityNode.position = sunPositions[2]
+    }
   }
 
   // MARK: - Misc
