@@ -51,7 +51,7 @@ class BottomTabBar: UIView {
     sun2Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "2")
     sun3Button        = BottomTabBar.makeTabButton(icon: "sun.max",  title: "3")
     infoButton        = BottomTabBar.makeTabButton(icon: "info.circle", title: "Info")
-    allButtons  = [fastForwardButton, trashButton, sun1Button, sun2Button, sun3Button, infoButton]
+    allButtons  = [fastForwardButton, sun1Button, sun2Button, sun3Button, trashButton, infoButton]
     sunButtons  = [sun1Button, sun2Button, sun3Button]
 
     clipView = UIView()
@@ -174,7 +174,7 @@ class BottomTabBar: UIView {
     var activeIndices: Set<Int> = []
     if isFastForwardOn { activeIndices.insert(0) }
     if let sunIdx = selectedSunIndex {
-      activeIndices.insert(2 + sunIdx)
+      activeIndices.insert(1 + sunIdx)
     }
 
     for (i, button) in allButtons.enumerated() {
