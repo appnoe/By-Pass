@@ -42,10 +42,6 @@ class GameScene: SKScene {
       model.addSound(node: musicAudioNode)
     }
 
-    if model.soundEnabled {
-      model.ambientEngine.start()
-    }
-
     backgroundColor = .black
   }
 
@@ -68,7 +64,6 @@ class GameScene: SKScene {
   // https://stackoverflow.com/a/31502698/498796
   override func update(_ currentTime: TimeInterval) {
     model.updateSunOrbit(dt: 1.0/60.0)
-    model.updateAmbient()
 
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)

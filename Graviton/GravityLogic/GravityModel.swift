@@ -28,7 +28,6 @@ public class GravityModel {
   private var sunPositions: [CGPoint] = []
   private var sunVelocities: [CGVector] = []
   var soundEnabled = true
-  let ambientEngine = ZenAmbientSoundEngine()
   public var mode: GravityMode = .gravity {
     didSet {
       gravityNode.falloff = mode.falloff
@@ -253,17 +252,11 @@ public class GravityModel {
 
   public func enableSound() {
     soundEnabled = true
-    ambientEngine.start()
   }
 
   public func disableSound() {
     musicAudioNode?.removeFromParent()
     soundEnabled = false
-    ambientEngine.stop()
-  }
-
-  public func updateAmbient() {
-    ambientEngine.updateIntensity(satelliteCount: satelliteNodes.count)
   }
 
   // MARK: - Velocity
