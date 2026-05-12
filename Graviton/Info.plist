@@ -6,6 +6,10 @@
 	<string>AppIcon</string>
 	<key>CFBundleVersion</key>
 	<string>1773589827</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Speichert Screenshots in deine Fotomediathek.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Nimmt den App-Sound bei Videoaufnahmen auf.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

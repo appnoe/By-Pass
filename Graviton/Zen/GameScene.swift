@@ -1,5 +1,5 @@
 //  Created by Dominik Hauser on 22.12.21.
-//  
+//
 //
 
 import SpriteKit
@@ -13,6 +13,7 @@ class GameScene: SKScene {
   var isPinching: Bool = false
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
+  private var trajectoryNodes: [Int: SKShapeNode] = [:]
   override class var supportsSecureCoding: Bool {
     return true
   }
@@ -63,6 +64,8 @@ class GameScene: SKScene {
 
   // https://stackoverflow.com/a/31502698/498796
   override func update(_ currentTime: TimeInterval) {
+    model.updateSunOrbit(dt: 1.0/60.0)
+
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)
       numberOfSatellites = model.satelliteNodes.count
@@ -113,18 +116,19 @@ class GameScene: SKScene {
   }
 
   func touchMoved(_ touch: UITouch) {
-
     let movePosition = touch.location(in: self)
 
     if let velocityNode = model.updateVelocity(id: touch.hash, input: movePosition) {
       insertChild(velocityNode, at: 0)
     }
+
+    updateTrajectoryPreview(for: touch)
   }
 
   func touchUp(_ touch: UITouch) {
-
     let endPosition = touch.location(in: self)
 
+    removeTrajectoryPreview(for: touch)
     model.addVelocityToSatellite(id: touch.hash, input: endPosition)
   }
 
@@ -168,7 +172,50 @@ class GameScene: SKScene {
     let pending = model.satelliteNodes.filter {
       $0.physicsBody?.velocity == .zero
     }
+    for (_, node) in trajectoryNodes {
+      node.removeFromParent()
+    }
+    trajectoryNodes.removeAll()
     model.clear(nodes: pending)
+  }
+
+  // MARK: - Trajectory Preview
+
+  private func updateTrajectoryPreview(for touch: UITouch) {
+    trajectoryNodes[touch.hash]?.removeFromParent()
+
+    guard !model.secondGravityNode.isEnabled else { return }
+    guard let satellite = model.temporaryNodes[touch.hash] else { return }
+
+    let input = touch.location(in: self)
+    let velocityScale: CGFloat = 0.6
+    let predictedVelocity = CGVector(
+      dx: (satellite.position.x - input.x) * velocityScale,
+      dy: (satellite.position.y - input.y) * velocityScale
+    )
+
+    let points = model.trajectoryPoints(from: satellite.position, velocity: predictedVelocity)
+    guard points.count > 1 else { return }
+
+    let path = CGMutablePath()
+    path.move(to: points[0])
+    for pt in points.dropFirst() {
+      path.addLine(to: pt)
+    }
+
+    let node = SKShapeNode(path: path)
+    node.strokeColor = .white
+    node.alpha = 0.35
+    node.lineWidth = 1.5
+    node.lineCap = .round
+    node.zPosition = 5
+    insertChild(node, at: 0)
+    trajectoryNodes[touch.hash] = node
+  }
+
+  private func removeTrajectoryPreview(for touch: UITouch) {
+    trajectoryNodes[touch.hash]?.removeFromParent()
+    trajectoryNodes.removeValue(forKey: touch.hash)
   }
 
   func setTrailLength(to length: TrailLength) {
