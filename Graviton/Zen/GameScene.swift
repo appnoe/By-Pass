@@ -184,6 +184,7 @@ class GameScene: SKScene {
   private func updateTrajectoryPreview(for touch: UITouch) {
     trajectoryNodes[touch.hash]?.removeFromParent()
 
+    guard !model.secondGravityNode.isEnabled else { return }
     guard let satellite = model.temporaryNodes[touch.hash] else { return }
 
     let input = touch.location(in: self)
