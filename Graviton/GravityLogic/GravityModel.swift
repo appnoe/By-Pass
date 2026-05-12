@@ -383,6 +383,58 @@ public class GravityModel {
     }
   }
 
+  // MARK: - Trajectory Preview
+
+  // SpriteKit default: 150 pts/meter; radialGravityField strength=1 → a = 1/r_m² m/s²
+  // In pts/s²: a = 150³ / r_pts² = 3_375_000 / r_pts²
+  private static let gravityStrength: CGFloat = 3_375_000
+
+  func activeSunPositions() -> [CGPoint] {
+    var positions = [gravityNode.position]
+    if secondGravityNode.isEnabled { positions.append(secondGravityNode.position) }
+    if thirdGravityNode.isEnabled  { positions.append(thirdGravityNode.position) }
+    return positions
+  }
+
+  func trajectoryPoints(
+    from startPosition: CGPoint,
+    velocity startVelocity: CGVector,
+    steps: Int = 360,
+    dt: CGFloat = 1.0 / 60.0
+  ) -> [CGPoint] {
+    let suns = activeSunPositions()
+    var pos = startPosition
+    var vel = startVelocity
+    var points = [CGPoint]()
+    points.reserveCapacity(steps)
+
+    for _ in 0..<steps {
+      var ax: CGFloat = 0
+      var ay: CGFloat = 0
+
+      for sunPos in suns {
+        let dx = sunPos.x - pos.x
+        let dy = sunPos.y - pos.y
+        let r2 = dx * dx + dy * dy
+        guard r2 > 200 else { return points }
+        let r = sqrt(r2)
+        let a = GravityModel.gravityStrength / r2
+        ax += (dx / r) * a
+        ay += (dy / r) * a
+      }
+
+      vel.dx += ax * dt
+      vel.dy += ay * dt
+      pos.x  += vel.dx * dt
+      pos.y  += vel.dy * dt
+
+      guard pos.x * pos.x + pos.y * pos.y < 3000 * 3000 else { break }
+      points.append(pos)
+    }
+
+    return points
+  }
+
   // MARK: - Misc
 
   public func random(size: CGSize, direction: Direction) -> (nodes: [SKNode], sound: SKAudioNode?) {
