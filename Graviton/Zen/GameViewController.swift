@@ -15,22 +15,23 @@ class GameViewController: UIViewController {
   private var isRecording = false
   private var recordingIndicator: UIView?
 
-  var contentView: GameView {
-    return view as! GameView
-  }
+  var contentView: GameView { view as! GameView }
   private var onboardingOverlay: OnboardingOverlayView?
 
   override func loadView() {
     let contentView = GameView(frame: .zero)
 
-    let tabBar = contentView.bottomTabBar
-    tabBar.fastForwardButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
-    tabBar.trashButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
-    tabBar.sun1Button.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
-    tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
-    tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
-    tabBar.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+    // Sun picker
+    contentView.sunPickerView.button1.addTarget(self, action: #selector(sun1Tapped), for: .touchUpInside)
+    contentView.sunPickerView.button2.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
+    contentView.sunPickerView.button3.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
 
+    // Round buttons
+    contentView.speedButton.button.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
+    contentView.clearButton.button.addTarget(self, action: #selector(clear), for: .touchUpInside)
+    contentView.infoButton.button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+
+    // Capture (tap = screenshot, long press = video)
     contentView.captureButton.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
     let longPress = UILongPressGestureRecognizer(target: self, action: #selector(cameraLongPressed(_:)))
     contentView.captureButton.addGestureRecognizer(longPress)
@@ -41,24 +42,20 @@ class GameViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    let view = self.contentView.skView
-    let scene = GameScene()
+    let skView = contentView.skView
+    let scene  = GameScene()
     scene.scaleMode = .aspectFill
-
-    scene.updateSatellitesHandler = { [weak self] _ in
-      self?.updateCountLabel()
-    }
+    scene.updateSatellitesHandler = { [weak self] _ in self?.updateCountLabel() }
 
     gameScene = scene
-    view.presentScene(scene)
+    skView.presentScene(scene)
 
     let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
-    view.addGestureRecognizer(pinch)
+    skView.addGestureRecognizer(pinch)
   }
 
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
-
     if shouldShowOnboarding() {
       showOnboarding()
     } else {
@@ -67,7 +64,7 @@ class GameViewController: UIViewController {
   }
 
   private func shouldShowOnboarding() -> Bool {
-    return !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
+    !UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
   }
 
   private func showOnboarding() {
@@ -84,11 +81,9 @@ class GameViewController: UIViewController {
   }
 
   override var shouldAutorotate: Bool { true }
-
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-    return UIDevice.current.userInterfaceIdiom == .phone ? .allButUpsideDown : .all
+    UIDevice.current.userInterfaceIdiom == .phone ? .allButUpsideDown : .all
   }
-
   override var prefersStatusBarHidden: Bool { true }
 }
 
@@ -97,19 +92,14 @@ extension GameViewController {
 
   @objc func handlePinch(_ recognizer: UIPinchGestureRecognizer) {
     guard let scene = gameScene else { return }
-
     switch recognizer.state {
     case .began:
       scene.isPinching = true
       pinchBaseScale = scene.camera?.xScale ?? 1.0
-
     case .changed:
-      let newScale = pinchBaseScale / recognizer.scale
-      scene.applyPinchScale(newScale)
-
+      scene.applyPinchScale(pinchBaseScale / recognizer.scale)
     case .ended, .cancelled, .failed:
       scene.isPinching = false
-
     default:
       break
     }
@@ -118,8 +108,7 @@ extension GameViewController {
   @objc func fastForwardToggled(_ sender: UIButton) {
     guard let gameScene else { return }
     isFastForward.toggle()
-    let speed: CGFloat = isFastForward ? 3 : 1
-    gameScene.physicsWorld.speed = speed
+    gameScene.physicsWorld.speed = isFastForward ? 3 : 1
     for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
       for case let emitter as SKEmitterNode in satellite.children {
         emitter.particleBirthRate = isFastForward
@@ -127,7 +116,7 @@ extension GameViewController {
           : emitter.particleBirthRate / 3
       }
     }
-    contentView.bottomTabBar.isFastForwardOn = isFastForward
+    contentView.speedButton.setActive(isFastForward)
   }
 
   @objc func infoTapped(_ sender: UIButton) {
@@ -147,7 +136,7 @@ extension GameViewController {
 
   private func setSunCount(_ count: Int) {
     guard let scene = gameScene else { return }
-    contentView.bottomTabBar.selectedSunIndex = count - 1
+    contentView.sunPickerView.selectedIndex = count - 1
     scene.model.setNumberOfBlackHoles(to: count, in: scene)
   }
 
@@ -163,17 +152,9 @@ extension GameViewController {
   func updateCountLabel() {
     guard let gameScene else { return }
     let count = gameScene.model.satelliteNodes.count
-    let text: String
-    switch gameScene.model.mode {
-      case .gravity:    text = "\(count)"
-      case .spirograph: text = "\(count)/10"
-    }
-    contentView.satellitesCountLabel.text = text
-    disableRandomButtonsIfNeeded()
-  }
-
-  func disableRandomButtonsIfNeeded() {
-    // No random buttons in tab bar yet — placeholder for future use
+    contentView.satellitesCountLabel.text = gameScene.model.mode == .spirograph
+      ? "\(count)/10"
+      : "\(count)"
   }
 
   func getScreenshot(scene: SKScene) -> UIImage? {
@@ -189,11 +170,7 @@ extension GameViewController {
 extension GameViewController: RPPreviewViewControllerDelegate {
 
   @objc func cameraTapped(_ sender: UIButton) {
-    if isRecording {
-      stopVideoRecording()
-    } else {
-      takeScreenshot()
-    }
+    isRecording ? stopVideoRecording() : takeScreenshot()
   }
 
   @objc func cameraLongPressed(_ gesture: UILongPressGestureRecognizer) {
@@ -202,12 +179,9 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   }
 
   private func takeScreenshot() {
-    guard let scene = gameScene,
-          let image = getScreenshot(scene: scene) else { return }
-
+    guard let scene = gameScene, let image = getScreenshot(scene: scene) else { return }
     flashScreen()
     UINotificationFeedbackGenerator().notificationOccurred(.success)
-
     PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
       guard status == .authorized || status == .limited else { return }
       PHPhotoLibrary.shared().performChanges {
@@ -246,11 +220,10 @@ extension GameViewController: RPPreviewViewControllerDelegate {
 
   private func updateCaptureButton(recording: Bool) {
     var config = contentView.captureButton.configuration ?? .plain()
-    let iconName = recording ? "stop.circle.fill" : "camera"
-    config.image = UIImage(systemName: iconName)?.withConfiguration(
+    config.image = UIImage(systemName: recording ? "stop.circle.fill" : "camera")?.withConfiguration(
       UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
     )
-    config.baseForegroundColor = recording ? .systemRed : UIColor.white.withAlphaComponent(0.75)
+    config.baseForegroundColor = recording ? .systemRed : UIColor.white.withAlphaComponent(0.55)
     contentView.captureButton.configuration = config
   }
 
@@ -260,12 +233,8 @@ extension GameViewController: RPPreviewViewControllerDelegate {
     flash.alpha = 0
     flash.isUserInteractionEnabled = false
     view.addSubview(flash)
-    UIView.animate(withDuration: 0.08) {
-      flash.alpha = 1
-    } completion: { _ in
-      UIView.animate(withDuration: 0.28) {
-        flash.alpha = 0
-      } completion: { _ in
+    UIView.animate(withDuration: 0.08) { flash.alpha = 1 } completion: { _ in
+      UIView.animate(withDuration: 0.28) { flash.alpha = 0 } completion: { _ in
         flash.removeFromSuperview()
       }
     }
@@ -282,12 +251,10 @@ extension GameViewController: RPPreviewViewControllerDelegate {
       dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
       dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
       dot.widthAnchor.constraint(equalToConstant: 12),
-      dot.heightAnchor.constraint(equalToConstant: 12),
+      dot.heightAnchor.constraint(equalToConstant: 44),
     ])
     UIView.animate(withDuration: 0.7, delay: 0,
-                   options: [.repeat, .autoreverse, .curveEaseInOut]) {
-      dot.alpha = 0.2
-    }
+                   options: [.repeat, .autoreverse, .curveEaseInOut]) { dot.alpha = 0.2 }
     recordingIndicator = dot
   }
 
