@@ -92,7 +92,6 @@
 		F2BD5C6A2773C4DE00136C85 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F2D6040C2781AAC9003958A2 /* GravityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GravityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2D604152781AB09003958A2 /* GameSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneTests.swift; sourceTree = "<group>"; };
-		F2D6041B2781D75F003958A2 /* gravity.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gravity.m4a; sourceTree = "<group>"; };
 		F2D6041D2781D927003958A2 /* background.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = background.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -231,7 +230,6 @@
 				F2BD5C672773C4DE00136C85 /* Assets.xcassets */,
 				F2BD5C692773C4DE00136C85 /* LaunchScreen.storyboard */,
 				F2D6041D2781D927003958A2 /* background.sks */,
-				F2D6041B2781D75F003958A2 /* gravity.m4a */,
 				CFE884142F661B66006183C5 /* SceneDelegate.swift */,
 			);
 			path = Graviton;
