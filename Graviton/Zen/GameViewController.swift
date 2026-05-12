@@ -1,15 +1,20 @@
 //  Created by Dominik Hauser on 22.12.21.
-//  
+//
 
 import UIKit
 import SpriteKit
 import GameplayKit
+import ReplayKit
+import Photos
 
 class GameViewController: UIViewController {
 
   var gameScene: GameScene?
   private var pinchBaseScale: CGFloat = 1.0
   private var isFastForward = false
+  private var isRecording = false
+  private var recordingIndicator: UIView?
+
   var contentView: GameView {
     return view as! GameView
   }
@@ -25,6 +30,10 @@ class GameViewController: UIViewController {
     tabBar.sun2Button.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     tabBar.sun3Button.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
     tabBar.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+
+    contentView.captureButton.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
+    let longPress = UILongPressGestureRecognizer(target: self, action: #selector(cameraLongPressed(_:)))
+    contentView.captureButton.addGestureRecognizer(longPress)
 
     view = contentView
   }
@@ -53,7 +62,6 @@ class GameViewController: UIViewController {
     if shouldShowOnboarding() {
       showOnboarding()
     } else {
-      // Start with a random configuration
       gameScene?.random(direction: .random)
     }
   }
@@ -96,7 +104,6 @@ extension GameViewController {
       pinchBaseScale = scene.camera?.xScale ?? 1.0
 
     case .changed:
-      // scale down as user spreads fingers (inverse: pinch out → zoom in → smaller camera scale)
       let newScale = pinchBaseScale / recognizer.scale
       scene.applyPinchScale(newScale)
 
@@ -175,5 +182,121 @@ extension GameViewController {
     return renderer.image { _ in
       view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
     }
+  }
+}
+
+// MARK: - Capture
+extension GameViewController: RPPreviewViewControllerDelegate {
+
+  @objc func cameraTapped(_ sender: UIButton) {
+    if isRecording {
+      stopVideoRecording()
+    } else {
+      takeScreenshot()
+    }
+  }
+
+  @objc func cameraLongPressed(_ gesture: UILongPressGestureRecognizer) {
+    guard gesture.state == .began, !isRecording else { return }
+    startVideoRecording()
+  }
+
+  private func takeScreenshot() {
+    guard let scene = gameScene,
+          let image = getScreenshot(scene: scene) else { return }
+
+    flashScreen()
+    UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
+      guard status == .authorized || status == .limited else { return }
+      PHPhotoLibrary.shared().performChanges {
+        PHAssetChangeRequest.creationRequestForAsset(from: image)
+      }
+    }
+  }
+
+  private func startVideoRecording() {
+    guard RPScreenRecorder.shared().isAvailable else { return }
+    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    RPScreenRecorder.shared().startRecording { [weak self] error in
+      DispatchQueue.main.async {
+        guard error == nil else { return }
+        self?.isRecording = true
+        self?.updateCaptureButton(recording: true)
+        self?.showRecordingIndicator()
+      }
+    }
+  }
+
+  private func stopVideoRecording() {
+    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    RPScreenRecorder.shared().stopRecording { [weak self] previewVC, _ in
+      DispatchQueue.main.async {
+        self?.isRecording = false
+        self?.updateCaptureButton(recording: false)
+        self?.hideRecordingIndicator()
+        if let previewVC = previewVC {
+          previewVC.previewControllerDelegate = self
+          self?.present(previewVC, animated: true)
+        }
+      }
+    }
+  }
+
+  private func updateCaptureButton(recording: Bool) {
+    var config = contentView.captureButton.configuration ?? .plain()
+    let iconName = recording ? "stop.circle.fill" : "camera"
+    config.image = UIImage(systemName: iconName)?.withConfiguration(
+      UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+    )
+    config.baseForegroundColor = recording ? .systemRed : UIColor.white.withAlphaComponent(0.75)
+    contentView.captureButton.configuration = config
+  }
+
+  private func flashScreen() {
+    let flash = UIView(frame: view.bounds)
+    flash.backgroundColor = .white
+    flash.alpha = 0
+    flash.isUserInteractionEnabled = false
+    view.addSubview(flash)
+    UIView.animate(withDuration: 0.08) {
+      flash.alpha = 1
+    } completion: { _ in
+      UIView.animate(withDuration: 0.28) {
+        flash.alpha = 0
+      } completion: { _ in
+        flash.removeFromSuperview()
+      }
+    }
+  }
+
+  private func showRecordingIndicator() {
+    let dot = UIView()
+    dot.backgroundColor = .systemRed
+    dot.layer.cornerRadius = 6
+    dot.translatesAutoresizingMaskIntoConstraints = false
+    dot.isUserInteractionEnabled = false
+    view.addSubview(dot)
+    NSLayoutConstraint.activate([
+      dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
+      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
+      dot.widthAnchor.constraint(equalToConstant: 12),
+      dot.heightAnchor.constraint(equalToConstant: 12),
+    ])
+    UIView.animate(withDuration: 0.7, delay: 0,
+                   options: [.repeat, .autoreverse, .curveEaseInOut]) {
+      dot.alpha = 0.2
+    }
+    recordingIndicator = dot
+  }
+
+  private func hideRecordingIndicator() {
+    recordingIndicator?.removeFromSuperview()
+    recordingIndicator = nil
+  }
+
+  func previewControllerDidFinish(_ previewController: RPPreviewViewController) {
+    previewController.dismiss(animated: true)
   }
 }
