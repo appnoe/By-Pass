@@ -4,11 +4,6 @@
 
 import SpriteKit
 
-public enum SatelliteType: Int {
-  case box
-  case rectangle
-}
-
 public enum Direction {
   case random
   case clockWise
@@ -26,7 +21,7 @@ public class Satellite: SKShapeNode {
     return true
   }
 
-  class func random(amount: Int = 5, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
+  class func random(amount: Int = 5, sceneSize: CGSize, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
     var satellites: [Satellite] = []
     let clockWise: Bool
     switch direction {

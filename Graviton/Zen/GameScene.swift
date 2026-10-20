@@ -11,7 +11,6 @@ class GameScene: SKScene {
   private static let logger = Logger(subsystem: "de.appnoe.by-pass", category: "GameScene")
 
   let model = GravityModel()
-  var zoomValue: CGFloat = 1.0
   var isPinching: Bool = false
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
@@ -47,22 +46,6 @@ class GameScene: SKScene {
     }
 
     backgroundColor = .black
-  }
-
-  class func loadScene(from data: Data) -> GameScene? {
-    let scene: GameScene?
-
-    do {
-      if let savedScene = try NSKeyedUnarchiver.unarchivedObject(ofClass: GameScene.self, from: data) {
-        scene = savedScene
-      } else {
-        scene = nil
-      }
-    } catch {
-      scene = nil
-    }
-
-    return scene
   }
 
   // https://stackoverflow.com/a/31502698/498796
@@ -227,16 +210,6 @@ class GameScene: SKScene {
     model.speedMultiplier = multiplier
   }
 
-  func setTrailLength(to length: TrailLength) {
-    model.trailLength = length
-  }
-
-  func zoom(to zoomValue: CGFloat) {
-    self.zoomValue = zoomValue
-    let zoomInAction = SKAction.scale(to: 1-(zoomValue-1), duration: 0.3)
-    camera?.run(zoomInAction)
-  }
-
   /// Called continuously during a pinch gesture with the cumulative scale.
   func applyPinchScale(_ scale: CGFloat) {
     let clamped = max(0.25, min(scale, 4.0))
@@ -260,14 +233,6 @@ class GameScene: SKScene {
     }
   }
 
-  func setSatelliteType(_ type: SatelliteType) {
-    model.currentSatelliteType = type
-  }
-
-  func setColorSetting(_ setting: ColorSetting) {
-    model.colorSetting = setting
-  }
-
   func random(direction: Direction) {
     let (nodes, sound) = model.random(size: size, direction: direction)
     for node in nodes {
@@ -281,11 +246,6 @@ class GameScene: SKScene {
   func clear() {
     model.clear()
   }
-
-  func fire() {
-    let projectile = model.projectile(size: size)
-    addChild(projectile)
-  }
 }
 
 extension GameScene: SKPhysicsContactDelegate {
@@ -298,15 +258,6 @@ extension GameScene: SKPhysicsContactDelegate {
     } else if contact.bodyB.categoryBitMask == PhysicsCategory.satellite {
       if let node = contact.bodyB.node {
         model.remove(node, explosionIn: self)
-      }
-    }
-    if contact.bodyA.categoryBitMask == PhysicsCategory.projectile {
-      if let node = contact.bodyA.node {
-        node.removeFromParent()
-      }
-    } else if contact.bodyB.categoryBitMask == PhysicsCategory.projectile {
-      if let node = contact.bodyB.node {
-        node.removeFromParent()
       }
     }
   }

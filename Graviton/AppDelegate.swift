@@ -15,8 +15,3 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
   }
 }
-
-func infoForKey(_ key: String) -> String? {
-  return (Bundle.main.infoDictionary?[key] as? String)?
-    .replacingOccurrences(of: "\\", with: "")
-}

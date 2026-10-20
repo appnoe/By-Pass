@@ -11,15 +11,14 @@ public class GravityModel {
   let emitterForBox: SKEmitterNode
   public var backgroundEmitter: SKNode?
   var explosionEmitter: SKEmitterNode?
-  public private(set) var gravityNode: SKFieldNode
-  public private(set) var secondGravityNode: SKFieldNode
-  public private(set) var thirdGravityNode: SKFieldNode
+  public let gravityNode: SKFieldNode
+  public let secondGravityNode: SKFieldNode
+  public let thirdGravityNode: SKFieldNode
 
-  public private(set) var center: SKShapeNode
-  public private(set) var secondCenter: SKShapeNode
-  public private(set) var thirdCenter: SKShapeNode
+  public let center: SKShapeNode
+  public let secondCenter: SKShapeNode
+  public let thirdCenter: SKShapeNode
 
-  public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
 
   // Sun orbit: the 2-sun circle and the 3-sun Lagrange triangle are both
@@ -68,13 +67,6 @@ public class GravityModel {
       }
     }
   }
-  public var particleScale: ParticleScale = .normal {
-    didSet {
-      setEmitter(enabled: false)
-      emitterForBox.particleScale = particleScale.value
-      setEmitter(enabled: true)
-    }
-  }
   public var colorSetting: ColorSetting = .multiColor {
     didSet {
       for node in satelliteNodes {
@@ -85,8 +77,9 @@ public class GravityModel {
 
   // MARK: - Setup
   public init() {
-    emitterForBox = BoxEmitter()
-    baseTrailBirthRate = emitterForBox.particleBirthRate
+    let trailEmitter = BoxEmitter()
+    emitterForBox = trailEmitter
+    baseTrailBirthRate = trailEmitter.particleBirthRate
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
 
@@ -106,40 +99,28 @@ public class GravityModel {
   }
 
   public func setup(scene: SKScene) {
+    guard center.parent == nil else { return }
+
     emitterForBox.targetNode = scene
 
-    if scene.children.filter({ $0 is Satellite }).count < 1 {
-      backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
-      if let backgroundEmitter = backgroundEmitter {
-        scene.addChild(backgroundEmitter)
-      }
-      center = NodeFactory.center()
-      center.position = .init(x: 4, y: 4)
-      scene.addChild(center)
-      gravityNode.falloff = 2.0
-      scene.addChild(gravityNode)
-
-      secondGravityNode.falloff = 2.0
-      secondGravityNode.isEnabled = false
-      scene.addChild(secondGravityNode)
-
-      thirdGravityNode.falloff = 2.0
-      thirdGravityNode.isEnabled = false
-      scene.addChild(thirdGravityNode)
-
-    } else if let gravityNode = scene.children.first(where: { $0 is SKFieldNode }) as? SKFieldNode {
-      self.gravityNode = gravityNode
+    backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
+    if let backgroundEmitter = backgroundEmitter {
+      scene.addChild(backgroundEmitter)
     }
+    center.position = .init(x: 4, y: 4)
+    scene.addChild(center)
 
-    for child in scene.children {
-      if let satellite = child as? Satellite {
-        satelliteNodes.append(satellite)
-      } else if let emitter = child as? SKEmitterNode, emitter.name == "background" {
-        backgroundEmitter = emitter  // legacy: plain emitter without crop mask
-      } else if let audio = child as? SKAudioNode {
-        musicAudioNode = audio
-      }
-    }
+    gravityNode.falloff = mode.falloff
+    gravityNode.position = center.position
+    scene.addChild(gravityNode)
+
+    secondGravityNode.falloff = mode.falloff
+    secondGravityNode.isEnabled = false
+    scene.addChild(secondGravityNode)
+
+    thirdGravityNode.falloff = mode.falloff
+    thirdGravityNode.isEnabled = false
+    scene.addChild(thirdGravityNode)
   }
 
   public func addSound(node: SKAudioNode) {
@@ -338,19 +319,6 @@ public class GravityModel {
     }
   }
 
-  // MARK: - Projectile
-
-  public func projectile(size: CGSize) -> SKNode {
-    let projectile = SKSpriteNode(color: .white, size: CGSize(width: 5, height: 5))
-    projectile.position = CGPoint(x: 0, y: -floor(size.height/2)+30)
-    projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
-    projectile.physicsBody?.velocity = CGVector(dx: 0, dy: 500)
-    projectile.physicsBody?.affectedByGravity = false
-    projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
-    projectile.physicsBody?.contactTestBitMask = PhysicsCategory.center | PhysicsCategory.satellite
-    return projectile
-  }
-
   // MARK: - Sun orbit
 
   /// Advances the orbiting suns by `dt` seconds of simulation time.
@@ -432,7 +400,7 @@ public class GravityModel {
   // MARK: - Misc
 
   public func random(size: CGSize, direction: Direction) -> (nodes: [SKNode], sound: SKAudioNode?) {
-    let satellites = Satellite.random(sceneSize: size, type: currentSatelliteType, colorSetting: colorSetting, direction: direction)
+    let satellites = Satellite.random(sceneSize: size, colorSetting: colorSetting, direction: direction)
     for satellite in satellites {
       if trailLength != .none {
         satellite.addEmitter(emitterBox: emitterForBox)
