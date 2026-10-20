@@ -172,7 +172,7 @@ extension GameViewController {
 }
 
 // MARK: - Capture
-extension GameViewController: RPPreviewViewControllerDelegate {
+extension GameViewController: @preconcurrency RPPreviewViewControllerDelegate {
 
   @objc func cameraTapped(_ sender: UIButton) {
     isRecording ? stopVideoRecording() : takeScreenshot()

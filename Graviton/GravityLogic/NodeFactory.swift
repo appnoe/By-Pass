@@ -20,6 +20,7 @@ enum PlanetType: CaseIterable {
   }
 }
 
+@MainActor
 enum NodeFactory {
   static func center() -> SKShapeNode {
     let radius: CGFloat = 14
