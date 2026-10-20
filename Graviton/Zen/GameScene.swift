@@ -14,6 +14,7 @@ class GameScene: SKScene {
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
   private var trajectoryNodes: [Int: SKShapeNode] = [:]
+  private var lastUpdateTime: TimeInterval?
   override class var supportsSecureCoding: Bool {
     return true
   }
@@ -64,7 +65,13 @@ class GameScene: SKScene {
 
   // https://stackoverflow.com/a/31502698/498796
   override func update(_ currentTime: TimeInterval) {
-    model.updateSunOrbit(dt: 1.0/60.0)
+    // Real frame time (60 or 120 Hz), clamped after pauses, scaled like the
+    // SpriteKit physics so fast-forward affects all simulated motion equally.
+    let frameTime = lastUpdateTime.map { currentTime - $0 } ?? 1.0/60.0
+    lastUpdateTime = currentTime
+    let dt = CGFloat(min(max(frameTime, 0), 1.0/30.0)) * physicsWorld.speed
+
+    model.updateSunOrbit(dt: dt)
 
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)
@@ -73,7 +80,6 @@ class GameScene: SKScene {
 
     if model.mode == .gravity {
       let strength: CGFloat = 10
-      let dt: CGFloat = 1.0/60.0
       for node1 in model.satelliteNodes {
         let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
         if distance > 3000 {
@@ -168,15 +174,11 @@ class GameScene: SKScene {
   }
 
   private func cancelAllPendingSatellites() {
-    // Remove satellite nodes that have no velocity yet (still being placed)
-    let pending = model.satelliteNodes.filter {
-      $0.physicsBody?.velocity == .zero
-    }
     for (_, node) in trajectoryNodes {
       node.removeFromParent()
     }
     trajectoryNodes.removeAll()
-    model.clear(nodes: pending)
+    model.cancelPendingSatellites()
   }
 
   // MARK: - Trajectory Preview
@@ -216,6 +218,11 @@ class GameScene: SKScene {
   private func removeTrajectoryPreview(for touch: UITouch) {
     trajectoryNodes[touch.hash]?.removeFromParent()
     trajectoryNodes.removeValue(forKey: touch.hash)
+  }
+
+  func setSimulationSpeed(_ speed: CGFloat) {
+    physicsWorld.speed = speed
+    model.simulationSpeed = speed
   }
 
   func setTrailLength(to length: TrailLength) {
