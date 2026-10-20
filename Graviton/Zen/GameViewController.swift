@@ -261,8 +261,9 @@ extension GameViewController: RPPreviewViewControllerDelegate {
     dot.isUserInteractionEnabled = false
     view.addSubview(dot)
     NSLayoutConstraint.activate([
-      dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
-      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
+      // Below the capture button; the sound button sits to its left
+      dot.centerXAnchor.constraint(equalTo: contentView.captureButton.centerXAnchor),
+      dot.topAnchor.constraint(equalTo: contentView.captureButton.bottomAnchor, constant: 8),
       dot.widthAnchor.constraint(equalToConstant: 12),
       dot.heightAnchor.constraint(equalToConstant: 12),
     ])
