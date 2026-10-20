@@ -29,6 +29,7 @@ class GameViewController: UIViewController {
     // Dock buttons
     contentView.speedButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
     contentView.clearButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
+    contentView.soundButton.addTarget(self, action: #selector(soundToggled), for: .touchUpInside)
     contentView.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
 
     // Capture (tap = screenshot, long press = video)
@@ -49,6 +50,7 @@ class GameViewController: UIViewController {
 
     gameScene = scene
     skView.presentScene(scene)
+    applySoundSetting()
 
     let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
     skView.addGestureRecognizer(pinch)
@@ -110,6 +112,19 @@ extension GameViewController {
     isFastForward.toggle()
     gameScene.setSimulationSpeed(isFastForward ? 3 : 1)
     contentView.speedButton.setActive(isFastForward)
+  }
+
+  @objc func soundToggled(_ sender: UIButton) {
+    let defaults = UserDefaults.standard
+    defaults.set(!defaults.bool(forKey: "soundEnabled"), forKey: "soundEnabled")
+    applySoundSetting()
+  }
+
+  private func applySoundSetting() {
+    let enabled = UserDefaults.standard.bool(forKey: "soundEnabled")
+    gameScene?.setSound(enabled: enabled)
+    contentView.soundButton.setIcon(enabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+    contentView.soundButton.accessibilityValue = enabled ? "On" : "Off"
   }
 
   @objc func infoTapped(_ sender: UIButton) {
