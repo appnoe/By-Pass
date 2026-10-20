@@ -317,7 +317,7 @@
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1310;
 				LastUpgradeCheck = 2630;
-				ORGANIZATIONNAME = dasdom;
+				ORGANIZATIONNAME = "Appnö GmbH";
 				TargetAttributes = {
 					F2A21E4C277F0F8D00EA5825 = {
 						CreatedOnToolsVersion = 13.1;
