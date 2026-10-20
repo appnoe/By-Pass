@@ -158,7 +158,7 @@ final class SunPickerView: UIView {
 /// [ 1 | 2 | 3 ]  [ speed · capture · clear ]  [ sound · info ]
 ///
 /// The groups are separate glass capsules inside one UIGlassContainerEffect,
-/// so they are rendered together and visually melt into each other.
+/// so they are rendered together with consistent lighting and refraction.
 final class ControlDock: UIView {
 
   let sunPickerView = SunPickerView()
@@ -173,7 +173,8 @@ final class ControlDock: UIView {
     translatesAutoresizingMaskIntoConstraints = false
 
     let containerEffect = UIGlassContainerEffect()
-    containerEffect.spacing = 12
+    // Merge distance below the gap between groups: rendered together, shapes stay separate
+    containerEffect.spacing = 4
     let container = UIVisualEffectView(effect: containerEffect)
     container.translatesAutoresizingMaskIntoConstraints = false
     addSubview(container)
@@ -185,7 +186,7 @@ final class ControlDock: UIView {
     ]
     let row = UIStackView(arrangedSubviews: groups)
     row.axis = .horizontal
-    row.spacing = 6
+    row.spacing = 8
     row.translatesAutoresizingMaskIntoConstraints = false
     container.contentView.addSubview(row)
 
@@ -270,7 +271,7 @@ class GameView: UIView {
       // ── Bottom-centre: control dock ───────────────────────────
       controlDock.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
       controlDock.centerXAnchor.constraint(equalTo: centerXAnchor),
-      controlDock.leadingAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.leadingAnchor, constant: 12),
+      controlDock.leadingAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.leadingAnchor, constant: 10),
 
       // ── Planet count, just above the dock ─────────────────────
       satellitesCountLabel.bottomAnchor.constraint(equalTo: controlDock.topAnchor, constant: -8),
