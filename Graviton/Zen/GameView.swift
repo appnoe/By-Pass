@@ -264,6 +264,16 @@ class GameView: UIView {
 
     super.init(frame: frame)
 
+    sunPickerView.button1.accessibilityIdentifier = "sun1"
+    sunPickerView.button2.accessibilityIdentifier = "sun2"
+    sunPickerView.button3.accessibilityIdentifier = "sun3"
+    speedButton.button.accessibilityIdentifier    = "speed"
+    clearButton.button.accessibilityIdentifier    = "clear"
+    infoButton.button.accessibilityIdentifier     = "info"
+    soundButton.button.accessibilityIdentifier    = "sound"
+    captureRoundButton.button.accessibilityIdentifier = "capture"
+    satellitesCountLabel.accessibilityIdentifier  = "satellitesCount"
+
     skView.ignoresSiblingOrder = true
     skView.preferredFramesPerSecond = 120
 

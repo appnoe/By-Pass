@@ -6,114 +6,59 @@ import XCTest
 
 class GravityUITests: XCTestCase {
 
-  override func setUpWithError() throws {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+  var app: XCUIApplication!
 
-    // In UI tests it is usually best to stop immediately when a failure occurs.
+  override func setUpWithError() throws {
     continueAfterFailure = false
 
-    // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+    app = XCUIApplication()
+    // Skip the first-launch onboarding overlay
+    app.launchArguments += ["-hasSeenOnboarding", "YES"]
+    app.launch()
   }
 
   override func tearDownWithError() throws {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
+    app = nil
+  }
+
+  func test_hudControlsAreReachable() throws {
+    // The splash screen is shown for ~5 s before the game appears
+    let sun3 = app.buttons["sun3"]
+    XCTAssertTrue(sun3.waitForExistence(timeout: 10))
+
+    sun3.tap()
+    app.buttons["sun2"].tap()
+    app.buttons["sun1"].tap()
+
+    app.buttons["speed"].tap()
+    app.buttons["speed"].tap()
+
+    app.buttons["sound"].tap()
+    app.buttons["sound"].tap()
+
+    app.buttons["clear"].tap()
+    XCTAssertTrue(app.staticTexts["satellitesCount"].exists)
   }
 
   func test_takeScreenshots() throws {
-    // UI tests must launch the application that they test.
-    let app = XCUIApplication()
-    app.launch()
+    let sun1 = app.buttons["sun1"]
+    XCTAssertTrue(sun1.waitForExistence(timeout: 10))
 
-    // Use recording to get started writing UI tests.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
+    sleep(20)
+    takeScreenshot(named: "one_sun")
 
-    let forwardButton = app.buttons["Forward"]
-    let backButton = app.buttons["Back"]
-    let diceButton = app.buttons["dice"]
-    let trashButton = app.buttons["trash"]
-    let saveButton = app.buttons["Save"]
-    let loadButton = app.buttons["Load"]
-    let shareButton = app.buttons["Share"]
-    let doneButton = app.buttons["Done"]
-    let thickButton = app.buttons["thick"]
-    let normalButton = app.buttons["normal"]
+    app.buttons["sun2"].tap()
+    sleep(20)
+    takeScreenshot(named: "two_suns")
 
-    forwardButton.tap()
-    for _ in 0..<5 {
-      sleep(2)
-      diceButton.tap()
-    }
+    app.buttons["sun3"].tap()
+    sleep(20)
+    takeScreenshot(named: "three_suns")
 
-    thickButton.tap()
-    backButton.tap()
-
-    sleep(40)
-
-    takeScreenshot(named: "circles_1")
-
-    forwardButton.tap()
-    saveButton.tap()
-
-    trashButton.tap()
-
-    for _ in 0..<5 {
-      sleep(2)
-      diceButton.tap()
-    }
-
-    thickButton.tap()
-    backButton.tap()
-
-    sleep(50)
-
-    takeScreenshot(named: "circles_2")
-
-    forwardButton.tap()
-    normalButton.tap()
-    backButton.tap()
-
-    sleep(50)
-
-    takeScreenshot(named: "circles_3")
-
-    forwardButton.tap()
-    saveButton.tap()
-
-//    app.buttons["rectangle"].tap()
-//
-//    for _ in 0..<5 {
-//      sleep(2)
-//      diceButton.tap()
-//    }
-//    backButton.tap()
-//
-//    sleep(20)
-//
-//    takeScreenshot(named: "rectangles")
-
-    takeScreenshot(named: "settings")
-
-    loadButton.tap()
-
-    takeScreenshot(named: "saved")
-
-    doneButton.tap()
-
-    app.switches["Show zoom buttons"].tap()
-    backButton.tap()
-
-    app.buttons["Decrement"].tap()
-    app.buttons["Decrement"].tap()
-    app.buttons["Decrement"].tap()
-
-    takeScreenshot(named: "zoomed_out")
-
-    forwardButton.tap()
-    shareButton.tap()
-
-    takeScreenshot(named: "share")
+    app.buttons["info"].tap()
+    sleep(2)
+    takeScreenshot(named: "info")
   }
-  
 }
 
 extension GravityUITests {

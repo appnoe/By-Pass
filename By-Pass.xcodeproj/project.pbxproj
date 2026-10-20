@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CF0A11142F90000000A1B2C1 /* GravityModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0A11132F90000000A1B2C1 /* GravityModelTests.swift */; };
 		CF0A11122F90000000A1B2C1 /* gravity.m4a in Resources */ = {isa = PBXBuildFile; fileRef = CF0A11112F90000000A1B2C1 /* gravity.m4a */; };
 		CF56F8952F69E3060072A4E2 /* OnboardingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */; };
 		CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884142F661B66006183C5 /* SceneDelegate.swift */; };
@@ -39,18 +40,19 @@
 			containerPortal = F2BD5C4F2773C4DC00136C85 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F2BD5C562773C4DC00136C85;
-			remoteInfo = GravitationFun;
+			remoteInfo = "By-Pass";
 		};
 		F2D604102781AAC9003958A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F2BD5C4F2773C4DC00136C85 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F2BD5C562773C4DC00136C85;
-			remoteInfo = GravitationFun;
+			remoteInfo = "By-Pass";
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CF0A11132F90000000A1B2C1 /* GravityModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityModelTests.swift; sourceTree = "<group>"; };
 		CF0A11112F90000000A1B2C1 /* gravity.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gravity.m4a; sourceTree = "<group>"; };
 		CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -193,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				F2D604152781AB09003958A2 /* GameSceneTests.swift */,
+				CF0A11132F90000000A1B2C1 /* GravityModelTests.swift */,
 			);
 			path = GravityTests;
 			sourceTree = "<group>";
@@ -240,7 +243,7 @@
 			name = "By-Pass";
 			packageProductDependencies = (
 			);
-			productName = GravitationFun;
+			productName = "By-Pass";
 			productReference = F2BD5C572773C4DC00136C85 /* By-Pass.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -375,6 +378,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F2D604162781AB09003958A2 /* GameSceneTests.swift in Sources */,
+				CF0A11142F90000000A1B2C1 /* GravityModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,7 +427,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = GravitationFun;
+				TEST_TARGET_NAME = "By-Pass";
 			};
 			name = Debug;
 		};
@@ -445,7 +449,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = GravitationFun;
+				TEST_TARGET_NAME = "By-Pass";
 			};
 			name = Release;
 		};
@@ -667,7 +671,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gravity.app/Gravity";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/By-Pass.app/By-Pass";
 			};
 			name = Debug;
 		};
@@ -691,7 +695,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gravity.app/Gravity";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/By-Pass.app/By-Pass";
 			};
 			name = Release;
 		};
