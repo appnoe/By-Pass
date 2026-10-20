@@ -144,10 +144,7 @@ extension GameViewController {
 
   func updateCountLabel() {
     guard let gameScene else { return }
-    let count = gameScene.model.satelliteNodes.count
-    contentView.satellitesCountLabel.text = gameScene.model.mode == .spirograph
-      ? "\(count)/10"
-      : "\(count)"
+    contentView.satellitesCountLabel.text = "\(gameScene.model.satelliteNodes.count)"
   }
 
   func getScreenshot(scene: SKScene) -> UIImage? {

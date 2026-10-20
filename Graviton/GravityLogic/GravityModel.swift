@@ -1,5 +1,5 @@
 //  Created by Dominik Hauser on 02.01.22.
-//  
+//
 //
 
 import SpriteKit
@@ -10,7 +10,7 @@ public class GravityModel {
   var velocityNodes: [Int:SKShapeNode] = [:]
   let emitterForBox: SKEmitterNode
   public var backgroundEmitter: SKNode?
-  var explosionEmitter: SKEmitterNode?
+  let explosionEmitter: SKEmitterNode
   public private(set) var gravityNode: SKFieldNode
   public private(set) var secondGravityNode: SKFieldNode
   public private(set) var thirdGravityNode: SKFieldNode
@@ -19,7 +19,6 @@ public class GravityModel {
   public private(set) var secondCenter: SKShapeNode
   public private(set) var thirdCenter: SKShapeNode
 
-  public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
 
   // Sun orbit (Lagrange equilateral-triangle solution for 3-sun mode)
@@ -28,28 +27,7 @@ public class GravityModel {
   private var sunPositions: [CGPoint] = []
   private var sunVelocities: [CGVector] = []
   var soundEnabled = true
-  public var mode: GravityMode = .gravity {
-    didSet {
-      gravityNode.falloff = mode.falloff
-      secondGravityNode.falloff = mode.falloff
-      thirdGravityNode.falloff = mode.falloff
-      trailLength = mode.trailLength
-    }
-  }
-  public var trailLength: TrailLength = .long {
-    didSet {
-      setEmitter(enabled: false)
 
-      emitterForBox.particleLifetime = trailLength.lifetime()
-
-      switch trailLength {
-        case .none:
-          break
-        case .short, .long, .spirograph:
-          setEmitter(enabled: true)
-      }
-    }
-  }
   /// Fast-forward factor; trail emitters scale their birth rate along with it
   /// so that trails keep their density. New emitters are copies of
   /// `emitterForBox` and therefore inherit the current rate.
@@ -64,20 +42,6 @@ public class GravityModel {
     }
   }
   private let baseParticleBirthRate: CGFloat
-  public var particleScale: ParticleScale = .normal {
-    didSet {
-      setEmitter(enabled: false)
-      emitterForBox.particleScale = particleScale.value
-      setEmitter(enabled: true)
-    }
-  }
-  public var colorSetting: ColorSetting = .multiColor {
-    didSet {
-      for node in satelliteNodes {
-        node.updateColor(for: colorSetting)
-      }
-    }
-  }
 
   // MARK: - Setup
   public init() {
@@ -105,38 +69,22 @@ public class GravityModel {
   public func setup(scene: SKScene) {
     emitterForBox.targetNode = scene
 
-    if scene.children.filter({ $0 is Satellite }).count < 1 {
-      backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
-      if let backgroundEmitter = backgroundEmitter {
-        scene.addChild(backgroundEmitter)
-      }
-      center = NodeFactory.center()
-      center.position = .init(x: 4, y: 4)
-      scene.addChild(center)
-      gravityNode.falloff = 2.0
-      scene.addChild(gravityNode)
-
-      secondGravityNode.falloff = 2.0
-      secondGravityNode.isEnabled = false
-      scene.addChild(secondGravityNode)
-
-      thirdGravityNode.falloff = 2.0
-      thirdGravityNode.isEnabled = false
-      scene.addChild(thirdGravityNode)
-
-    } else if let gravityNode = scene.children.first(where: { $0 is SKFieldNode }) as? SKFieldNode {
-      self.gravityNode = gravityNode
+    backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
+    if let backgroundEmitter = backgroundEmitter {
+      scene.addChild(backgroundEmitter)
     }
+    center.position = .init(x: 4, y: 4)
+    scene.addChild(center)
+    gravityNode.falloff = 2.0
+    scene.addChild(gravityNode)
 
-    for child in scene.children {
-      if let satellite = child as? Satellite {
-        satelliteNodes.append(satellite)
-      } else if let emitter = child as? SKEmitterNode, emitter.name == "background" {
-        backgroundEmitter = emitter  // legacy: plain emitter without crop mask
-      } else if let audio = child as? SKAudioNode {
-        musicAudioNode = audio
-      }
-    }
+    secondGravityNode.falloff = 2.0
+    secondGravityNode.isEnabled = false
+    scene.addChild(secondGravityNode)
+
+    thirdGravityNode.falloff = 2.0
+    thirdGravityNode.isEnabled = false
+    scene.addChild(thirdGravityNode)
   }
 
   public func addSound(node: SKAudioNode) {
@@ -246,11 +194,6 @@ public class GravityModel {
     }
   }
 
-  public func setColorOfSatelliteWith(id: Int, forInput input: CGPoint) {
-    let node = temporaryNodes[id]
-    node?.addColor(forInput: input, colorSetting: colorSetting)
-  }
-
   public func remove(_ node: SKNode, explosionIn target: SKScene) {
     guard let satellite = node as? Satellite else {
       return
@@ -302,7 +245,7 @@ public class GravityModel {
       return nil
     }
 
-    satellite.addColor(forInput: input, colorSetting: colorSetting)
+    satellite.addColor(forInput: input)
 
     let correctedPosition = CGPoint(x: satellite.position.x + satellite.radius, y: satellite.position.y + satellite.radius)
     let velocityNode = NodeFactory.velocity(from: correctedPosition, to: input)
@@ -325,50 +268,18 @@ public class GravityModel {
     let velocityScale: CGFloat = 0.6
     let velocity = CGVector(dx: (position.x - input.x) * velocityScale, dy: (position.y - input.y) * velocityScale)
     satellite.addPhysicsBody(with: velocity)
-
-    if trailLength != .none {
-      satellite.addEmitter(emitterBox: emitterForBox)
-    }
+    satellite.addEmitter(emitterBox: emitterForBox)
   }
 
   // MARK: - Emitter
 
-  func setEmitter(enabled: Bool) {
-
-    for node in satelliteNodes {
-      if enabled {
-        node.addEmitter(emitterBox: emitterForBox)
-      } else {
-        let allEmitter = node.children.filter { $0 is SKEmitterNode }
-        for emitter in allEmitter {
-          emitter.removeFromParent()
-        }
-      }
-    }
-  }
-
   func explosion(at position: CGPoint, inNode node: SKNode) {
-    let emitter = explosionEmitter?.copy() as? SKEmitterNode
-    emitter?.position = position
-    if let emitter = emitter {
-      node.addChild(emitter)
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-        emitter.removeFromParent()
-      }
+    guard let emitter = explosionEmitter.copy() as? SKEmitterNode else { return }
+    emitter.position = position
+    node.addChild(emitter)
+    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+      emitter.removeFromParent()
     }
-  }
-
-  // MARK: - Projectile
-
-  public func projectile(size: CGSize) -> SKNode {
-    let projectile = SKSpriteNode(color: .white, size: CGSize(width: 5, height: 5))
-    projectile.position = CGPoint(x: 0, y: -floor(size.height/2)+30)
-    projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
-    projectile.physicsBody?.velocity = CGVector(dx: 0, dy: 500)
-    projectile.physicsBody?.affectedByGravity = false
-    projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
-    projectile.physicsBody?.contactTestBitMask = PhysicsCategory.center | PhysicsCategory.satellite
-    return projectile
   }
 
   // MARK: - Sun orbit
@@ -469,16 +380,13 @@ public class GravityModel {
 
   // MARK: - Misc
 
-  public func random(size: CGSize, direction: Direction) -> (nodes: [SKNode], sound: SKAudioNode?) {
-    let satellites = Satellite.random(sceneSize: size, type: currentSatelliteType, colorSetting: colorSetting, direction: direction)
+  public func random(size: CGSize, direction: Direction) -> [Satellite] {
+    let satellites = Satellite.random(sceneSize: size, direction: direction)
     for satellite in satellites {
-      if trailLength != .none {
-        satellite.addEmitter(emitterBox: emitterForBox)
-      }
-      satellite.physicsBody?.linearDamping = 0.0
+      satellite.addEmitter(emitterBox: emitterForBox)
     }
     self.satelliteNodes.append(contentsOf: satellites)
-    return (nodes: satellites, sound: sound())
+    return satellites
   }
 
   public func clear(nodes: [Satellite]? = nil) {
