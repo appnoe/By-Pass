@@ -71,7 +71,7 @@ class SplashViewController: UIViewController {
         view.addSubview(badge)
 
         let label = UILabel()
-        label.text = "Based on \"Gravity Zen\" by Dasdom"
+        label.text = String(localized: "Based on \"Gravity Zen\" by Dasdom")
         label.textAlignment = .center
         label.textColor = UIColor(white: 0.85, alpha: 1.0)
         label.font = UIFont.systemFont(ofSize: 13, weight: .regular)

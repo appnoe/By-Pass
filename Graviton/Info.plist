@@ -7,7 +7,7 @@
 	<key>CFBundleVersion</key>
 	<string>1773589827</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Speichert Screenshots in deine Fotomediathek.</string>
+	<string>Saves screenshots to your photo library.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
