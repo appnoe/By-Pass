@@ -32,6 +32,7 @@
 		D5726E2537EB963067AD21E4 /* gravity.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7AF7CD0977A3B75654AF3ACB /* gravity.m4a */; };
 		25E7BEC00EFE366F108133EA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 474899854A22E899175AAFC4 /* Localizable.xcstrings */; };
 		8E211C640E28CFC11A13D49B /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8C0379EAF97BA1D64A1C597D /* InfoPlist.xcstrings */; };
+		4E0C56CEBEA32F863CAAE49C /* GravityModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80BA8E5E19F09669162CD2C3 /* GravityModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,14 +41,14 @@
 			containerPortal = F2BD5C4F2773C4DC00136C85 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F2BD5C562773C4DC00136C85;
-			remoteInfo = GravitationFun;
+			remoteInfo = "By-Pass";
 		};
 		F2D604102781AAC9003958A2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F2BD5C4F2773C4DC00136C85 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = F2BD5C562773C4DC00136C85;
-			remoteInfo = GravitationFun;
+			remoteInfo = "By-Pass";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -83,6 +84,7 @@
 		7AF7CD0977A3B75654AF3ACB /* gravity.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gravity.m4a; sourceTree = "<group>"; };
 		474899854A22E899175AAFC4 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		8C0379EAF97BA1D64A1C597D /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		80BA8E5E19F09669162CD2C3 /* GravityModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +201,7 @@
 		F2D6040D2781AAC9003958A2 /* GravityTests */ = {
 			isa = PBXGroup;
 			children = (
+				80BA8E5E19F09669162CD2C3 /* GravityModelTests.swift */,
 				F2D604152781AB09003958A2 /* GameSceneTests.swift */,
 			);
 			path = GravityTests;
@@ -383,6 +386,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E0C56CEBEA32F863CAAE49C /* GravityModelTests.swift in Sources */,
 				F2D604162781AB09003958A2 /* GameSceneTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -432,7 +436,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = GravitationFun;
+				TEST_TARGET_NAME = "By-Pass";
 			};
 			name = Debug;
 		};
@@ -454,7 +458,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = GravitationFun;
+				TEST_TARGET_NAME = "By-Pass";
 			};
 			name = Release;
 		};
@@ -676,7 +680,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gravity.app/Gravity";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/By-Pass.app/By-Pass";
 			};
 			name = Debug;
 		};
@@ -700,7 +704,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Gravity.app/Gravity";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/By-Pass.app/By-Pass";
 			};
 			name = Release;
 		};
