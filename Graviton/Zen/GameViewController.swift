@@ -186,13 +186,34 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   private func takeScreenshot() {
     guard let scene = gameScene, let image = getScreenshot(scene: scene) else { return }
     flashScreen()
-    UINotificationFeedbackGenerator().notificationOccurred(.success)
-    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-      guard status == .authorized || status == .limited else { return }
+    PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] status in
+      guard status == .authorized || status == .limited else {
+        DispatchQueue.main.async { self?.showPhotoAccessDeniedAlert() }
+        return
+      }
       PHPhotoLibrary.shared().performChanges {
         PHAssetChangeRequest.creationRequestForAsset(from: image)
+      } completionHandler: { success, _ in
+        DispatchQueue.main.async {
+          UINotificationFeedbackGenerator().notificationOccurred(success ? .success : .error)
+        }
       }
     }
+  }
+
+  private func showPhotoAccessDeniedAlert() {
+    UINotificationFeedbackGenerator().notificationOccurred(.error)
+    let alert = UIAlertController(
+      title: String(localized: "No access to Photos"),
+      message: String(localized: "Allow By-Pass to add photos in Settings to save screenshots."),
+      preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: String(localized: "Cancel"), style: .cancel))
+    alert.addAction(UIAlertAction(title: String(localized: "Settings"), style: .default) { _ in
+      if let url = URL(string: UIApplication.openSettingsURLString) {
+        UIApplication.shared.open(url)
+      }
+    })
+    present(alert, animated: true)
   }
 
   private func startVideoRecording() {

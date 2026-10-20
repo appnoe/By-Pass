@@ -89,6 +89,10 @@ class GameScene: SKScene {
 
   func touchDown(_ touch: UITouch) {
     guard !isPinching else { return }
+    guard model.canAddSatellite else {
+      UINotificationFeedbackGenerator().notificationOccurred(.warning)
+      return
+    }
     let position = touch.location(in: self)
     let node = model.satellite(with: position, id: touch.hash)
     addChild(node)

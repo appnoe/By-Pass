@@ -21,11 +21,18 @@ public class GravityModel {
 
   public var musicAudioNode: SKAudioNode?
 
-  // Sun orbit (Lagrange equilateral-triangle solution for 3-sun mode)
-  private var sunsAreOrbiting = false
+  /// Upper bound for planets: their mutual attraction costs O(n²) per frame.
+  static let maxSatellites = 50
+
+  // Sun orbit (two-body / Lagrange equilateral-triangle solution).
+  // The suns rotate rigidly around the origin with the angular velocity of
+  // the analytic circular-orbit solution. Integrating them numerically would
+  // let the (inherently unstable) triangle drift apart over time.
   private let sunOrbitStrength: CGFloat = 73_000
+  private var sunStartPositions: [CGPoint] = []
   private var sunPositions: [CGPoint] = []
-  private var sunVelocities: [CGVector] = []
+  private var sunAngularVelocity: CGFloat = 0
+  private var sunAngle: CGFloat = 0
   var soundEnabled = true
 
   /// Fast-forward factor; trail emitters scale their birth rate along with it
@@ -96,17 +103,12 @@ public class GravityModel {
     switch number {
       case 2:
         // Two-body circular orbit (CW): both suns on the x-axis, equal speed
+        // v = √(G / 2d) on radius d/2
         let v2 = sqrt(sunOrbitStrength / (2 * distance))
-        sunPositions = [
+        startSunOrbit(at: [
           CGPoint(x: -distance/2, y: 0),
           CGPoint(x:  distance/2, y: 0)
-        ]
-        // CW tangential: point at (−r,0) → velocity (0,+v); point at (+r,0) → (0,−v)
-        sunVelocities = [
-          CGVector(dx: 0, dy:  v2),
-          CGVector(dx: 0, dy: -v2)
-        ]
-        sunsAreOrbiting = true
+        ], angularVelocity: -v2 / (distance / 2))
 
         center.position      = sunPositions[0]
         gravityNode.position = sunPositions[0]
@@ -127,18 +129,11 @@ public class GravityModel {
         let v = sqrt(sunOrbitStrength / distance)   // orbital speed (px/s)
 
         // Equilateral triangle centred at (0,0), CW rotation
-        sunPositions = [
+        startSunOrbit(at: [
           CGPoint(x: 0,          y:  R),
           CGPoint(x: -distance/2, y: -R/2),
           CGPoint(x:  distance/2, y: -R/2)
-        ]
-        // CW tangential velocities (net centre-of-mass velocity = zero)
-        sunVelocities = [
-          CGVector(dx:  v,         dy:  0),
-          CGVector(dx: -v/2,       dy:  v * sqrt(3.0)/2),
-          CGVector(dx: -v/2,       dy: -v * sqrt(3.0)/2)
-        ]
-        sunsAreOrbiting = true
+        ], angularVelocity: -v / R)
 
         center.position         = sunPositions[0]
         gravityNode.position    = sunPositions[0]
@@ -155,9 +150,7 @@ public class GravityModel {
         thirdCenter.isHidden  = false
         thirdCenter.position  = sunPositions[2]
       default:
-        sunsAreOrbiting = false
-        sunPositions = []
-        sunVelocities = []
+        startSunOrbit(at: [], angularVelocity: 0)
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
@@ -277,49 +270,33 @@ public class GravityModel {
     guard let emitter = explosionEmitter.copy() as? SKEmitterNode else { return }
     emitter.position = position
     node.addChild(emitter)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-      emitter.removeFromParent()
-    }
+    emitter.run(.sequence([.wait(forDuration: 1), .removeFromParent()]))
   }
 
   // MARK: - Sun orbit
 
-  /// Symplectic-Euler integration of the three orbiting suns (Lagrange solution).
+  private func startSunOrbit(at positions: [CGPoint], angularVelocity: CGFloat) {
+    sunStartPositions = positions
+    sunPositions = positions
+    sunAngularVelocity = angularVelocity
+    sunAngle = 0
+  }
+
+  /// Advances the orbiting suns by `dt` seconds of simulation time.
   /// Call once per frame; updates both visual nodes and gravity-field positions.
   public func updateSunOrbit(dt: CGFloat) {
-    let n = sunPositions.count
-    guard sunsAreOrbiting, n >= 2 else { return }
+    let n = sunStartPositions.count
+    guard n >= 2 else { return }
 
-    // Accumulate velocity impulses from pairwise sun–sun attraction
-    var dv = [CGVector](repeating: .zero, count: n)
-    for i in 0..<n {
-      for j in 0..<n where j != i {
-        let dx = sunPositions[j].x - sunPositions[i].x
-        let dy = sunPositions[j].y - sunPositions[i].y
-        let r2 = dx*dx + dy*dy
-        guard r2 > 1 else { continue }
-        let r  = sqrt(r2)
-        let f  = sunOrbitStrength / r2
-        dv[i].dx += (dx / r) * f * dt
-        dv[i].dy += (dy / r) * f * dt
-      }
-    }
-
-    // Update velocities then positions (symplectic Euler)
-    for i in 0..<n {
-      sunVelocities[i].dx += dv[i].dx
-      sunVelocities[i].dy += dv[i].dy
-      sunPositions[i].x   += sunVelocities[i].dx * dt
-      sunPositions[i].y   += sunVelocities[i].dy * dt
-    }
+    sunAngle = (sunAngle + sunAngularVelocity * dt).truncatingRemainder(dividingBy: 2 * .pi)
+    let rotation = CGAffineTransform(rotationAngle: sunAngle)
+    sunPositions = sunStartPositions.map { $0.applying(rotation) }
 
     // Sync visual and field nodes to the new positions
     center.position      = sunPositions[0]
     gravityNode.position = sunPositions[0]
-    if n >= 2 {
-      secondCenter.position      = sunPositions[1]
-      secondGravityNode.position = sunPositions[1]
-    }
+    secondCenter.position      = sunPositions[1]
+    secondGravityNode.position = sunPositions[1]
     if n >= 3 {
       thirdCenter.position      = sunPositions[2]
       thirdGravityNode.position = sunPositions[2]
@@ -380,8 +357,14 @@ public class GravityModel {
 
   // MARK: - Misc
 
+  public var canAddSatellite: Bool {
+    satelliteNodes.count < GravityModel.maxSatellites
+  }
+
   public func random(size: CGSize, direction: Direction) -> [Satellite] {
-    let satellites = Satellite.random(sceneSize: size, direction: direction)
+    let free = GravityModel.maxSatellites - satelliteNodes.count
+    guard free > 0 else { return [] }
+    let satellites = Satellite.random(amount: min(5, free), sceneSize: size, direction: direction)
     for satellite in satellites {
       satellite.addEmitter(emitterBox: emitterForBox)
     }
