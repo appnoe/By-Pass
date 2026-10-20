@@ -50,6 +50,20 @@ public class GravityModel {
       }
     }
   }
+  /// Fast-forward factor; trail emitters scale their birth rate along with it
+  /// so that trails keep their density. New emitters are copies of
+  /// `emitterForBox` and therefore inherit the current rate.
+  public var simulationSpeed: CGFloat = 1 {
+    didSet {
+      emitterForBox.particleBirthRate = baseParticleBirthRate * simulationSpeed
+      for node in satelliteNodes {
+        for case let emitter as SKEmitterNode in node.children {
+          emitter.particleBirthRate = emitterForBox.particleBirthRate
+        }
+      }
+    }
+  }
+  private let baseParticleBirthRate: CGFloat
   public var particleScale: ParticleScale = .normal {
     didSet {
       setEmitter(enabled: false)
@@ -67,7 +81,9 @@ public class GravityModel {
 
   // MARK: - Setup
   public init() {
-    emitterForBox = BoxEmitter()
+    let boxEmitter = BoxEmitter()
+    emitterForBox = boxEmitter
+    baseParticleBirthRate = boxEmitter.particleBirthRate
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
 
@@ -215,6 +231,21 @@ public class GravityModel {
     return node
   }
 
+  /// Removes all satellites that are still being placed (no velocity yet),
+  /// e.g. when a second finger turns the touch into a pinch.
+  public func cancelPendingSatellites() {
+    clear(nodes: Array(temporaryNodes.values))
+  }
+
+  /// Drops placement state (touch mapping, velocity indicator) of a satellite
+  /// that leaves the scene.
+  private func forgetPlacement(of satellite: Satellite) {
+    for (id, node) in temporaryNodes where node == satellite {
+      temporaryNodes.removeValue(forKey: id)
+      velocityNodes.removeValue(forKey: id)?.removeFromParent()
+    }
+  }
+
   public func setColorOfSatelliteWith(id: Int, forInput input: CGPoint) {
     let node = temporaryNodes[id]
     node?.addColor(forInput: input, colorSetting: colorSetting)
@@ -225,6 +256,7 @@ public class GravityModel {
       return
     }
     satelliteNodes.removeAll(where: { $0 == satellite })
+    forgetPlacement(of: satellite)
 
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()
@@ -285,7 +317,7 @@ public class GravityModel {
 
     velocityNodes.removeValue(forKey: id)
 
-    guard let satellite = temporaryNodes[id] else {
+    guard let satellite = temporaryNodes.removeValue(forKey: id) else {
       return
     }
 
@@ -454,6 +486,7 @@ public class GravityModel {
     for node in satellitesToRemove {
       node.removeFromParent()
       satelliteNodes.removeAll(where: { node == $0 })
+      forgetPlacement(of: node)
     }
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()

@@ -108,14 +108,7 @@ extension GameViewController {
   @objc func fastForwardToggled(_ sender: UIButton) {
     guard let gameScene else { return }
     isFastForward.toggle()
-    gameScene.physicsWorld.speed = isFastForward ? 3 : 1
-    for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
-      for case let emitter as SKEmitterNode in satellite.children {
-        emitter.particleBirthRate = isFastForward
-          ? emitter.particleBirthRate * 3
-          : emitter.particleBirthRate / 3
-      }
-    }
+    gameScene.setSimulationSpeed(isFastForward ? 3 : 1)
     contentView.speedButton.setActive(isFastForward)
   }
 
