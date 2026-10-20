@@ -8,26 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		CF56F8952F69E3060072A4E2 /* OnboardingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */; };
-		CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884122F6615C6006183C5 /* BottomTabBar.swift */; };
 		CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884142F661B66006183C5 /* SceneDelegate.swift */; };
 		CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884162F66B314006183C5 /* SplashViewController.swift */; };
 		CFE884192F66B6BB006183C5 /* InfoSheetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */; };
-		F23AFF862EFE870D0046B0D1 /* ColorSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7C2EFE870D0046B0D1 /* ColorSetting.swift */; };
 		F23AFF872EFE870D0046B0D1 /* RectangleEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */; };
 		F23AFF882EFE870D0046B0D1 /* GravityModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7F2EFE870D0046B0D1 /* GravityModel.swift */; };
 		F23AFF892EFE870D0046B0D1 /* Satellite.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF832EFE870D0046B0D1 /* Satellite.swift */; };
-		F23AFF8A2EFE870D0046B0D1 /* TrailLength.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF842EFE870D0046B0D1 /* TrailLength.swift */; };
-		F23AFF8B2EFE870D0046B0D1 /* ParticleScale.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF812EFE870D0046B0D1 /* ParticleScale.swift */; };
 		F23AFF8C2EFE870D0046B0D1 /* ExplosionEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF782EFE870D0046B0D1 /* ExplosionEmitter.swift */; };
 		F23AFF8D2EFE870D0046B0D1 /* NodeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF802EFE870D0046B0D1 /* NodeFactory.swift */; };
-		F23AFF8E2EFE870D0046B0D1 /* GravityMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7E2EFE870D0046B0D1 /* GravityMode.swift */; };
 		F23AFF8F2EFE870D0046B0D1 /* PhysicsCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF822EFE870D0046B0D1 /* PhysicsCategory.swift */; };
-		F23AFF902EFE870D0046B0D1 /* Friction.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF7D2EFE870D0046B0D1 /* Friction.swift */; };
 		F23AFF912EFE870D0046B0D1 /* BoxEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23AFF772EFE870D0046B0D1 /* BoxEmitter.swift */; };
 		F23AFF922EFE870D0046B0D1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F23AFF7B2EFE870D0046B0D1 /* Assets.xcassets */; };
-		F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE1B2A10F014003B5178 /* GravityZenState.swift */; };
-		F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */; };
-		F272AE212A110E59003B5178 /* ZenStatesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F272AE202A110E59003B5178 /* ZenStatesViewController.swift */; };
 		F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E3B277B0F7C00EA5825 /* GameView.swift */; };
 		F2A21E50277F0F8D00EA5825 /* GravityUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */; };
 		F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2BD5C5A2773C4DC00136C85 /* AppDelegate.swift */; };
@@ -60,7 +51,6 @@
 /* Begin PBXFileReference section */
 		CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
 		CF8163DC2F66D2980000646F /* buildnumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = buildnumber.xcconfig; sourceTree = "<group>"; };
-		CFE884122F6615C6006183C5 /* BottomTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BottomTabBar.swift; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CFE884162F66B314006183C5 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoSheetViewController.swift; sourceTree = "<group>"; };
@@ -68,18 +58,10 @@
 		F23AFF782EFE870D0046B0D1 /* ExplosionEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplosionEmitter.swift; sourceTree = "<group>"; };
 		F23AFF792EFE870D0046B0D1 /* RectangleEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleEmitter.swift; sourceTree = "<group>"; };
 		F23AFF7B2EFE870D0046B0D1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		F23AFF7C2EFE870D0046B0D1 /* ColorSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSetting.swift; sourceTree = "<group>"; };
-		F23AFF7D2EFE870D0046B0D1 /* Friction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Friction.swift; sourceTree = "<group>"; };
-		F23AFF7E2EFE870D0046B0D1 /* GravityMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityMode.swift; sourceTree = "<group>"; };
 		F23AFF7F2EFE870D0046B0D1 /* GravityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityModel.swift; sourceTree = "<group>"; };
 		F23AFF802EFE870D0046B0D1 /* NodeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NodeFactory.swift; sourceTree = "<group>"; };
-		F23AFF812EFE870D0046B0D1 /* ParticleScale.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParticleScale.swift; sourceTree = "<group>"; };
 		F23AFF822EFE870D0046B0D1 /* PhysicsCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhysicsCategory.swift; sourceTree = "<group>"; };
 		F23AFF832EFE870D0046B0D1 /* Satellite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Satellite.swift; sourceTree = "<group>"; };
-		F23AFF842EFE870D0046B0D1 /* TrailLength.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrailLength.swift; sourceTree = "<group>"; };
-		F272AE1B2A10F014003B5178 /* GravityZenState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityZenState.swift; sourceTree = "<group>"; };
-		F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extension.swift"; sourceTree = "<group>"; };
-		F272AE202A110E59003B5178 /* ZenStatesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenStatesViewController.swift; sourceTree = "<group>"; };
 		F2A21E3B277B0F7C00EA5825 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		F2A21E4D277F0F8D00EA5825 /* GravityUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GravityUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GravityUITests.swift; sourceTree = "<group>"; };
@@ -137,15 +119,10 @@
 			children = (
 				F23AFF7A2EFE870D0046B0D1 /* Emitter */,
 				F23AFF7B2EFE870D0046B0D1 /* Assets.xcassets */,
-				F23AFF7C2EFE870D0046B0D1 /* ColorSetting.swift */,
-				F23AFF7D2EFE870D0046B0D1 /* Friction.swift */,
-				F23AFF7E2EFE870D0046B0D1 /* GravityMode.swift */,
 				F23AFF7F2EFE870D0046B0D1 /* GravityModel.swift */,
 				F23AFF802EFE870D0046B0D1 /* NodeFactory.swift */,
-				F23AFF812EFE870D0046B0D1 /* ParticleScale.swift */,
 				F23AFF822EFE870D0046B0D1 /* PhysicsCategory.swift */,
 				F23AFF832EFE870D0046B0D1 /* Satellite.swift */,
-				F23AFF842EFE870D0046B0D1 /* TrailLength.swift */,
 			);
 			path = GravityLogic;
 			sourceTree = "<group>";
@@ -156,7 +133,6 @@
 				F2BD5C602773C4DC00136C85 /* GameScene.swift */,
 				F2BD5C622773C4DC00136C85 /* GameViewController.swift */,
 				F2A21E3B277B0F7C00EA5825 /* GameView.swift */,
-				CFE884122F6615C6006183C5 /* BottomTabBar.swift */,
 				CFE884162F66B314006183C5 /* SplashViewController.swift */,
 				CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */,
 				CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */,
@@ -170,30 +146,6 @@
 				F2A21E4F277F0F8D00EA5825 /* GravityUITests.swift */,
 			);
 			path = GravityUITests;
-			sourceTree = "<group>";
-		};
-		F2B5FF0D2A19E26F005C53A1 /* ZenStates */ = {
-			isa = PBXGroup;
-			children = (
-				F272AE202A110E59003B5178 /* ZenStatesViewController.swift */,
-			);
-			path = ZenStates;
-			sourceTree = "<group>";
-		};
-		F2B5FF0E2A19E2A0005C53A1 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				F272AE1B2A10F014003B5178 /* GravityZenState.swift */,
-			);
-			path = Model;
-			sourceTree = "<group>";
-		};
-		F2B5FF0F2A19E2AE005C53A1 /* Helper */ = {
-			isa = PBXGroup;
-			children = (
-				F272AE1D2A110B38003B5178 /* FileManager+Extension.swift */,
-			);
-			path = Helper;
 			sourceTree = "<group>";
 		};
 		F2BD5C4E2773C4DC00136C85 = {
@@ -226,10 +178,7 @@
 				F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */,
 				F2BD5C5A2773C4DC00136C85 /* AppDelegate.swift */,
 				F272AE1F2A110E32003B5178 /* Zen */,
-				F2B5FF0D2A19E26F005C53A1 /* ZenStates */,
 				F23AFF852EFE870D0046B0D1 /* GravityLogic */,
-				F2B5FF0E2A19E2A0005C53A1 /* Model */,
-				F2B5FF0F2A19E2AE005C53A1 /* Helper */,
 				F2BD5C672773C4DE00136C85 /* Assets.xcassets */,
 				F2BD5C692773C4DE00136C85 /* LaunchScreen.storyboard */,
 				F2D6041D2781D927003958A2 /* background.sks */,
@@ -399,29 +348,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F272AE212A110E59003B5178 /* ZenStatesViewController.swift in Sources */,
-				F23AFF862EFE870D0046B0D1 /* ColorSetting.swift in Sources */,
 				F23AFF872EFE870D0046B0D1 /* RectangleEmitter.swift in Sources */,
 				F23AFF882EFE870D0046B0D1 /* GravityModel.swift in Sources */,
 				CFE884192F66B6BB006183C5 /* InfoSheetViewController.swift in Sources */,
 				F23AFF892EFE870D0046B0D1 /* Satellite.swift in Sources */,
 				CFE884172F66B314006183C5 /* SplashViewController.swift in Sources */,
-				F23AFF8A2EFE870D0046B0D1 /* TrailLength.swift in Sources */,
-				F23AFF8B2EFE870D0046B0D1 /* ParticleScale.swift in Sources */,
 				CFE884152F661B66006183C5 /* SceneDelegate.swift in Sources */,
-				CFE884132F6615C6006183C5 /* BottomTabBar.swift in Sources */,
 				F23AFF8C2EFE870D0046B0D1 /* ExplosionEmitter.swift in Sources */,
 				F23AFF8D2EFE870D0046B0D1 /* NodeFactory.swift in Sources */,
-				F23AFF8E2EFE870D0046B0D1 /* GravityMode.swift in Sources */,
 				CF56F8952F69E3060072A4E2 /* OnboardingOverlayView.swift in Sources */,
 				F23AFF8F2EFE870D0046B0D1 /* PhysicsCategory.swift in Sources */,
-				F23AFF902EFE870D0046B0D1 /* Friction.swift in Sources */,
 				F23AFF912EFE870D0046B0D1 /* BoxEmitter.swift in Sources */,
 				F2BD5C612773C4DC00136C85 /* GameScene.swift in Sources */,
 				F2BD5C632773C4DC00136C85 /* GameViewController.swift in Sources */,
 				F2BD5C5B2773C4DC00136C85 /* AppDelegate.swift in Sources */,
-				F272AE1C2A10F014003B5178 /* GravityZenState.swift in Sources */,
-				F272AE1E2A110B38003B5178 /* FileManager+Extension.swift in Sources */,
 				F2A21E3C277B0F7C00EA5825 /* GameView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,10 +8,9 @@ class RectangleEmitter: SKEmitterNode {
   override init() {
     super.init()
 
-//    particleTexture = SKTextureAtlas(named: "Particle Sprite Atlas").textureNamed("bokeh")
     particleSize = .init(width: 1.5, height: 1.5)
     particleBirthRate = 30
-    particleLifetime = TrailLength.long.lifetime()
+    particleLifetime = 30
     particleAlpha = 0.7
     particleScale = 1
     particleColorBlendFactor = 1
