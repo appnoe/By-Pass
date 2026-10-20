@@ -4,6 +4,7 @@
 
 import SpriteKit
 
+@MainActor
 public class GravityModel {
   public var satelliteNodes: [Satellite] = []
   var temporaryNodes: [Int:Satellite] = [:]

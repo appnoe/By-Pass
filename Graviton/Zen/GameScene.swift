@@ -226,7 +226,7 @@ class GameScene: SKScene {
   }
 }
 
-extension GameScene: SKPhysicsContactDelegate {
+extension GameScene: @preconcurrency SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
     if contact.bodyA.categoryBitMask == PhysicsCategory.satellite {
       if let node = contact.bodyA.node {

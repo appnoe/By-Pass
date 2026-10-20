@@ -131,7 +131,7 @@ class OnboardingOverlayView: UIView {
             return
         }
         animationLoopCount += 1
-        runOneCycle {
+        runOneCycle { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.runNextCycle()
             }
