@@ -124,7 +124,7 @@ extension GameViewController {
     let enabled = UserDefaults.standard.bool(forKey: "soundEnabled")
     gameScene?.setSound(enabled: enabled)
     contentView.soundButton.setIcon(enabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
-    contentView.soundButton.accessibilityValue = enabled ? "On" : "Off"
+    contentView.soundButton.accessibilityValue = enabled ? String(localized: "On") : String(localized: "Off")
   }
 
   @objc func infoTapped(_ sender: UIButton) {
@@ -252,7 +252,7 @@ extension GameViewController: RPPreviewViewControllerDelegate {
     )
     config.baseForegroundColor = recording ? .systemRed : DockButton.inactiveColor
     button.configuration = config
-    button.accessibilityLabel = recording ? "Stop recording" : "Capture"
+    button.accessibilityLabel = recording ? String(localized: "Stop recording") : String(localized: "Capture")
   }
 
   private func flashScreen() {

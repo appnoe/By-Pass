@@ -17,7 +17,7 @@ class GravitySKView: SKView {
 /// Icon-only 40×44 button for the control dock. Inactive icons are dimmed.
 final class DockButton: UIButton {
 
-  init(icon: String, accessibilityLabel label: String) {
+  init(icon: String, accessibilityLabel label: String.LocalizationValue) {
     super.init(frame: .zero)
     var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: icon)?.withConfiguration(
@@ -25,7 +25,7 @@ final class DockButton: UIButton {
     )
     config.baseForegroundColor = DockButton.inactiveColor
     configuration = config
-    accessibilityLabel = label
+    accessibilityLabel = String(localized: label)
     translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       widthAnchor.constraint(equalToConstant: 40),
@@ -112,7 +112,7 @@ final class SunPickerView: UIView {
     positionSelection(animated: false)
   }
 
-  private static func makeSegment(_ title: String, accessibilityLabel label: String) -> UIButton {
+  private static func makeSegment(_ title: String, accessibilityLabel label: String.LocalizationValue) -> UIButton {
     var config = UIButton.Configuration.plain()
     config.title = title
     config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
@@ -121,7 +121,7 @@ final class SunPickerView: UIView {
       return out
     }
     let btn = UIButton(configuration: config)
-    btn.accessibilityLabel = label
+    btn.accessibilityLabel = String(localized: label)
     btn.translatesAutoresizingMaskIntoConstraints = false
     return btn
   }

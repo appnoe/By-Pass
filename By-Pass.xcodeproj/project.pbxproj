@@ -30,6 +30,8 @@
 		F2D604242781D92E003958A2 /* background.sks in Resources */ = {isa = PBXBuildFile; fileRef = F2D6041D2781D927003958A2 /* background.sks */; };
 		6720D51186B837EAEE50F6B4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */; };
 		D5726E2537EB963067AD21E4 /* gravity.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 7AF7CD0977A3B75654AF3ACB /* gravity.m4a */; };
+		25E7BEC00EFE366F108133EA /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 474899854A22E899175AAFC4 /* Localizable.xcstrings */; };
+		8E211C640E28CFC11A13D49B /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 8C0379EAF97BA1D64A1C597D /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +81,8 @@
 		F2D6041D2781D927003958A2 /* background.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = background.sks; sourceTree = "<group>"; };
 		DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		7AF7CD0977A3B75654AF3ACB /* gravity.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gravity.m4a; sourceTree = "<group>"; };
+		474899854A22E899175AAFC4 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		8C0379EAF97BA1D64A1C597D /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -175,6 +179,8 @@
 		F2BD5C592773C4DC00136C85 /* Graviton */ = {
 			isa = PBXGroup;
 			children = (
+				8C0379EAF97BA1D64A1C597D /* InfoPlist.xcstrings */,
+				474899854A22E899175AAFC4 /* Localizable.xcstrings */,
 				7AF7CD0977A3B75654AF3ACB /* gravity.m4a */,
 				DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */,
 				F2B6164B2777998200BCE6C4 /* Info.plist */,
@@ -294,6 +300,7 @@
 			knownRegions = (
 				en,
 				Base,
+				de,
 			);
 			mainGroup = F2BD5C4E2773C4DC00136C85;
 			packageReferences = (
@@ -321,6 +328,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E211C640E28CFC11A13D49B /* InfoPlist.xcstrings in Resources */,
+				25E7BEC00EFE366F108133EA /* Localizable.xcstrings in Resources */,
 				D5726E2537EB963067AD21E4 /* gravity.m4a in Resources */,
 				6720D51186B837EAEE50F6B4 /* PrivacyInfo.xcprivacy in Resources */,
 				F2BD5C682773C4DE00136C85 /* Assets.xcassets in Resources */,
