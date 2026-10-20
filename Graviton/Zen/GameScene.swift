@@ -54,6 +54,10 @@ class GameScene: SKScene {
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)
       numberOfSatellites = model.satelliteNodes.count
+      // Music plays while there is something in orbit (model stops it at zero)
+      if let music = model.sound() {
+        addChild(music)
+      }
     }
 
     let strength: CGFloat = 10
