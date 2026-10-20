@@ -14,6 +14,7 @@ class GameScene: SKScene {
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
   private var trajectoryNodes: [Int: SKShapeNode] = [:]
+  private var lastUpdateTime: TimeInterval?
   override class var supportsSecureCoding: Bool {
     return true
   }
@@ -64,7 +65,14 @@ class GameScene: SKScene {
 
   // https://stackoverflow.com/a/31502698/498796
   override func update(_ currentTime: TimeInterval) {
-    model.updateSunOrbit(dt: 1.0/60.0)
+    // Use the real frame time (60 or 120 Hz) scaled like the SpriteKit physics,
+    // so suns and mutual attraction stay in sync with the gravity fields.
+    // Clamped so a stalled frame (app switch, debugger) can't cause a jump.
+    let frameTime = lastUpdateTime.map { currentTime - $0 } ?? 1.0/60.0
+    lastUpdateTime = currentTime
+    let dt = CGFloat(min(max(frameTime, 0), 1.0/30.0)) * physicsWorld.speed
+
+    model.updateSunOrbit(dt: dt)
 
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)
@@ -73,11 +81,9 @@ class GameScene: SKScene {
 
     if model.mode == .gravity {
       let strength: CGFloat = 10
-      let dt: CGFloat = 1.0/60.0
       for node1 in model.satelliteNodes {
         let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
         if distance > 3000 {
-          print("distance: \(distance), removing")
           model.clear(nodes: [node1])
           continue
         }
@@ -216,6 +222,11 @@ class GameScene: SKScene {
   private func removeTrajectoryPreview(for touch: UITouch) {
     trajectoryNodes[touch.hash]?.removeFromParent()
     trajectoryNodes.removeValue(forKey: touch.hash)
+  }
+
+  func setSpeed(_ multiplier: CGFloat) {
+    physicsWorld.speed = multiplier
+    model.speedMultiplier = multiplier
   }
 
   func setTrailLength(to length: TrailLength) {

@@ -22,11 +22,29 @@ public class GravityModel {
   public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
 
-  // Sun orbit (Lagrange equilateral-triangle solution for 3-sun mode)
-  private var sunsAreOrbiting = false
+  // Sun orbit: the 2-sun circle and the 3-sun Lagrange triangle are both
+  // rigid rotations about the common centre of mass, so they are evaluated
+  // analytically instead of being integrated (which drifts and, for the
+  // Lagrange triangle, is unstable).
   private let sunOrbitStrength: CGFloat = 73_000
-  private var sunPositions: [CGPoint] = []
-  private var sunVelocities: [CGVector] = []
+  private var sunBasePositions: [CGPoint] = []
+  private var sunAngularVelocity: CGFloat = 0
+  private var sunAngle: CGFloat = 0
+  var sunPositions: [CGPoint] { sunBasePositions.map { rotated($0, by: sunAngle) } }
+
+  // Trail particles are emitted in real time, so the birth rate has to follow
+  // the simulation speed to keep the trails dense in fast-forward.
+  private let baseTrailBirthRate: CGFloat
+  public var speedMultiplier: CGFloat = 1 {
+    didSet {
+      emitterForBox.particleBirthRate = baseTrailBirthRate * speedMultiplier
+      for node in satelliteNodes {
+        for case let emitter as SKEmitterNode in node.children {
+          emitter.particleBirthRate = emitterForBox.particleBirthRate
+        }
+      }
+    }
+  }
   var soundEnabled = true
   public var mode: GravityMode = .gravity {
     didSet {
@@ -68,6 +86,7 @@ public class GravityModel {
   // MARK: - Setup
   public init() {
     emitterForBox = BoxEmitter()
+    baseTrailBirthRate = emitterForBox.particleBirthRate
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
 
@@ -133,16 +152,13 @@ public class GravityModel {
       case 2:
         // Two-body circular orbit (CW): both suns on the x-axis, equal speed
         let v2 = sqrt(sunOrbitStrength / (2 * distance))
-        sunPositions = [
+        sunBasePositions = [
           CGPoint(x: -distance/2, y: 0),
           CGPoint(x:  distance/2, y: 0)
         ]
-        // CW tangential: point at (−r,0) → velocity (0,+v); point at (+r,0) → (0,−v)
-        sunVelocities = [
-          CGVector(dx: 0, dy:  v2),
-          CGVector(dx: 0, dy: -v2)
-        ]
-        sunsAreOrbiting = true
+        sunAngle = 0
+        sunAngularVelocity = -v2 / (distance/2)
+        let sunPositions = self.sunPositions
 
         center.position      = sunPositions[0]
         gravityNode.position = sunPositions[0]
@@ -163,18 +179,14 @@ public class GravityModel {
         let v = sqrt(sunOrbitStrength / distance)   // orbital speed (px/s)
 
         // Equilateral triangle centred at (0,0), CW rotation
-        sunPositions = [
+        sunBasePositions = [
           CGPoint(x: 0,          y:  R),
           CGPoint(x: -distance/2, y: -R/2),
           CGPoint(x:  distance/2, y: -R/2)
         ]
-        // CW tangential velocities (net centre-of-mass velocity = zero)
-        sunVelocities = [
-          CGVector(dx:  v,         dy:  0),
-          CGVector(dx: -v/2,       dy:  v * sqrt(3.0)/2),
-          CGVector(dx: -v/2,       dy: -v * sqrt(3.0)/2)
-        ]
-        sunsAreOrbiting = true
+        sunAngle = 0
+        sunAngularVelocity = -v / R
+        let sunPositions = self.sunPositions
 
         center.position         = sunPositions[0]
         gravityNode.position    = sunPositions[0]
@@ -191,9 +203,9 @@ public class GravityModel {
         thirdCenter.isHidden  = false
         thirdCenter.position  = sunPositions[2]
       default:
-        sunsAreOrbiting = false
-        sunPositions = []
-        sunVelocities = []
+        sunBasePositions = []
+        sunAngle = 0
+        sunAngularVelocity = 0
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
@@ -341,46 +353,28 @@ public class GravityModel {
 
   // MARK: - Sun orbit
 
-  /// Symplectic-Euler integration of the three orbiting suns (Lagrange solution).
+  /// Advances the orbiting suns by `dt` seconds of simulation time.
   /// Call once per frame; updates both visual nodes and gravity-field positions.
   public func updateSunOrbit(dt: CGFloat) {
-    let n = sunPositions.count
-    guard sunsAreOrbiting, n >= 2 else { return }
+    guard sunBasePositions.count >= 2 else { return }
 
-    // Accumulate velocity impulses from pairwise sun–sun attraction
-    var dv = [CGVector](repeating: .zero, count: n)
-    for i in 0..<n {
-      for j in 0..<n where j != i {
-        let dx = sunPositions[j].x - sunPositions[i].x
-        let dy = sunPositions[j].y - sunPositions[i].y
-        let r2 = dx*dx + dy*dy
-        guard r2 > 1 else { continue }
-        let r  = sqrt(r2)
-        let f  = sunOrbitStrength / r2
-        dv[i].dx += (dx / r) * f * dt
-        dv[i].dy += (dy / r) * f * dt
-      }
-    }
+    sunAngle = (sunAngle + sunAngularVelocity * dt).truncatingRemainder(dividingBy: 2 * .pi)
+    let positions = sunPositions
 
-    // Update velocities then positions (symplectic Euler)
-    for i in 0..<n {
-      sunVelocities[i].dx += dv[i].dx
-      sunVelocities[i].dy += dv[i].dy
-      sunPositions[i].x   += sunVelocities[i].dx * dt
-      sunPositions[i].y   += sunVelocities[i].dy * dt
+    center.position      = positions[0]
+    gravityNode.position = positions[0]
+    secondCenter.position      = positions[1]
+    secondGravityNode.position = positions[1]
+    if positions.count >= 3 {
+      thirdCenter.position      = positions[2]
+      thirdGravityNode.position = positions[2]
     }
+  }
 
-    // Sync visual and field nodes to the new positions
-    center.position      = sunPositions[0]
-    gravityNode.position = sunPositions[0]
-    if n >= 2 {
-      secondCenter.position      = sunPositions[1]
-      secondGravityNode.position = sunPositions[1]
-    }
-    if n >= 3 {
-      thirdCenter.position      = sunPositions[2]
-      thirdGravityNode.position = sunPositions[2]
-    }
+  private func rotated(_ point: CGPoint, by angle: CGFloat) -> CGPoint {
+    let c = cos(angle)
+    let s = sin(angle)
+    return CGPoint(x: point.x * c - point.y * s, y: point.x * s + point.y * c)
   }
 
   // MARK: - Trajectory Preview
