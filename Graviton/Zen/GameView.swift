@@ -12,72 +12,50 @@ class GravitySKView: SKView {
   override func focusItems(in rect: CGRect) -> [any UIFocusItem] { [] }
 }
 
-// MARK: - RoundGlassButton
+// MARK: - DockButton
 
-/// A 44×44 Liquid-Glass circle wrapping a single UIButton.
-final class RoundGlassButton: UIView {
+/// Icon-only 44×44 button for the control dock. Inactive icons are dimmed.
+final class DockButton: UIButton {
 
-  let button: UIButton
-
-  init(icon: String, pointSize: CGFloat = 18) {
+  init(icon: String, accessibilityLabel label: String) {
+    super.init(frame: .zero)
     var config = UIButton.Configuration.plain()
     config.image = UIImage(systemName: icon)?.withConfiguration(
-      UIImage.SymbolConfiguration(pointSize: pointSize, weight: .medium)
+      UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
     )
-    config.baseForegroundColor = UIColor.white.withAlphaComponent(0.55)
-    button = UIButton(configuration: config)
-    button.translatesAutoresizingMaskIntoConstraints = false
-
-    super.init(frame: .zero)
+    config.baseForegroundColor = DockButton.inactiveColor
+    configuration = config
+    accessibilityLabel = label
     translatesAutoresizingMaskIntoConstraints = false
-    layer.cornerRadius = 22
-    layer.cornerCurve = .continuous
-    clipsToBounds = true
-
-    let container = UIVisualEffectView(effect: UIGlassContainerEffect())
-    container.translatesAutoresizingMaskIntoConstraints = false
-
-    let glassEffect = UIGlassEffect()
-    glassEffect.tintColor = UIColor.black.withAlphaComponent(0.55)
-    glassEffect.isInteractive = true
-    let glass = UIVisualEffectView(effect: glassEffect)
-    glass.translatesAutoresizingMaskIntoConstraints = false
-    glass.isUserInteractionEnabled = false
-
-    container.contentView.addSubview(glass)
-    container.contentView.addSubview(button)
-    addSubview(container)
-
     NSLayoutConstraint.activate([
-      container.topAnchor.constraint(equalTo: topAnchor),
-      container.leadingAnchor.constraint(equalTo: leadingAnchor),
-      container.bottomAnchor.constraint(equalTo: bottomAnchor),
-      container.trailingAnchor.constraint(equalTo: trailingAnchor),
-
-      glass.topAnchor.constraint(equalTo: container.contentView.topAnchor),
-      glass.leadingAnchor.constraint(equalTo: container.contentView.leadingAnchor),
-      glass.bottomAnchor.constraint(equalTo: container.contentView.bottomAnchor),
-      glass.trailingAnchor.constraint(equalTo: container.contentView.trailingAnchor),
-
-      button.topAnchor.constraint(equalTo: container.contentView.topAnchor),
-      button.leadingAnchor.constraint(equalTo: container.contentView.leadingAnchor),
-      button.bottomAnchor.constraint(equalTo: container.contentView.bottomAnchor),
-      button.trailingAnchor.constraint(equalTo: container.contentView.trailingAnchor),
+      widthAnchor.constraint(equalToConstant: 44),
+      heightAnchor.constraint(equalToConstant: 44),
     ])
   }
 
   required init?(coder: NSCoder) { fatalError() }
 
+  static let inactiveColor = UIColor.white.withAlphaComponent(0.6)
+
   func setActive(_ active: Bool) {
-    var config = button.configuration ?? .plain()
-    config.baseForegroundColor = active ? .white : UIColor.white.withAlphaComponent(0.55)
-    button.configuration = config
+    var config = configuration ?? .plain()
+    config.baseForegroundColor = active ? .white : DockButton.inactiveColor
+    configuration = config
+    UIView.animate(withDuration: 0.2) {
+      self.backgroundColor = active ? UIColor.white.withAlphaComponent(0.18) : .clear
+    }
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    layer.cornerRadius = bounds.height / 2
   }
 }
 
 // MARK: - SunPickerView
 
-/// Compact 3-segment Liquid-Glass pill: selects 1, 2 or 3 gravity centres.
+/// Segmented 1 | 2 | 3 selector for the number of gravity centres.
+/// Has no background of its own; it lives inside a glass group of the dock.
 final class SunPickerView: UIView {
 
   let button1: UIButton
@@ -88,33 +66,13 @@ final class SunPickerView: UIView {
     didSet { positionSelection(animated: true) }
   }
 
-  private let containerView: UIVisualEffectView
-  private let selectionView: UIVisualEffectView
+  private let selectionView = UIView()
   private let stackView: UIStackView
-  private var selectionLeadingConstraint: NSLayoutConstraint?
-  private var selectionWidthConstraint: NSLayoutConstraint?
 
   override init(frame: CGRect) {
-    button1 = SunPickerView.makeSegment("1")
-    button2 = SunPickerView.makeSegment("2")
-    button3 = SunPickerView.makeSegment("3")
-
-    containerView = UIVisualEffectView(effect: UIGlassContainerEffect())
-    containerView.translatesAutoresizingMaskIntoConstraints = false
-
-    let pillEffect = UIGlassEffect()
-    pillEffect.tintColor = UIColor.black.withAlphaComponent(0.55)
-    let pillGlass = UIVisualEffectView(effect: pillEffect)
-    pillGlass.translatesAutoresizingMaskIntoConstraints = false
-    pillGlass.isUserInteractionEnabled = false
-
-    let selEffect = UIGlassEffect()
-    selEffect.tintColor = UIColor.white.withAlphaComponent(0.2)
-    selectionView = UIVisualEffectView(effect: selEffect)
-    selectionView.translatesAutoresizingMaskIntoConstraints = false
-    selectionView.layer.cornerRadius = 18
-    selectionView.layer.cornerCurve = .continuous
-    selectionView.clipsToBounds = true
+    button1 = SunPickerView.makeSegment("1", accessibilityLabel: "1 sun")
+    button2 = SunPickerView.makeSegment("2", accessibilityLabel: "2 suns")
+    button3 = SunPickerView.makeSegment("3", accessibilityLabel: "3 suns")
 
     stackView = UIStackView(arrangedSubviews: [button1, button2, button3])
     stackView.axis = .horizontal
@@ -122,47 +80,21 @@ final class SunPickerView: UIView {
     stackView.translatesAutoresizingMaskIntoConstraints = false
 
     super.init(frame: frame)
-
     translatesAutoresizingMaskIntoConstraints = false
-    layer.cornerRadius = 22
-    layer.cornerCurve = .continuous
-    clipsToBounds = true
 
-    containerView.contentView.addSubview(pillGlass)
-    containerView.contentView.addSubview(selectionView)
-    containerView.contentView.addSubview(stackView)
-    addSubview(containerView)
-
-    let leading = selectionView.leadingAnchor.constraint(
-      equalTo: containerView.contentView.leadingAnchor, constant: 4)
-    let width = selectionView.widthAnchor.constraint(equalToConstant: 44)
-    selectionLeadingConstraint = leading
-    selectionWidthConstraint   = width
+    selectionView.backgroundColor = UIColor.white.withAlphaComponent(0.18)
+    selectionView.isUserInteractionEnabled = false
+    addSubview(selectionView)
+    addSubview(stackView)
 
     NSLayoutConstraint.activate([
-      containerView.topAnchor.constraint(equalTo: topAnchor),
-      containerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      containerView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      containerView.trailingAnchor.constraint(equalTo: trailingAnchor),
-
-      pillGlass.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
-      pillGlass.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
-      pillGlass.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
-      pillGlass.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
-
-      selectionView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor, constant: 4),
-      selectionView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor, constant: -4),
-      leading, width,
-
-      stackView.topAnchor.constraint(equalTo: containerView.contentView.topAnchor),
-      stackView.leadingAnchor.constraint(equalTo: containerView.contentView.leadingAnchor),
-      stackView.bottomAnchor.constraint(equalTo: containerView.contentView.bottomAnchor),
-      stackView.trailingAnchor.constraint(equalTo: containerView.contentView.trailingAnchor),
+      stackView.topAnchor.constraint(equalTo: topAnchor),
+      stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
+      stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
+      stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
+      button1.widthAnchor.constraint(equalToConstant: 40),
+      button1.heightAnchor.constraint(equalToConstant: 44),
     ])
-
-    dim(button1, false)
-    dim(button2, true)
-    dim(button3, true)
   }
 
   required init?(coder: NSCoder) { fatalError() }
@@ -172,48 +104,120 @@ final class SunPickerView: UIView {
     positionSelection(animated: false)
   }
 
-  private static func makeSegment(_ title: String) -> UIButton {
+  private static func makeSegment(_ title: String, accessibilityLabel label: String) -> UIButton {
     var config = UIButton.Configuration.plain()
     config.title = title
-    config.baseForegroundColor = .white
     config.titleTextAttributesTransformer = UIConfigurationTextAttributesTransformer { incoming in
       var out = incoming
       out.font = UIFont.systemFont(ofSize: 15, weight: .semibold)
       return out
     }
     let btn = UIButton(configuration: config)
+    btn.accessibilityLabel = label
     btn.translatesAutoresizingMaskIntoConstraints = false
     return btn
   }
 
   private func positionSelection(animated: Bool) {
     let buttons = [button1, button2, button3]
-    for (i, btn) in buttons.enumerated() { dim(btn, i != selectedIndex) }
+    for (i, btn) in buttons.enumerated() {
+      var config = btn.configuration ?? .plain()
+      config.baseForegroundColor = i == selectedIndex ? .white : DockButton.inactiveColor
+      btn.configuration = config
+      btn.accessibilityTraits = i == selectedIndex ? [.button, .selected] : .button
+    }
     guard stackView.frame.width > 0 else { return }
-    let target   = buttons[selectedIndex]
-    let newLeading = target.frame.origin.x + 4
-    let newWidth   = target.frame.width - 8
+    stackView.layoutIfNeeded()
 
+    let frame = buttons[selectedIndex].frame
     let update = {
-      self.selectionLeadingConstraint?.constant = newLeading
-      self.selectionWidthConstraint?.constant   = newWidth
-      self.containerView.contentView.layoutIfNeeded()
+      self.selectionView.frame = frame
+      self.selectionView.layer.cornerRadius = frame.height / 2
     }
     if animated {
-      UIView.animate(withDuration: 0.3, delay: 0,
+      UIView.animate(withDuration: 0.35, delay: 0,
                      usingSpringWithDamping: 0.75, initialSpringVelocity: 0,
                      animations: update)
     } else {
       update()
     }
   }
+}
 
-  private func dim(_ button: UIButton, _ dimmed: Bool) {
-    var config = button.configuration ?? .plain()
-    config.baseForegroundColor = dimmed
-      ? UIColor.white.withAlphaComponent(0.35)
-      : .white
-    button.configuration = config
+// MARK: - ControlDock
+
+/// Floating Liquid-Glass dock that bundles all HUD controls:
+/// [ 1 | 2 | 3 ]  [ speed · capture · clear ]  [ info ]
+///
+/// The groups are separate glass capsules inside one UIGlassContainerEffect,
+/// so they are rendered together and visually melt into each other.
+final class ControlDock: UIView {
+
+  let sunPickerView = SunPickerView()
+  let speedButton   = DockButton(icon: "forward.fill",   accessibilityLabel: "Fast forward")
+  let captureButton = DockButton(icon: "camera.fill",    accessibilityLabel: "Capture")
+  let clearButton   = DockButton(icon: "trash.fill",     accessibilityLabel: "Clear")
+  let infoButton    = DockButton(icon: "info.circle",    accessibilityLabel: "Info")
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    translatesAutoresizingMaskIntoConstraints = false
+
+    let containerEffect = UIGlassContainerEffect()
+    containerEffect.spacing = 12
+    let container = UIVisualEffectView(effect: containerEffect)
+    container.translatesAutoresizingMaskIntoConstraints = false
+    addSubview(container)
+
+    let groups = [
+      ControlDock.glassGroup(containing: [sunPickerView]),
+      ControlDock.glassGroup(containing: [speedButton, captureButton, clearButton]),
+      ControlDock.glassGroup(containing: [infoButton]),
+    ]
+    let row = UIStackView(arrangedSubviews: groups)
+    row.axis = .horizontal
+    row.spacing = 8
+    row.translatesAutoresizingMaskIntoConstraints = false
+    container.contentView.addSubview(row)
+
+    NSLayoutConstraint.activate([
+      container.topAnchor.constraint(equalTo: topAnchor),
+      container.leadingAnchor.constraint(equalTo: leadingAnchor),
+      container.bottomAnchor.constraint(equalTo: bottomAnchor),
+      container.trailingAnchor.constraint(equalTo: trailingAnchor),
+
+      row.topAnchor.constraint(equalTo: container.contentView.topAnchor),
+      row.leadingAnchor.constraint(equalTo: container.contentView.leadingAnchor),
+      row.bottomAnchor.constraint(equalTo: container.contentView.bottomAnchor),
+      row.trailingAnchor.constraint(equalTo: container.contentView.trailingAnchor),
+    ])
+  }
+
+  required init?(coder: NSCoder) { fatalError() }
+
+  /// One interactive glass capsule with the given controls laid out in a row.
+  private static func glassGroup(containing views: [UIView]) -> UIVisualEffectView {
+    let effect = UIGlassEffect()
+    effect.tintColor = UIColor.white.withAlphaComponent(0.06)
+    effect.isInteractive = true
+    let glass = UIVisualEffectView(effect: effect)
+    glass.translatesAutoresizingMaskIntoConstraints = false
+    glass.cornerConfiguration = .capsule()
+
+    let stack = UIStackView(arrangedSubviews: views)
+    stack.axis = .horizontal
+    stack.spacing = 2
+    stack.translatesAutoresizingMaskIntoConstraints = false
+    glass.contentView.addSubview(stack)
+
+    let inset: CGFloat = 4
+    NSLayoutConstraint.activate([
+      stack.topAnchor.constraint(equalTo: glass.contentView.topAnchor, constant: inset),
+      stack.leadingAnchor.constraint(equalTo: glass.contentView.leadingAnchor, constant: inset),
+      stack.bottomAnchor.constraint(equalTo: glass.contentView.bottomAnchor, constant: -inset),
+      stack.trailingAnchor.constraint(equalTo: glass.contentView.trailingAnchor, constant: -inset),
+    ])
+    return glass
   }
 }
 
@@ -223,16 +227,13 @@ class GameView: UIView {
 
   let skView: GravitySKView
   let satellitesCountLabel: UILabel
+  let controlDock = ControlDock()
 
-  // HUD controls
-  let sunPickerView: SunPickerView    // top-left:  1 | 2 | 3 gravity centres
-  let speedButton:   RoundGlassButton // bottom-right, inner
-  let clearButton:   RoundGlassButton // bottom-right, outer
-  let infoButton:    RoundGlassButton // bottom-left
-
-  // Capture button: accessed as UIButton by GameViewController
-  private let captureRoundButton: RoundGlassButton
-  var captureButton: UIButton { captureRoundButton.button }
+  var sunPickerView: SunPickerView { controlDock.sunPickerView }
+  var speedButton:   DockButton    { controlDock.speedButton }
+  var captureButton: DockButton    { controlDock.captureButton }
+  var clearButton:   DockButton    { controlDock.clearButton }
+  var infoButton:    DockButton    { controlDock.infoButton }
 
   override init(frame: CGRect) {
 
@@ -244,13 +245,7 @@ class GameView: UIView {
     satellitesCountLabel.translatesAutoresizingMaskIntoConstraints = false
     satellitesCountLabel.text = "0"
     satellitesCountLabel.textColor = UIColor.white.withAlphaComponent(0.4)
-    satellitesCountLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 13, weight: .regular)
-
-    sunPickerView       = SunPickerView()
-    speedButton         = RoundGlassButton(icon: "forward")
-    clearButton         = RoundGlassButton(icon: "trash")
-    infoButton          = RoundGlassButton(icon: "info.circle")
-    captureRoundButton  = RoundGlassButton(icon: "camera")
+    satellitesCountLabel.font = UIFont.monospacedDigitSystemFont(ofSize: 12, weight: .medium)
 
     super.init(frame: frame)
 
@@ -258,45 +253,18 @@ class GameView: UIView {
     skView.preferredFramesPerSecond = 120
 
     addSubview(skView)
-    addSubview(sunPickerView)
-    addSubview(captureRoundButton)
-    addSubview(infoButton)
+    addSubview(controlDock)
     addSubview(satellitesCountLabel)
-    addSubview(speedButton)
-    addSubview(clearButton)
 
     NSLayoutConstraint.activate([
-      // ── Top-left: sun picker pill ──────────────────────────────
-      sunPickerView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
-      sunPickerView.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
-      sunPickerView.widthAnchor.constraint(equalToConstant: 120),
-      sunPickerView.heightAnchor.constraint(equalToConstant: 44),
+      // ── Bottom-centre: control dock ───────────────────────────
+      controlDock.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -12),
+      controlDock.centerXAnchor.constraint(equalTo: centerXAnchor),
+      controlDock.leadingAnchor.constraint(greaterThanOrEqualTo: safeAreaLayoutGuide.leadingAnchor, constant: 12),
 
-      // ── Top-right: capture button ──────────────────────────────
-      captureRoundButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
-      captureRoundButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
-      captureRoundButton.widthAnchor.constraint(equalToConstant: 44),
-      captureRoundButton.heightAnchor.constraint(equalToConstant: 44),
-
-      // ── Bottom-left: info + count ──────────────────────────────
-      infoButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
-      infoButton.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
-      infoButton.widthAnchor.constraint(equalToConstant: 44),
-      infoButton.heightAnchor.constraint(equalToConstant: 44),
-
-      satellitesCountLabel.leadingAnchor.constraint(equalTo: infoButton.trailingAnchor, constant: 10),
-      satellitesCountLabel.centerYAnchor.constraint(equalTo: infoButton.centerYAnchor),
-
-      // ── Bottom-right: clear then speed (right to left) ────────
-      clearButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
-      clearButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
-      clearButton.widthAnchor.constraint(equalToConstant: 44),
-      clearButton.heightAnchor.constraint(equalToConstant: 44),
-
-      speedButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),
-      speedButton.trailingAnchor.constraint(equalTo: clearButton.leadingAnchor, constant: -10),
-      speedButton.widthAnchor.constraint(equalToConstant: 44),
-      speedButton.heightAnchor.constraint(equalToConstant: 44),
+      // ── Planet count, just above the dock ─────────────────────
+      satellitesCountLabel.bottomAnchor.constraint(equalTo: controlDock.topAnchor, constant: -8),
+      satellitesCountLabel.centerXAnchor.constraint(equalTo: controlDock.centerXAnchor),
     ])
   }
 
