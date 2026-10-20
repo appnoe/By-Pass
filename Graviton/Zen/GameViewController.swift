@@ -26,10 +26,10 @@ class GameViewController: UIViewController {
     contentView.sunPickerView.button2.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     contentView.sunPickerView.button3.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
 
-    // Round buttons
-    contentView.speedButton.button.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
-    contentView.clearButton.button.addTarget(self, action: #selector(clear), for: .touchUpInside)
-    contentView.infoButton.button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+    // Dock buttons
+    contentView.speedButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
+    contentView.clearButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
+    contentView.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
 
     // Capture (tap = screenshot, long press = video)
     contentView.captureButton.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
@@ -212,12 +212,14 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   }
 
   private func updateCaptureButton(recording: Bool) {
-    var config = contentView.captureButton.configuration ?? .plain()
-    config.image = UIImage(systemName: recording ? "stop.circle.fill" : "camera")?.withConfiguration(
-      UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+    let button = contentView.captureButton
+    var config = button.configuration ?? .plain()
+    config.image = UIImage(systemName: recording ? "stop.fill" : "camera.fill")?.withConfiguration(
+      UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
     )
-    config.baseForegroundColor = recording ? .systemRed : UIColor.white.withAlphaComponent(0.55)
-    contentView.captureButton.configuration = config
+    config.baseForegroundColor = recording ? .systemRed : DockButton.inactiveColor
+    button.configuration = config
+    button.accessibilityLabel = recording ? "Stop recording" : "Capture"
   }
 
   private func flashScreen() {
@@ -234,17 +236,18 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   }
 
   private func showRecordingIndicator() {
+    // Pulsing badge on the capture button inside the dock
     let dot = UIView()
     dot.backgroundColor = .systemRed
-    dot.layer.cornerRadius = 6
+    dot.layer.cornerRadius = 4
     dot.translatesAutoresizingMaskIntoConstraints = false
     dot.isUserInteractionEnabled = false
     view.addSubview(dot)
     NSLayoutConstraint.activate([
-      dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
-      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
-      dot.widthAnchor.constraint(equalToConstant: 12),
-      dot.heightAnchor.constraint(equalToConstant: 44),
+      dot.topAnchor.constraint(equalTo: contentView.captureButton.topAnchor, constant: 6),
+      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.trailingAnchor, constant: -6),
+      dot.widthAnchor.constraint(equalToConstant: 8),
+      dot.heightAnchor.constraint(equalToConstant: 8),
     ])
     UIView.animate(withDuration: 0.7, delay: 0,
                    options: [.repeat, .autoreverse, .curveEaseInOut]) { dot.alpha = 0.2 }
