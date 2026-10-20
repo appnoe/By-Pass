@@ -53,7 +53,6 @@
 /* Begin PBXFileReference section */
 		CF0A11112F90000000A1B2C1 /* gravity.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = gravity.m4a; sourceTree = "<group>"; };
 		CF56F8942F69E3060072A4E2 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
-		CF8163DC2F66D2980000646F /* buildnumber.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = buildnumber.xcconfig; sourceTree = "<group>"; };
 		CFE884142F661B66006183C5 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		CFE884162F66B314006183C5 /* SplashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashViewController.swift; sourceTree = "<group>"; };
 		CFE884182F66B6BB006183C5 /* InfoSheetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoSheetViewController.swift; sourceTree = "<group>"; };
@@ -161,7 +160,6 @@
 				F2A21E4E277F0F8D00EA5825 /* GravityUITests */,
 				F2BD5C582773C4DC00136C85 /* Products */,
 				F2D604182781B597003958A2 /* Frameworks */,
-				CF8163DC2F66D2980000646F /* buildnumber.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
