@@ -118,3 +118,6 @@ fastlane/test_output
 iOSInjectionProject/
 
 # End of https://www.toptal.com/developers/gitignore/api/swift,macos
+
+# Claude Code (local worktrees)
+.claude/
