@@ -15,6 +15,12 @@ class GameViewController: UIViewController {
   private var isRecording = false
   private var recordingIndicator: UIView?
 
+  private static let soundEnabledKey = "soundEnabled"
+  private var isSoundEnabled: Bool {
+    get { UserDefaults.standard.object(forKey: Self.soundEnabledKey) as? Bool ?? true }
+    set { UserDefaults.standard.set(newValue, forKey: Self.soundEnabledKey) }
+  }
+
   var contentView: GameView { view as! GameView }
   private var onboardingOverlay: OnboardingOverlayView?
 
@@ -30,6 +36,7 @@ class GameViewController: UIViewController {
     contentView.speedButton.button.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
     contentView.clearButton.button.addTarget(self, action: #selector(clear), for: .touchUpInside)
     contentView.infoButton.button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+    contentView.soundButton.button.addTarget(self, action: #selector(soundToggled), for: .touchUpInside)
 
     // Capture (tap = screenshot, long press = video)
     contentView.captureButton.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
@@ -49,6 +56,7 @@ class GameViewController: UIViewController {
 
     gameScene = scene
     skView.presentScene(scene)
+    applySoundSetting()
 
     let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
     skView.addGestureRecognizer(pinch)
@@ -110,6 +118,18 @@ extension GameViewController {
     isFastForward.toggle()
     gameScene.setSpeed(isFastForward ? 3 : 1)
     contentView.speedButton.setActive(isFastForward)
+  }
+
+  @objc func soundToggled(_ sender: UIButton) {
+    isSoundEnabled.toggle()
+    applySoundSetting()
+  }
+
+  private func applySoundSetting() {
+    let enabled = isSoundEnabled
+    gameScene?.setSound(enabled: enabled)
+    contentView.soundButton.setIcon(enabled ? "speaker.wave.2" : "speaker.slash")
+    contentView.soundButton.button.accessibilityLabel = enabled ? "Musik aus" : "Musik an"
   }
 
   @objc func infoTapped(_ sender: UIButton) {

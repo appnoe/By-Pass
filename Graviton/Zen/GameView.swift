@@ -68,6 +68,14 @@ final class RoundGlassButton: UIView {
 
   required init?(coder: NSCoder) { fatalError() }
 
+  func setIcon(_ icon: String, pointSize: CGFloat = 18) {
+    var config = button.configuration ?? .plain()
+    config.image = UIImage(systemName: icon)?.withConfiguration(
+      UIImage.SymbolConfiguration(pointSize: pointSize, weight: .medium)
+    )
+    button.configuration = config
+  }
+
   func setActive(_ active: Bool) {
     var config = button.configuration ?? .plain()
     config.baseForegroundColor = active ? .white : UIColor.white.withAlphaComponent(0.55)
@@ -229,6 +237,7 @@ class GameView: UIView {
   let speedButton:   RoundGlassButton // bottom-right, inner
   let clearButton:   RoundGlassButton // bottom-right, outer
   let infoButton:    RoundGlassButton // bottom-left
+  let soundButton:   RoundGlassButton // top-right, left of capture
 
   // Capture button: accessed as UIButton by GameViewController
   private let captureRoundButton: RoundGlassButton
@@ -250,6 +259,7 @@ class GameView: UIView {
     speedButton         = RoundGlassButton(icon: "forward")
     clearButton         = RoundGlassButton(icon: "trash")
     infoButton          = RoundGlassButton(icon: "info.circle")
+    soundButton         = RoundGlassButton(icon: "speaker.wave.2")
     captureRoundButton  = RoundGlassButton(icon: "camera")
 
     super.init(frame: frame)
@@ -260,6 +270,7 @@ class GameView: UIView {
     addSubview(skView)
     addSubview(sunPickerView)
     addSubview(captureRoundButton)
+    addSubview(soundButton)
     addSubview(infoButton)
     addSubview(satellitesCountLabel)
     addSubview(speedButton)
@@ -277,6 +288,11 @@ class GameView: UIView {
       captureRoundButton.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
       captureRoundButton.widthAnchor.constraint(equalToConstant: 44),
       captureRoundButton.heightAnchor.constraint(equalToConstant: 44),
+
+      soundButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
+      soundButton.trailingAnchor.constraint(equalTo: captureRoundButton.leadingAnchor, constant: -10),
+      soundButton.widthAnchor.constraint(equalToConstant: 44),
+      soundButton.heightAnchor.constraint(equalToConstant: 44),
 
       // ── Bottom-left: info + count ──────────────────────────────
       infoButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -16),

@@ -137,6 +137,7 @@ class GameScene: SKScene {
 
     removeTrajectoryPreview(for: touch)
     model.addVelocityToSatellite(id: touch.hash, input: endPosition)
+    startMusicIfNeeded()
   }
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -245,11 +246,17 @@ class GameScene: SKScene {
   func setSound(enabled: Bool) {
     if enabled {
       model.enableSound()
-      if let sound = model.sound() {
-        addChild(sound)
-      }
+      startMusicIfNeeded()
     } else {
       model.disableSound()
+    }
+  }
+
+  /// Starts the looped background music once there is something in orbit
+  /// (and sound is enabled). No-op if it is already playing.
+  private func startMusicIfNeeded() {
+    if let sound = model.sound() {
+      addChild(sound)
     }
   }
 
@@ -262,9 +269,12 @@ class GameScene: SKScene {
   }
 
   func random(direction: Direction) {
-    let (nodes, _) = model.random(size: size, direction: direction)
+    let (nodes, sound) = model.random(size: size, direction: direction)
     for node in nodes {
       addChild(node)
+    }
+    if let sound {
+      addChild(sound)
     }
   }
 
