@@ -8,6 +8,8 @@ import OSLog
 
 class GameScene: SKScene {
 
+  private static let logger = Logger(subsystem: "de.appnoe.by-pass", category: "GameScene")
+
   let model = GravityModel()
   var zoomValue: CGFloat = 1.0
   var isPinching: Bool = false
@@ -110,8 +112,7 @@ class GameScene: SKScene {
 
   func touchDown(_ touch: UITouch) {
     guard !isPinching else { return }
-    let logger = Logger(subsystem: "GravityFun", category: "GameScene")
-    logger.info("\(touch)")
+    GameScene.logger.debug("touch down: \(touch)")
     if model.mode == .spirograph,
        model.satelliteNodes.count > 9 {
       return
@@ -174,15 +175,11 @@ class GameScene: SKScene {
   }
 
   private func cancelAllPendingSatellites() {
-    // Remove satellite nodes that have no velocity yet (still being placed)
-    let pending = model.satelliteNodes.filter {
-      $0.physicsBody?.velocity == .zero
-    }
     for (_, node) in trajectoryNodes {
       node.removeFromParent()
     }
     trajectoryNodes.removeAll()
-    model.clear(nodes: pending)
+    model.cancelPendingSatellites()
   }
 
   // MARK: - Trajectory Preview

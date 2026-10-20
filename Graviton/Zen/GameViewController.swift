@@ -244,7 +244,7 @@ extension GameViewController: RPPreviewViewControllerDelegate {
       dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
       dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
       dot.widthAnchor.constraint(equalToConstant: 12),
-      dot.heightAnchor.constraint(equalToConstant: 44),
+      dot.heightAnchor.constraint(equalToConstant: 12),
     ])
     UIView.animate(withDuration: 0.7, delay: 0,
                    options: [.repeat, .autoreverse, .curveEaseInOut]) { dot.alpha = 0.2 }

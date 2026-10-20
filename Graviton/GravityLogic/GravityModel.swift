@@ -237,6 +237,7 @@ public class GravityModel {
       return
     }
     satelliteNodes.removeAll(where: { $0 == satellite })
+    forgetPlacement(of: satellite)
 
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()
@@ -297,7 +298,8 @@ public class GravityModel {
 
     velocityNodes.removeValue(forKey: id)
 
-    guard let satellite = temporaryNodes[id] else {
+    // Once launched, the satellite is no longer being placed.
+    guard let satellite = temporaryNodes.removeValue(forKey: id) else {
       return
     }
 
@@ -332,9 +334,7 @@ public class GravityModel {
     emitter?.position = position
     if let emitter = emitter {
       node.addChild(emitter)
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-        emitter.removeFromParent()
-      }
+      emitter.run(SKAction.sequence([.wait(forDuration: 1), .removeFromParent()]))
     }
   }
 
@@ -443,14 +443,29 @@ public class GravityModel {
     return (nodes: satellites, sound: sound())
   }
 
+  /// Removes all satellites that are still being placed (touch down, not yet
+  /// launched) together with their velocity indicators.
+  public func cancelPendingSatellites() {
+    let pending = Array(temporaryNodes.values)
+    clear(nodes: pending)
+  }
+
   public func clear(nodes: [Satellite]? = nil) {
     let satellitesToRemove = nodes ?? satelliteNodes
     for node in satellitesToRemove {
       node.removeFromParent()
       satelliteNodes.removeAll(where: { node == $0 })
+      forgetPlacement(of: node)
     }
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()
+    }
+  }
+
+  private func forgetPlacement(of satellite: Satellite) {
+    for (id, node) in temporaryNodes where node == satellite {
+      temporaryNodes.removeValue(forKey: id)
+      velocityNodes.removeValue(forKey: id)?.removeFromParent()
     }
   }
 }
