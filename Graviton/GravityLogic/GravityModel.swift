@@ -1,16 +1,17 @@
 //  Created by Dominik Hauser on 02.01.22.
-//  
+//
 //
 
 import SpriteKit
 
+@MainActor
 public class GravityModel {
   public var satelliteNodes: [Satellite] = []
   var temporaryNodes: [Int:Satellite] = [:]
   var velocityNodes: [Int:SKShapeNode] = [:]
   let emitterForBox: SKEmitterNode
   public var backgroundEmitter: SKNode?
-  var explosionEmitter: SKEmitterNode?
+  let explosionEmitter: SKEmitterNode
   public private(set) var gravityNode: SKFieldNode
   public private(set) var secondGravityNode: SKFieldNode
   public private(set) var thirdGravityNode: SKFieldNode
@@ -19,55 +20,42 @@ public class GravityModel {
   public private(set) var secondCenter: SKShapeNode
   public private(set) var thirdCenter: SKShapeNode
 
-  public var currentSatelliteType: SatelliteType = .box
   public var musicAudioNode: SKAudioNode?
 
-  // Sun orbit (Lagrange equilateral-triangle solution for 3-sun mode)
-  private var sunsAreOrbiting = false
+  /// Upper bound for planets: their mutual attraction costs O(n²) per frame.
+  static let maxSatellites = 50
+
+  // Sun orbit (two-body / Lagrange equilateral-triangle solution).
+  // The suns rotate rigidly around the origin with the angular velocity of
+  // the analytic circular-orbit solution. Integrating them numerically would
+  // let the (inherently unstable) triangle drift apart over time.
   private let sunOrbitStrength: CGFloat = 73_000
+  private var sunStartPositions: [CGPoint] = []
   private var sunPositions: [CGPoint] = []
-  private var sunVelocities: [CGVector] = []
+  private var sunAngularVelocity: CGFloat = 0
+  private var sunAngle: CGFloat = 0
   var soundEnabled = true
-  public var mode: GravityMode = .gravity {
-    didSet {
-      gravityNode.falloff = mode.falloff
-      secondGravityNode.falloff = mode.falloff
-      thirdGravityNode.falloff = mode.falloff
-      trailLength = mode.trailLength
-    }
-  }
-  public var trailLength: TrailLength = .long {
-    didSet {
-      setEmitter(enabled: false)
 
-      emitterForBox.particleLifetime = trailLength.lifetime()
-
-      switch trailLength {
-        case .none:
-          break
-        case .short, .long, .spirograph:
-          setEmitter(enabled: true)
-      }
-    }
-  }
-  public var particleScale: ParticleScale = .normal {
+  /// Fast-forward factor; trail emitters scale their birth rate along with it
+  /// so that trails keep their density. New emitters are copies of
+  /// `emitterForBox` and therefore inherit the current rate.
+  public var simulationSpeed: CGFloat = 1 {
     didSet {
-      setEmitter(enabled: false)
-      emitterForBox.particleScale = particleScale.value
-      setEmitter(enabled: true)
-    }
-  }
-  public var colorSetting: ColorSetting = .multiColor {
-    didSet {
+      emitterForBox.particleBirthRate = baseParticleBirthRate * simulationSpeed
       for node in satelliteNodes {
-        node.updateColor(for: colorSetting)
+        for case let emitter as SKEmitterNode in node.children {
+          emitter.particleBirthRate = emitterForBox.particleBirthRate
+        }
       }
     }
   }
+  private let baseParticleBirthRate: CGFloat
 
   // MARK: - Setup
   public init() {
-    emitterForBox = BoxEmitter()
+    let boxEmitter = BoxEmitter()
+    emitterForBox = boxEmitter
+    baseParticleBirthRate = boxEmitter.particleBirthRate
     explosionEmitter = ExplosionEmitter()
     gravityNode = SKFieldNode.radialGravityField()
 
@@ -89,38 +77,22 @@ public class GravityModel {
   public func setup(scene: SKScene) {
     emitterForBox.targetNode = scene
 
-    if scene.children.filter({ $0 is Satellite }).count < 1 {
-      backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
-      if let backgroundEmitter = backgroundEmitter {
-        scene.addChild(backgroundEmitter)
-      }
-      center = NodeFactory.center()
-      center.position = .init(x: 4, y: 4)
-      scene.addChild(center)
-      gravityNode.falloff = 2.0
-      scene.addChild(gravityNode)
-
-      secondGravityNode.falloff = 2.0
-      secondGravityNode.isEnabled = false
-      scene.addChild(secondGravityNode)
-
-      thirdGravityNode.falloff = 2.0
-      thirdGravityNode.isEnabled = false
-      scene.addChild(thirdGravityNode)
-
-    } else if let gravityNode = scene.children.first(where: { $0 is SKFieldNode }) as? SKFieldNode {
-      self.gravityNode = gravityNode
+    backgroundEmitter = NodeFactory.backgroundEmitter(size: scene.size)
+    if let backgroundEmitter = backgroundEmitter {
+      scene.addChild(backgroundEmitter)
     }
+    center.position = .init(x: 4, y: 4)
+    scene.addChild(center)
+    gravityNode.falloff = 2.0
+    scene.addChild(gravityNode)
 
-    for child in scene.children {
-      if let satellite = child as? Satellite {
-        satelliteNodes.append(satellite)
-      } else if let emitter = child as? SKEmitterNode, emitter.name == "background" {
-        backgroundEmitter = emitter  // legacy: plain emitter without crop mask
-      } else if let audio = child as? SKAudioNode {
-        musicAudioNode = audio
-      }
-    }
+    secondGravityNode.falloff = 2.0
+    secondGravityNode.isEnabled = false
+    scene.addChild(secondGravityNode)
+
+    thirdGravityNode.falloff = 2.0
+    thirdGravityNode.isEnabled = false
+    scene.addChild(thirdGravityNode)
   }
 
   public func addSound(node: SKAudioNode) {
@@ -132,17 +104,12 @@ public class GravityModel {
     switch number {
       case 2:
         // Two-body circular orbit (CW): both suns on the x-axis, equal speed
+        // v = √(G / 2d) on radius d/2
         let v2 = sqrt(sunOrbitStrength / (2 * distance))
-        sunPositions = [
+        startSunOrbit(at: [
           CGPoint(x: -distance/2, y: 0),
           CGPoint(x:  distance/2, y: 0)
-        ]
-        // CW tangential: point at (−r,0) → velocity (0,+v); point at (+r,0) → (0,−v)
-        sunVelocities = [
-          CGVector(dx: 0, dy:  v2),
-          CGVector(dx: 0, dy: -v2)
-        ]
-        sunsAreOrbiting = true
+        ], angularVelocity: -v2 / (distance / 2))
 
         center.position      = sunPositions[0]
         gravityNode.position = sunPositions[0]
@@ -163,18 +130,11 @@ public class GravityModel {
         let v = sqrt(sunOrbitStrength / distance)   // orbital speed (px/s)
 
         // Equilateral triangle centred at (0,0), CW rotation
-        sunPositions = [
+        startSunOrbit(at: [
           CGPoint(x: 0,          y:  R),
           CGPoint(x: -distance/2, y: -R/2),
           CGPoint(x:  distance/2, y: -R/2)
-        ]
-        // CW tangential velocities (net centre-of-mass velocity = zero)
-        sunVelocities = [
-          CGVector(dx:  v,         dy:  0),
-          CGVector(dx: -v/2,       dy:  v * sqrt(3.0)/2),
-          CGVector(dx: -v/2,       dy: -v * sqrt(3.0)/2)
-        ]
-        sunsAreOrbiting = true
+        ], angularVelocity: -v / R)
 
         center.position         = sunPositions[0]
         gravityNode.position    = sunPositions[0]
@@ -191,9 +151,7 @@ public class GravityModel {
         thirdCenter.isHidden  = false
         thirdCenter.position  = sunPositions[2]
       default:
-        sunsAreOrbiting = false
-        sunPositions = []
-        sunVelocities = []
+        startSunOrbit(at: [], angularVelocity: 0)
         secondGravityNode.isEnabled = false
         secondCenter.isHidden = true
         secondCenter.removeFromParent()
@@ -215,9 +173,19 @@ public class GravityModel {
     return node
   }
 
-  public func setColorOfSatelliteWith(id: Int, forInput input: CGPoint) {
-    let node = temporaryNodes[id]
-    node?.addColor(forInput: input, colorSetting: colorSetting)
+  /// Removes all satellites that are still being placed (no velocity yet),
+  /// e.g. when a second finger turns the touch into a pinch.
+  public func cancelPendingSatellites() {
+    clear(nodes: Array(temporaryNodes.values))
+  }
+
+  /// Drops placement state (touch mapping, velocity indicator) of a satellite
+  /// that leaves the scene.
+  private func forgetPlacement(of satellite: Satellite) {
+    for (id, node) in temporaryNodes where node == satellite {
+      temporaryNodes.removeValue(forKey: id)
+      velocityNodes.removeValue(forKey: id)?.removeFromParent()
+    }
   }
 
   public func remove(_ node: SKNode, explosionIn target: SKScene) {
@@ -225,6 +193,7 @@ public class GravityModel {
       return
     }
     satelliteNodes.removeAll(where: { $0 == satellite })
+    forgetPlacement(of: satellite)
 
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()
@@ -270,7 +239,7 @@ public class GravityModel {
       return nil
     }
 
-    satellite.addColor(forInput: input, colorSetting: colorSetting)
+    satellite.addColor(forInput: input)
 
     let correctedPosition = CGPoint(x: satellite.position.x + satellite.radius, y: satellite.position.y + satellite.radius)
     let velocityNode = NodeFactory.velocity(from: correctedPosition, to: input)
@@ -285,7 +254,7 @@ public class GravityModel {
 
     velocityNodes.removeValue(forKey: id)
 
-    guard let satellite = temporaryNodes[id] else {
+    guard let satellite = temporaryNodes.removeValue(forKey: id) else {
       return
     }
 
@@ -293,90 +262,42 @@ public class GravityModel {
     let velocityScale: CGFloat = 0.6
     let velocity = CGVector(dx: (position.x - input.x) * velocityScale, dy: (position.y - input.y) * velocityScale)
     satellite.addPhysicsBody(with: velocity)
-
-    if trailLength != .none {
-      satellite.addEmitter(emitterBox: emitterForBox)
-    }
+    satellite.addEmitter(emitterBox: emitterForBox)
   }
 
   // MARK: - Emitter
 
-  func setEmitter(enabled: Bool) {
-
-    for node in satelliteNodes {
-      if enabled {
-        node.addEmitter(emitterBox: emitterForBox)
-      } else {
-        let allEmitter = node.children.filter { $0 is SKEmitterNode }
-        for emitter in allEmitter {
-          emitter.removeFromParent()
-        }
-      }
-    }
-  }
-
   func explosion(at position: CGPoint, inNode node: SKNode) {
-    let emitter = explosionEmitter?.copy() as? SKEmitterNode
-    emitter?.position = position
-    if let emitter = emitter {
-      node.addChild(emitter)
-      DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-        emitter.removeFromParent()
-      }
-    }
-  }
-
-  // MARK: - Projectile
-
-  public func projectile(size: CGSize) -> SKNode {
-    let projectile = SKSpriteNode(color: .white, size: CGSize(width: 5, height: 5))
-    projectile.position = CGPoint(x: 0, y: -floor(size.height/2)+30)
-    projectile.physicsBody = SKPhysicsBody(rectangleOf: projectile.size)
-    projectile.physicsBody?.velocity = CGVector(dx: 0, dy: 500)
-    projectile.physicsBody?.affectedByGravity = false
-    projectile.physicsBody?.categoryBitMask = PhysicsCategory.projectile
-    projectile.physicsBody?.contactTestBitMask = PhysicsCategory.center | PhysicsCategory.satellite
-    return projectile
+    guard let emitter = explosionEmitter.copy() as? SKEmitterNode else { return }
+    emitter.position = position
+    node.addChild(emitter)
+    emitter.run(.sequence([.wait(forDuration: 1), .removeFromParent()]))
   }
 
   // MARK: - Sun orbit
 
-  /// Symplectic-Euler integration of the three orbiting suns (Lagrange solution).
+  private func startSunOrbit(at positions: [CGPoint], angularVelocity: CGFloat) {
+    sunStartPositions = positions
+    sunPositions = positions
+    sunAngularVelocity = angularVelocity
+    sunAngle = 0
+  }
+
+  /// Advances the orbiting suns by `dt` seconds of simulation time.
   /// Call once per frame; updates both visual nodes and gravity-field positions.
   public func updateSunOrbit(dt: CGFloat) {
-    let n = sunPositions.count
-    guard sunsAreOrbiting, n >= 2 else { return }
+    let n = sunStartPositions.count
+    guard n >= 2 else { return }
 
-    // Accumulate velocity impulses from pairwise sun–sun attraction
-    var dv = [CGVector](repeating: .zero, count: n)
-    for i in 0..<n {
-      for j in 0..<n where j != i {
-        let dx = sunPositions[j].x - sunPositions[i].x
-        let dy = sunPositions[j].y - sunPositions[i].y
-        let r2 = dx*dx + dy*dy
-        guard r2 > 1 else { continue }
-        let r  = sqrt(r2)
-        let f  = sunOrbitStrength / r2
-        dv[i].dx += (dx / r) * f * dt
-        dv[i].dy += (dy / r) * f * dt
-      }
-    }
-
-    // Update velocities then positions (symplectic Euler)
-    for i in 0..<n {
-      sunVelocities[i].dx += dv[i].dx
-      sunVelocities[i].dy += dv[i].dy
-      sunPositions[i].x   += sunVelocities[i].dx * dt
-      sunPositions[i].y   += sunVelocities[i].dy * dt
-    }
+    sunAngle = (sunAngle + sunAngularVelocity * dt).truncatingRemainder(dividingBy: 2 * .pi)
+    let rotation = CGAffineTransform(rotationAngle: sunAngle)
+    sunPositions = sunStartPositions.map { $0.applying(rotation) }
 
     // Sync visual and field nodes to the new positions
     center.position      = sunPositions[0]
     gravityNode.position = sunPositions[0]
-    if n >= 2 {
-      secondCenter.position      = sunPositions[1]
-      secondGravityNode.position = sunPositions[1]
-    }
+    secondCenter.position      = sunPositions[1]
+    secondGravityNode.position = sunPositions[1]
     if n >= 3 {
       thirdCenter.position      = sunPositions[2]
       thirdGravityNode.position = sunPositions[2]
@@ -437,16 +358,19 @@ public class GravityModel {
 
   // MARK: - Misc
 
-  public func random(size: CGSize, direction: Direction) -> (nodes: [SKNode], sound: SKAudioNode?) {
-    let satellites = Satellite.random(sceneSize: size, type: currentSatelliteType, colorSetting: colorSetting, direction: direction)
+  public var canAddSatellite: Bool {
+    satelliteNodes.count < GravityModel.maxSatellites
+  }
+
+  public func random(size: CGSize, direction: Direction) -> [Satellite] {
+    let free = GravityModel.maxSatellites - satelliteNodes.count
+    guard free > 0 else { return [] }
+    let satellites = Satellite.random(amount: min(5, free), sceneSize: size, direction: direction)
     for satellite in satellites {
-      if trailLength != .none {
-        satellite.addEmitter(emitterBox: emitterForBox)
-      }
-      satellite.physicsBody?.linearDamping = 0.0
+      satellite.addEmitter(emitterBox: emitterForBox)
     }
     self.satelliteNodes.append(contentsOf: satellites)
-    return (nodes: satellites, sound: sound())
+    return satellites
   }
 
   public func clear(nodes: [Satellite]? = nil) {
@@ -454,6 +378,7 @@ public class GravityModel {
     for node in satellitesToRemove {
       node.removeFromParent()
       satelliteNodes.removeAll(where: { node == $0 })
+      forgetPlacement(of: node)
     }
     if satelliteNodes.count < 1 {
       musicAudioNode?.removeFromParent()

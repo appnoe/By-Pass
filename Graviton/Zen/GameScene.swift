@@ -3,20 +3,15 @@
 //
 
 import SpriteKit
-import GameplayKit
-import OSLog
 
 class GameScene: SKScene {
 
   let model = GravityModel()
-  var zoomValue: CGFloat = 1.0
   var isPinching: Bool = false
   var numberOfSatellites = 0
   var updateSatellitesHandler: ((Int) -> Void)?
   private var trajectoryNodes: [Int: SKShapeNode] = [:]
-  override class var supportsSecureCoding: Bool {
-    return true
-  }
+  private var lastUpdateTime: TimeInterval?
 
   override init() {
     super.init(size: CGSize(width: 750, height: 1334))
@@ -46,68 +41,56 @@ class GameScene: SKScene {
     backgroundColor = .black
   }
 
-  class func loadScene(from data: Data) -> GameScene? {
-    let scene: GameScene?
-
-    do {
-      if let savedScene = try NSKeyedUnarchiver.unarchivedObject(ofClass: GameScene.self, from: data) {
-        scene = savedScene
-      } else {
-        scene = nil
-      }
-    } catch {
-      scene = nil
-    }
-
-    return scene
-  }
-
   // https://stackoverflow.com/a/31502698/498796
   override func update(_ currentTime: TimeInterval) {
-    model.updateSunOrbit(dt: 1.0/60.0)
+    // Real frame time (60 or 120 Hz), clamped after pauses, scaled like the
+    // SpriteKit physics so fast-forward affects all simulated motion equally.
+    let frameTime = lastUpdateTime.map { currentTime - $0 } ?? 1.0/60.0
+    lastUpdateTime = currentTime
+    let dt = CGFloat(min(max(frameTime, 0), 1.0/30.0)) * physicsWorld.speed
+
+    model.updateSunOrbit(dt: dt)
 
     if model.satelliteNodes.count != numberOfSatellites {
       updateSatellitesHandler?(model.satelliteNodes.count)
       numberOfSatellites = model.satelliteNodes.count
+      // Music plays while there is something in orbit (model stops it at zero)
+      if let music = model.sound() {
+        addChild(music)
+      }
     }
 
-    if model.mode == .gravity {
-      let strength: CGFloat = 10
-      let dt: CGFloat = 1.0/60.0
-      for node1 in model.satelliteNodes {
-        let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
-        if distance > 3000 {
-          print("distance: \(distance), removing")
-          model.clear(nodes: [node1])
+    let strength: CGFloat = 10
+    for node1 in model.satelliteNodes {
+      let distance = sqrt(node1.position.x*node1.position.x+node1.position.y*node1.position.y)
+      if distance > 3000 {
+        model.clear(nodes: [node1])
+        continue
+      }
+      for node2 in model.satelliteNodes {
+        guard let body1 = node1.physicsBody, let body2 = node2.physicsBody else {
           continue
         }
-        for node2 in model.satelliteNodes {
-          guard let body1 = node1.physicsBody, let body2 = node2.physicsBody else {
-            continue
-          }
-          let m1 = body1.mass * strength
-          let m2 = body2.mass * strength
-          let disp = CGVector(dx: node2.position.x-node1.position.x, dy: node2.position.y-node1.position.y)
-          let radius = sqrt(disp.dx*disp.dx+disp.dy*disp.dy)
-          if radius < node1.radius*1.3 { //Radius lower-bound.
-            continue
-          }
-          let force = (m1*m2)/(radius*radius)
-          let normal = CGVector(dx: disp.dx/radius, dy: disp.dy/radius)
-          let impulse = CGVector(dx: normal.dx*force*dt, dy: normal.dy*force*dt)
-
-          body1.velocity = CGVector(dx: body1.velocity.dx + impulse.dx, dy: body1.velocity.dy + impulse.dy)
+        let m1 = body1.mass * strength
+        let m2 = body2.mass * strength
+        let disp = CGVector(dx: node2.position.x-node1.position.x, dy: node2.position.y-node1.position.y)
+        let radius = sqrt(disp.dx*disp.dx+disp.dy*disp.dy)
+        if radius < node1.radius*1.3 { //Radius lower-bound.
+          continue
         }
+        let force = (m1*m2)/(radius*radius)
+        let normal = CGVector(dx: disp.dx/radius, dy: disp.dy/radius)
+        let impulse = CGVector(dx: normal.dx*force*dt, dy: normal.dy*force*dt)
+
+        body1.velocity = CGVector(dx: body1.velocity.dx + impulse.dx, dy: body1.velocity.dy + impulse.dy)
       }
     }
   }
 
   func touchDown(_ touch: UITouch) {
     guard !isPinching else { return }
-    let logger = Logger(subsystem: "GravityFun", category: "GameScene")
-    logger.info("\(touch)")
-    if model.mode == .spirograph,
-       model.satelliteNodes.count > 9 {
+    guard model.canAddSatellite else {
+      UINotificationFeedbackGenerator().notificationOccurred(.warning)
       return
     }
     let position = touch.location(in: self)
@@ -168,15 +151,11 @@ class GameScene: SKScene {
   }
 
   private func cancelAllPendingSatellites() {
-    // Remove satellite nodes that have no velocity yet (still being placed)
-    let pending = model.satelliteNodes.filter {
-      $0.physicsBody?.velocity == .zero
-    }
     for (_, node) in trajectoryNodes {
       node.removeFromParent()
     }
     trajectoryNodes.removeAll()
-    model.clear(nodes: pending)
+    model.cancelPendingSatellites()
   }
 
   // MARK: - Trajectory Preview
@@ -218,14 +197,9 @@ class GameScene: SKScene {
     trajectoryNodes.removeValue(forKey: touch.hash)
   }
 
-  func setTrailLength(to length: TrailLength) {
-    model.trailLength = length
-  }
-
-  func zoom(to zoomValue: CGFloat) {
-    self.zoomValue = zoomValue
-    let zoomInAction = SKAction.scale(to: 1-(zoomValue-1), duration: 0.3)
-    camera?.run(zoomInAction)
+  func setSimulationSpeed(_ speed: CGFloat) {
+    physicsWorld.speed = speed
+    model.simulationSpeed = speed
   }
 
   /// Called continuously during a pinch gesture with the cumulative scale.
@@ -245,34 +219,15 @@ class GameScene: SKScene {
     }
   }
 
-  func setSatelliteType(_ type: SatelliteType) {
-    model.currentSatelliteType = type
-  }
-
-  func setColorSetting(_ setting: ColorSetting) {
-    model.colorSetting = setting
-  }
-
   func random(direction: Direction) {
-    let (nodes, _) = model.random(size: size, direction: direction)
-    for node in nodes {
+    for node in model.random(size: size, direction: direction) {
       addChild(node)
     }
   }
-
-  func clear() {
-    model.clear()
-  }
-
-  func fire() {
-    let projectile = model.projectile(size: size)
-    addChild(projectile)
-  }
 }
 
-extension GameScene: SKPhysicsContactDelegate {
+extension GameScene: @preconcurrency SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
-
     if contact.bodyA.categoryBitMask == PhysicsCategory.satellite {
       if let node = contact.bodyA.node {
         model.remove(node, explosionIn: self)
@@ -280,15 +235,6 @@ extension GameScene: SKPhysicsContactDelegate {
     } else if contact.bodyB.categoryBitMask == PhysicsCategory.satellite {
       if let node = contact.bodyB.node {
         model.remove(node, explosionIn: self)
-      }
-    }
-    if contact.bodyA.categoryBitMask == PhysicsCategory.projectile {
-      if let node = contact.bodyA.node {
-        node.removeFromParent()
-      }
-    } else if contact.bodyB.categoryBitMask == PhysicsCategory.projectile {
-      if let node = contact.bodyB.node {
-        node.removeFromParent()
       }
     }
   }

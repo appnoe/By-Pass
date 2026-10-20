@@ -4,11 +4,6 @@
 
 import SpriteKit
 
-public enum SatelliteType: Int {
-  case box
-  case rectangle
-}
-
 public enum Direction {
   case random
   case clockWise
@@ -22,11 +17,7 @@ public class Satellite: SKShapeNode {
   private var planetType: PlanetType = .rocky
   private var spriteNode: SKSpriteNode?
 
-  public override class var supportsSecureCoding: Bool {
-    return true
-  }
-
-  class func random(amount: Int = 5, sceneSize: CGSize, type: SatelliteType, colorSetting: ColorSetting, direction: Direction) -> [Satellite] {
+  class func random(amount: Int = 5, sceneSize: CGSize, direction: Direction) -> [Satellite] {
     var satellites: [Satellite] = []
     let clockWise: Bool
     switch direction {
@@ -50,7 +41,7 @@ public class Satellite: SKShapeNode {
       let randomXVelocity = CGFloat.random(in: -40...40)
       let length = sqrt(pow(randomXVelocity, 2) + pow(randomYVelocity, 2))
       satellite.colorRatio = min(length/150, 0.9)
-      satellite.updateColor(for: colorSetting)
+      satellite.updateColor()
       let velocity = CGVector(dx: randomXVelocity, dy: randomYVelocity)
       satellite.addPhysicsBody(with: velocity)
 
@@ -100,22 +91,16 @@ public class Satellite: SKShapeNode {
     sprite.run(SKAction.repeatForever(SKAction.rotate(byAngle: -.pi * 2, duration: Double.random(in: 12...28))))
   }
 
-  func addColor(forInput input: CGPoint, colorSetting: ColorSetting) {
+  func addColor(forInput input: CGPoint) {
     let length = sqrt(pow(input.x - position.x, 2) + pow(input.y - position.y, 2))
     colorRatio = min(length/150, 0.9)
-    updateColor(for: colorSetting)
+    updateColor()
   }
 
-  func updateColor(for colorSetting: ColorSetting) {
-    // In multiColor mode: tint the planet sprite; in B&W: desaturate
-    switch colorSetting {
-    case .multiColor:
-      spriteNode?.color = UIColor(hue: colorRatio, saturation: 0.55, brightness: 1.0, alpha: 1)
-      spriteNode?.colorBlendFactor = 0.25
-    case .blackAndWhite:
-      spriteNode?.color = UIColor(white: colorRatio, alpha: 1)
-      spriteNode?.colorBlendFactor = 0.6
-    }
+  func updateColor() {
+    // Tint the planet sprite according to the launch speed
+    spriteNode?.color = UIColor(hue: colorRatio, saturation: 0.55, brightness: 1.0, alpha: 1)
+    spriteNode?.colorBlendFactor = 0.25
     let trailColor = UIColor(hue: colorRatio, saturation: 0.8, brightness: 1.0, alpha: 1)
     let emitters = children.compactMap({ $0 as? SKEmitterNode })
     for emitter in emitters {
@@ -136,9 +121,9 @@ public class Satellite: SKShapeNode {
 
   func addEmitter(emitterBox: SKEmitterNode?) {
 
-        guard let emitterCopy = emitterBox?.copy() as? SKEmitterNode else {
-          return
-        }
+    guard let emitterCopy = emitterBox?.copy() as? SKEmitterNode else {
+      return
+    }
 
     // Center the emitter on the planet sprite
     emitterCopy.position = CGPoint(x: radius, y: radius)
@@ -151,6 +136,6 @@ public class Satellite: SKShapeNode {
       trailColor = UIColor(hue: colorRatio, saturation: 0.8, brightness: 1.0, alpha: 1)
     }
     emitterCopy.particleColor = trailColor
-        addChild(emitterCopy)
+    addChild(emitterCopy)
   }
 }

@@ -170,28 +170,28 @@ class InfoSheetViewController: UIViewController {
         ])
 
         let result = NSMutableAttributedString()
-        result.append(body("by"))
+        result.append(body(String(localized: "by")))
         result.append(spacer)
         result.append(NSAttributedString(string: "Appnö GmbH\n", attributes: [
             .font: UIFont.systemFont(ofSize: 13, weight: .bold),
             .foregroundColor: UIColor(white: 0.75, alpha: 1.0)
         ]))
-        result.append(body("Erkrather Str. 401\n40231 Düsseldorf"))
+        result.append(body(String(localized: "Erkrather Str. 401\n40231 Düsseldorf, Germany")))
         result.append(spacer)
-        result.append(heading("Geschäftsführer:"))
+        result.append(heading(String(localized: "Managing Director:")))
         result.append(body("Klaus Rodewig"))
         result.append(spacer)
-        result.append(heading("Kontakt:"))
+        result.append(heading(String(localized: "Contact:")))
         result.append(body("info@appnoe.de"))
         result.append(spacer)
-        result.append(heading("Handelsregister:"))
-        result.append(body("Amtsgericht Düsseldorf\nHRB 74943"))
+        result.append(heading(String(localized: "Commercial Register:")))
+        result.append(body(String(localized: "Amtsgericht Düsseldorf\nHRB 74943")))
         result.append(spacer)
-        result.append(heading("Steuerinformationen:"))
-        result.append(body("Finanzamt Düsseldorf-Süd\nSteuer-Nr. 122/5703/5885\nUSt-IdNr: DE308226646"))
+        result.append(heading(String(localized: "Tax Information:")))
+        result.append(body(String(localized: "Tax Office Düsseldorf-Süd\nTax No. 122/5703/5885\nVAT ID: DE308226646")))
         result.append(spacer)
         result.append(spacer)
-        result.append(NSAttributedString(string: "Datenschutzerklärung:\nDiese App erfasst keine Daten.", attributes: [
+        result.append(NSAttributedString(string: String(localized: "Privacy Policy:\nThis app does not collect any data."), attributes: [
             .font: UIFont.systemFont(ofSize: 13, weight: .bold),
             .foregroundColor: UIColor(white: 0.95, alpha: 1.0)
         ]))

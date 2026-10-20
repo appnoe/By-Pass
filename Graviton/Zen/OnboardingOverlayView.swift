@@ -74,7 +74,7 @@ class OnboardingOverlayView: UIView {
         addSubview(handImageView)
 
         // Hinweistext
-        hintLabel.text = "Tap, drag & release"
+        hintLabel.text = String(localized: "Tap, drag & release")
         hintLabel.textColor = UIColor.white.withAlphaComponent(0.90)
         hintLabel.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         hintLabel.textAlignment = .center
@@ -82,8 +82,7 @@ class OnboardingOverlayView: UIView {
         hintLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(hintLabel)
 
-        // "Tippen zum Überspringen"
-        skipLabel.text = "Tap to skip"
+        skipLabel.text = String(localized: "Tap to skip")
         skipLabel.textColor = UIColor.white.withAlphaComponent(0.45)
         skipLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         skipLabel.textAlignment = .center
@@ -132,7 +131,7 @@ class OnboardingOverlayView: UIView {
             return
         }
         animationLoopCount += 1
-        runOneCycle {
+        runOneCycle { [weak self] in
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
                 self?.runNextCycle()
             }

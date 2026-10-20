@@ -4,141 +4,96 @@
 
 import XCTest
 
-class GravityUITests: XCTestCase {
+@MainActor
+final class GravityUITests: XCTestCase {
 
-  override func setUpWithError() throws {
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+  var app: XCUIApplication!
 
-    // In UI tests it is usually best to stop immediately when a failure occurs.
+  override func setUp() async throws {
     continueAfterFailure = false
+    XCUIDevice.shared.orientation = .portrait
 
-    // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
-  }
-
-  override func tearDownWithError() throws {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-  }
-
-  func test_takeScreenshots() throws {
-    // UI tests must launch the application that they test.
-    let app = XCUIApplication()
+    app = XCUIApplication()
+    // Skip onboarding, keep the test run silent and in English
+    app.launchArguments += [
+      "-hasSeenOnboarding", "YES",
+      "-soundEnabled", "NO",
+      "-AppleLanguages", "(en)",
+      "-AppleLocale", "en_US",
+    ]
     app.launch()
-
-    // Use recording to get started writing UI tests.
-    // Use XCTAssert and related functions to verify your tests produce the correct results.
-
-    let forwardButton = app.buttons["Forward"]
-    let backButton = app.buttons["Back"]
-    let diceButton = app.buttons["dice"]
-    let trashButton = app.buttons["trash"]
-    let saveButton = app.buttons["Save"]
-    let loadButton = app.buttons["Load"]
-    let shareButton = app.buttons["Share"]
-    let doneButton = app.buttons["Done"]
-    let thickButton = app.buttons["thick"]
-    let normalButton = app.buttons["normal"]
-
-    forwardButton.tap()
-    for _ in 0..<5 {
-      sleep(2)
-      diceButton.tap()
-    }
-
-    thickButton.tap()
-    backButton.tap()
-
-    sleep(40)
-
-    takeScreenshot(named: "circles_1")
-
-    forwardButton.tap()
-    saveButton.tap()
-
-    trashButton.tap()
-
-    for _ in 0..<5 {
-      sleep(2)
-      diceButton.tap()
-    }
-
-    thickButton.tap()
-    backButton.tap()
-
-    sleep(50)
-
-    takeScreenshot(named: "circles_2")
-
-    forwardButton.tap()
-    normalButton.tap()
-    backButton.tap()
-
-    sleep(50)
-
-    takeScreenshot(named: "circles_3")
-
-    forwardButton.tap()
-    saveButton.tap()
-
-//    app.buttons["rectangle"].tap()
-//
-//    for _ in 0..<5 {
-//      sleep(2)
-//      diceButton.tap()
-//    }
-//    backButton.tap()
-//
-//    sleep(20)
-//
-//    takeScreenshot(named: "rectangles")
-
-    takeScreenshot(named: "settings")
-
-    loadButton.tap()
-
-    takeScreenshot(named: "saved")
-
-    doneButton.tap()
-
-    app.switches["Show zoom buttons"].tap()
-    backButton.tap()
-
-    app.buttons["Decrement"].tap()
-    app.buttons["Decrement"].tap()
-    app.buttons["Decrement"].tap()
-
-    takeScreenshot(named: "zoomed_out")
-
-    forwardButton.tap()
-    shareButton.tap()
-
-    takeScreenshot(named: "share")
   }
-  
+
+  override func tearDown() async throws {
+    XCUIDevice.shared.orientation = .portrait
+  }
+
+  func test_dock_switchesSunsAndFastForward() throws {
+    let threeSuns = app.buttons["3 suns"]
+    XCTAssertTrue(threeSuns.waitForExistence(timeout: 15), "Dock did not appear after the splash screen")
+    XCTAssertTrue(app.buttons["1 sun"].isSelected)
+
+    threeSuns.tap()
+
+    XCTAssertTrue(threeSuns.isSelected)
+    XCTAssertFalse(app.buttons["1 sun"].isSelected)
+
+    for label in ["Fast forward", "Capture", "Clear", "Sound", "Info"] {
+      XCTAssertTrue(app.buttons[label].isHittable, "\(label) not reachable")
+    }
+    app.buttons["Fast forward"].tap()
+    app.buttons["Fast forward"].tap()
+
+    takeScreenshot(named: "dock_portrait")
+  }
+
+  func test_dock_isReachableInLandscape() throws {
+    XCTAssertTrue(app.buttons["Info"].waitForExistence(timeout: 15))
+
+    XCUIDevice.shared.orientation = .landscapeLeft
+
+    for label in ["1 sun", "2 suns", "3 suns", "Fast forward", "Capture", "Clear", "Sound", "Info"] {
+      XCTAssertTrue(app.buttons[label].isHittable, "\(label) not reachable in landscape")
+    }
+    takeScreenshot(named: "dock_landscape")
+  }
+
+  func test_soundButton_togglesState() throws {
+    // A launch argument would override the stored setting, so relaunch without it
+    app.terminate()
+    app.launchArguments.removeAll { $0 == "-soundEnabled" || $0 == "NO" }
+    app.launch()
+    let sound = app.buttons["Sound"]
+    XCTAssertTrue(sound.waitForExistence(timeout: 15))
+    let before = sound.value as? String
+
+    sound.tap()
+
+    XCTAssertNotEqual(sound.value as? String, before)
+    sound.tap()
+    XCTAssertEqual(sound.value as? String, before)
+  }
+
+  func test_clear_removesAllPlanets() throws {
+    let clear = app.buttons["Clear"]
+    XCTAssertTrue(clear.waitForExistence(timeout: 15))
+
+    clear.tap()
+
+    let emptyCount = app.staticTexts["0"]
+    XCTAssertTrue(emptyCount.waitForExistence(timeout: 5))
+  }
 }
 
 extension GravityUITests {
   func takeScreenshot(named name: String) {
-    sleep(1)
-
-    // Take the screenshot
-    let fullScreenshot = XCUIScreen.main.screenshot()
-
-    // Create a new attachment to save our screenshot
-    // and give it a name consisting of the "named"
-    // parameter and the device name, so we can find
-    // it later.
-    let screenshotAttachment = XCTAttachment(
+    let screenshot = XCUIScreen.main.screenshot()
+    let attachment = XCTAttachment(
       uniformTypeIdentifier: "public.png",
-      name: "Screenshot-\(UIDevice.current.name)-\(name).png",
-      payload: fullScreenshot.pngRepresentation,
+      name: "Screenshot-\(name).png",
+      payload: screenshot.pngRepresentation,
       userInfo: nil)
-
-    // Usually Xcode will delete attachments after
-    // the test has run; we don't want that!
-    screenshotAttachment.lifetime = .keepAlways
-
-    // Add the attachment to the test log,
-    // so we can retrieve it later
-    add(screenshotAttachment)
+    attachment.lifetime = .keepAlways
+    add(attachment)
   }
 }

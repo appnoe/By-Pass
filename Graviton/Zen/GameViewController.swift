@@ -26,10 +26,11 @@ class GameViewController: UIViewController {
     contentView.sunPickerView.button2.addTarget(self, action: #selector(sun2Tapped), for: .touchUpInside)
     contentView.sunPickerView.button3.addTarget(self, action: #selector(sun3Tapped), for: .touchUpInside)
 
-    // Round buttons
-    contentView.speedButton.button.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
-    contentView.clearButton.button.addTarget(self, action: #selector(clear), for: .touchUpInside)
-    contentView.infoButton.button.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
+    // Dock buttons
+    contentView.speedButton.addTarget(self, action: #selector(fastForwardToggled), for: .touchUpInside)
+    contentView.clearButton.addTarget(self, action: #selector(clear), for: .touchUpInside)
+    contentView.soundButton.addTarget(self, action: #selector(soundToggled), for: .touchUpInside)
+    contentView.infoButton.addTarget(self, action: #selector(infoTapped), for: .touchUpInside)
 
     // Capture (tap = screenshot, long press = video)
     contentView.captureButton.addTarget(self, action: #selector(cameraTapped), for: .touchUpInside)
@@ -49,6 +50,7 @@ class GameViewController: UIViewController {
 
     gameScene = scene
     skView.presentScene(scene)
+    applySoundSetting()
 
     let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
     skView.addGestureRecognizer(pinch)
@@ -108,15 +110,21 @@ extension GameViewController {
   @objc func fastForwardToggled(_ sender: UIButton) {
     guard let gameScene else { return }
     isFastForward.toggle()
-    gameScene.physicsWorld.speed = isFastForward ? 3 : 1
-    for satellite in gameScene.children.compactMap({ $0 as? Satellite }) {
-      for case let emitter as SKEmitterNode in satellite.children {
-        emitter.particleBirthRate = isFastForward
-          ? emitter.particleBirthRate * 3
-          : emitter.particleBirthRate / 3
-      }
-    }
+    gameScene.setSimulationSpeed(isFastForward ? 3 : 1)
     contentView.speedButton.setActive(isFastForward)
+  }
+
+  @objc func soundToggled(_ sender: UIButton) {
+    let defaults = UserDefaults.standard
+    defaults.set(!defaults.bool(forKey: "soundEnabled"), forKey: "soundEnabled")
+    applySoundSetting()
+  }
+
+  private func applySoundSetting() {
+    let enabled = UserDefaults.standard.bool(forKey: "soundEnabled")
+    gameScene?.setSound(enabled: enabled)
+    contentView.soundButton.setIcon(enabled ? "speaker.wave.2.fill" : "speaker.slash.fill")
+    contentView.soundButton.accessibilityValue = enabled ? String(localized: "On") : String(localized: "Off")
   }
 
   @objc func infoTapped(_ sender: UIButton) {
@@ -151,10 +159,7 @@ extension GameViewController {
 
   func updateCountLabel() {
     guard let gameScene else { return }
-    let count = gameScene.model.satelliteNodes.count
-    contentView.satellitesCountLabel.text = gameScene.model.mode == .spirograph
-      ? "\(count)/10"
-      : "\(count)"
+    contentView.satellitesCountLabel.text = "\(gameScene.model.satelliteNodes.count)"
   }
 
   func getScreenshot(scene: SKScene) -> UIImage? {
@@ -167,7 +172,7 @@ extension GameViewController {
 }
 
 // MARK: - Capture
-extension GameViewController: RPPreviewViewControllerDelegate {
+extension GameViewController: @preconcurrency RPPreviewViewControllerDelegate {
 
   @objc func cameraTapped(_ sender: UIButton) {
     isRecording ? stopVideoRecording() : takeScreenshot()
@@ -181,13 +186,34 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   private func takeScreenshot() {
     guard let scene = gameScene, let image = getScreenshot(scene: scene) else { return }
     flashScreen()
-    UINotificationFeedbackGenerator().notificationOccurred(.success)
-    PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
-      guard status == .authorized || status == .limited else { return }
+    PHPhotoLibrary.requestAuthorization(for: .addOnly) { [weak self] status in
+      guard status == .authorized || status == .limited else {
+        DispatchQueue.main.async { self?.showPhotoAccessDeniedAlert() }
+        return
+      }
       PHPhotoLibrary.shared().performChanges {
         PHAssetChangeRequest.creationRequestForAsset(from: image)
+      } completionHandler: { success, _ in
+        DispatchQueue.main.async {
+          UINotificationFeedbackGenerator().notificationOccurred(success ? .success : .error)
+        }
       }
     }
+  }
+
+  private func showPhotoAccessDeniedAlert() {
+    UINotificationFeedbackGenerator().notificationOccurred(.error)
+    let alert = UIAlertController(
+      title: String(localized: "No access to Photos"),
+      message: String(localized: "Allow By-Pass to add photos in Settings to save screenshots."),
+      preferredStyle: .alert)
+    alert.addAction(UIAlertAction(title: String(localized: "Cancel"), style: .cancel))
+    alert.addAction(UIAlertAction(title: String(localized: "Settings"), style: .default) { _ in
+      if let url = URL(string: UIApplication.openSettingsURLString) {
+        UIApplication.shared.open(url)
+      }
+    })
+    present(alert, animated: true)
   }
 
   private func startVideoRecording() {
@@ -219,12 +245,14 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   }
 
   private func updateCaptureButton(recording: Bool) {
-    var config = contentView.captureButton.configuration ?? .plain()
-    config.image = UIImage(systemName: recording ? "stop.circle.fill" : "camera")?.withConfiguration(
-      UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+    let button = contentView.captureButton
+    var config = button.configuration ?? .plain()
+    config.image = UIImage(systemName: recording ? "stop.fill" : "camera.fill")?.withConfiguration(
+      UIImage.SymbolConfiguration(pointSize: 17, weight: .medium)
     )
-    config.baseForegroundColor = recording ? .systemRed : UIColor.white.withAlphaComponent(0.55)
-    contentView.captureButton.configuration = config
+    config.baseForegroundColor = recording ? .systemRed : DockButton.inactiveColor
+    button.configuration = config
+    button.accessibilityLabel = recording ? String(localized: "Stop recording") : String(localized: "Capture")
   }
 
   private func flashScreen() {
@@ -241,17 +269,18 @@ extension GameViewController: RPPreviewViewControllerDelegate {
   }
 
   private func showRecordingIndicator() {
+    // Pulsing badge on the capture button inside the dock
     let dot = UIView()
     dot.backgroundColor = .systemRed
-    dot.layer.cornerRadius = 6
+    dot.layer.cornerRadius = 4
     dot.translatesAutoresizingMaskIntoConstraints = false
     dot.isUserInteractionEnabled = false
     view.addSubview(dot)
     NSLayoutConstraint.activate([
-      dot.centerYAnchor.constraint(equalTo: contentView.captureButton.centerYAnchor),
-      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.leadingAnchor, constant: -8),
-      dot.widthAnchor.constraint(equalToConstant: 12),
-      dot.heightAnchor.constraint(equalToConstant: 44),
+      dot.topAnchor.constraint(equalTo: contentView.captureButton.topAnchor, constant: 6),
+      dot.trailingAnchor.constraint(equalTo: contentView.captureButton.trailingAnchor, constant: -6),
+      dot.widthAnchor.constraint(equalToConstant: 8),
+      dot.heightAnchor.constraint(equalToConstant: 8),
     ])
     UIView.animate(withDuration: 0.7, delay: 0,
                    options: [.repeat, .autoreverse, .curveEaseInOut]) { dot.alpha = 0.2 }
