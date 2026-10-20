@@ -37,6 +37,7 @@
 		F2BD5C6B2773C4DE00136C85 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2BD5C692773C4DE00136C85 /* LaunchScreen.storyboard */; };
 		F2D604162781AB09003958A2 /* GameSceneTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2D604152781AB09003958A2 /* GameSceneTests.swift */; };
 		F2D604242781D92E003958A2 /* background.sks in Resources */ = {isa = PBXBuildFile; fileRef = F2D6041D2781D927003958A2 /* background.sks */; };
+		6720D51186B837EAEE50F6B4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -93,6 +94,7 @@
 		F2D6040C2781AAC9003958A2 /* GravityTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GravityTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2D604152781AB09003958A2 /* GameSceneTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameSceneTests.swift; sourceTree = "<group>"; };
 		F2D6041D2781D927003958A2 /* background.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = background.sks; sourceTree = "<group>"; };
+		DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,6 +221,7 @@
 		F2BD5C592773C4DC00136C85 /* Graviton */ = {
 			isa = PBXGroup;
 			children = (
+				DF006DE58A7BA11A857DDB80 /* PrivacyInfo.xcprivacy */,
 				F2B6164B2777998200BCE6C4 /* Info.plist */,
 				F2B5FF0C2A194DF9005C53A1 /* Config.xcconfig */,
 				F2BD5C5A2773C4DC00136C85 /* AppDelegate.swift */,
@@ -366,6 +369,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6720D51186B837EAEE50F6B4 /* PrivacyInfo.xcprivacy in Resources */,
 				F2BD5C682773C4DE00136C85 /* Assets.xcassets in Resources */,
 				F2D604242781D92E003958A2 /* background.sks in Resources */,
 				F23AFF922EFE870D0046B0D1 /* Assets.xcassets in Resources */,
