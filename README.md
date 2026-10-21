@@ -44,6 +44,38 @@ Project layout:
 
 Branching follows git flow: `main`, `develop`, `feature/*`, `fix/*`, `release/*`.
 
+## Release
+
+`scripts/asc.py` talks to the App Store Connect API. The API key (role App Manager) lives in the login keychain as a generic password, service `App Store Connect API`, account = key ID, value = base64 of the `.p8` file; it is never written to disk except as a short-lived temporary copy for `xcodebuild`.
+
+```bash
+# read-only check of the API access
+scripts/asc.py GET '/v1/apps?filter[bundleId]=de.appnoe.by-pass'
+```
+
+1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` on `release/<version>`, merge into `main` and `develop`, tag.
+2. Archive and upload from the tag:
+
+   ```bash
+   scripts/asc.py keyfile -- sh -c 'xcodebuild -project By-Pass.xcodeproj -scheme By-Pass -configuration Release \
+     -destination generic/platform=iOS -archivePath build/By-Pass.xcarchive archive \
+     -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" \
+     -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" &&
+   xcodebuild -exportArchive -archivePath build/By-Pass.xcarchive -exportOptionsPlist scripts/ExportOptions.plist \
+     -exportPath build/export -allowProvisioningUpdates -authenticationKeyPath "$ASC_KEY_PATH" \
+     -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID"'
+   ```
+
+3. Store screenshots (German, iPhone 6.9" and iPad 13"):
+
+   ```bash
+   TEST_RUNNER_BYPASS_SCREENSHOTS=1 xcodebuild -project By-Pass.xcodeproj -scheme By-Pass \
+     -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max' \
+     -only-testing:GravityUITests/StoreScreenshotTests -resultBundlePath build/shots.xcresult test
+   ```
+
+4. Create the version, attach the build, release notes and screenshots in App Store Connect (or via the API), then submit for review.
+
 ## Credits
 
 By-Pass is developed by Appnö GmbH and is based on [Gravity Zen](https://apps.apple.com/us/app/gravity-zen/id1602081846) by Dominik Hauser.
